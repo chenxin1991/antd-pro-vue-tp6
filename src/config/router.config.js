@@ -45,7 +45,124 @@ export const asyncRouterMap = [
           }
         ]
       },
-
+      {
+        path: '/order',
+        redirect: '/order/resident',
+        component: PageView,
+        meta: { title: '订单管理', icon: 'unordered-list', permission: [ 'order' ] },
+        children: [
+          {
+            path: '/order/resident',
+            name: 'BaseForm',
+            component: () => import('@/views/form/BasicForm'),
+            meta: { title: '居民搬家', keepAlive: true, permission: [ 'order' ] }
+          },
+          {
+            path: '/order/company',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '单位企业搬迁', keepAlive: true, permission: [ 'order' ] }
+          },
+          {
+            path: '/order/international',
+            name: 'AdvanceForm',
+            component: () => import('@/views/form/advancedForm/AdvancedForm'),
+            meta: { title: '国际搬家', keepAlive: true, permission: [ 'order' ] }
+          }
+        ]
+      },
+      {
+        path: '/operation',
+        redirect: '/operation/valued',
+        component: PageView,
+        meta: { title: '运营管理', icon: 'form' },
+        children: [
+          {
+            path: '/operation/valued',
+            name: 'BaseForm',
+            component: () => import('@/views/form/BasicForm'),
+            meta: { title: '估价管理', keepAlive: true }
+          },
+          {
+            path: '/operation/coupon',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '优惠券管理', keepAlive: true }
+          },
+          {
+            path: '/operation/company',
+            name: 'AdvanceForm',
+            component: () => import('@/views/form/advancedForm/AdvancedForm'),
+            meta: { title: '企业入驻', keepAlive: true }
+          }
+        ]
+      },
+      {
+        path: '/finance',
+        redirect: '/finance/cash',
+        component: PageView,
+        meta: { title: '财务管理', icon: 'form' },
+        children: [
+          {
+            path: '/finance/cash',
+            name: 'BaseForm',
+            component: () => import('@/views/form/BasicForm'),
+            meta: { title: '提现审批', keepAlive: true }
+          },
+          {
+            path: '/finance/coupon',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '合作订单', keepAlive: true }
+          }
+        ]
+      },
+      {
+        path: '/user',
+        redirect: '/user/wechat',
+        component: PageView,
+        meta: { title: '用户管理', icon: 'user' },
+        children: [
+          {
+            path: '/user/wechat',
+            name: 'BaseForm',
+            component: () => import('@/views/form/BasicForm'),
+            meta: { title: '微信用户', keepAlive: true }
+          },
+          {
+            path: '/user/partners',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '合作伙伴', keepAlive: true }
+          }
+        ]
+      },
+      {
+        path: '/basic',
+        redirect: '/basic/captain',
+        component: PageView,
+        meta: { title: '基础数据管理', icon: 'form' },
+        children: [
+          {
+            path: '/basic/captain',
+            name: 'BaseForm',
+            component: () => import('@/views/form/BasicForm'),
+            meta: { title: '搬家队长', keepAlive: true }
+          },
+          {
+            path: '/basic/news',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '资讯管理', keepAlive: true }
+          },
+          {
+            path: '/basic/bill',
+            name: 'AdvanceForm',
+            component: () => import('@/views/form/advancedForm/AdvancedForm'),
+            meta: { title: '发票管理', keepAlive: true }
+          }
+        ]
+      },
       // forms
       {
         path: '/form',
