@@ -75,14 +75,8 @@ export const asyncRouterMap = [
         path: '/operation',
         redirect: '/operation/valued',
         component: PageView,
-        meta: { title: '运营管理', icon: 'form' },
+        meta: { title: '运营管理', icon: 'schedule' },
         children: [
-          {
-            path: '/operation/valued',
-            name: 'BaseForm',
-            component: () => import('@/views/form/BasicForm'),
-            meta: { title: '估价管理', keepAlive: true }
-          },
           {
             path: '/operation/coupon',
             name: 'StepForm',
@@ -101,7 +95,7 @@ export const asyncRouterMap = [
         path: '/finance',
         redirect: '/finance/cash',
         component: PageView,
-        meta: { title: '财务管理', icon: 'form' },
+        meta: { title: '财务管理', icon: 'account-book' },
         children: [
           {
             path: '/finance/cash',
@@ -118,22 +112,16 @@ export const asyncRouterMap = [
         ]
       },
       {
-        path: '/user',
-        redirect: '/user/wechat',
+        path: '/wechat',
+        redirect: '/wechat/user',
         component: PageView,
-        meta: { title: '用户管理', icon: 'user' },
+        meta: { title: '微信管理', icon: 'wechat' },
         children: [
           {
-            path: '/user/wechat',
+            path: '/wechat/user',
             name: 'BaseForm',
             component: () => import('@/views/form/BasicForm'),
             meta: { title: '微信用户', keepAlive: true }
-          },
-          {
-            path: '/user/partners',
-            name: 'StepForm',
-            component: () => import('@/views/form/stepForm/StepForm'),
-            meta: { title: '合作伙伴', keepAlive: true }
           }
         ]
       },
@@ -141,25 +129,57 @@ export const asyncRouterMap = [
         path: '/basic',
         redirect: '/basic/captain',
         component: PageView,
-        meta: { title: '基础数据管理', icon: 'form' },
+        meta: { title: '基础数据管理', icon: 'database' },
         children: [
           {
-            path: '/basic/captain',
+            path: '/basic/valued',
             name: 'BaseForm',
             component: () => import('@/views/form/BasicForm'),
-            meta: { title: '搬家队长', keepAlive: true }
+            meta: { title: '估价管理', keepAlive: true }
+          },
+          {
+            path: '/basic/area',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '区域管理', keepAlive: true }
+          },
+          {
+            path: '/basic/cartype',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '车型管理', keepAlive: true }
           },
           {
             path: '/basic/news',
             name: 'StepForm',
             component: () => import('@/views/form/stepForm/StepForm'),
             meta: { title: '资讯管理', keepAlive: true }
+          }
+        ]
+      },
+      {
+        path: '/setting',
+        redirect: '/setting/user',
+        component: PageView,
+        meta: { title: '系统管理', icon: 'setting' },
+        children: [
+          {
+            path: '/setting/user',
+            name: 'BaseForm',
+            component: () => import('@/views/form/BasicForm'),
+            meta: { title: '用户管理', keepAlive: true }
           },
           {
-            path: '/basic/bill',
-            name: 'AdvanceForm',
-            component: () => import('@/views/form/advancedForm/AdvancedForm'),
-            meta: { title: '发票管理', keepAlive: true }
+            path: '/setting/role',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '角色管理', keepAlive: true }
+          },
+          {
+            path: '/setting/permission',
+            name: 'StepForm',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '权限管理', keepAlive: true }
           }
         ]
       },
