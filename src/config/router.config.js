@@ -165,8 +165,8 @@ export const asyncRouterMap = [
         children: [
           {
             path: '/setting/user',
-            name: 'BaseForm',
-            component: () => import('@/views/form/BasicForm'),
+            name: 'SettingUser',
+            component: () => import('@/views/setting/user/User'),
             meta: { title: '用户管理', keepAlive: true }
           },
           {
