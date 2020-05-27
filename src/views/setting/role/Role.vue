@@ -4,26 +4,8 @@
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="6" :sm="24">
-            <a-form-item label="用户名/姓名">
+            <a-form-item label="角色名">
               <a-input v-model="queryParam.id" placeholder=""/>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="24">
-            <a-form-item label="角色">
-              <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="24">
-            <a-form-item label="状态">
-              <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="24">
@@ -69,19 +51,17 @@
         <template>
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
-          <a @click="handleSub(record)">禁用</a>
+          <a @click="handleSub(record)">删除</a>
         </template>
       </span>
     </s-table>
     <create-form ref="createModal" @ok="handleOk" />
-    <step-by-step-modal ref="modal" @ok="handleOk"/>
   </a-card>
 </template>
 
 <script>
 import moment from 'moment'
-import { STable, Ellipsis } from '@/components'
-import StepByStepModal from './StepByStepModal'
+import { STable, Ellipsis, Tree } from '@/components'
 import CreateForm from './CreateForm'
 import { getRoleList, getServiceList } from '@/api/manage'
 
@@ -105,12 +85,12 @@ const statusMap = {
 }
 
 export default {
-  name: 'SettingUser',
+  name: 'SettingRole',
   components: {
     STable,
     Ellipsis,
     CreateForm,
-    StepByStepModal
+    Tree
   },
   data () {
     return {
@@ -122,28 +102,8 @@ export default {
       // 表头
       columns: [
         {
-          title: '用户名',
+          title: '角色名',
           dataIndex: 'no'
-        },
-        {
-          title: '姓名',
-          dataIndex: 'description',
-          scopedSlots: { customRender: 'description' }
-        },
-        {
-          title: '角色',
-          dataIndex: 'callNo',
-          sorter: true
-        },
-        {
-          title: '状态',
-          dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
-        },
-        {
-          title: '创建时间',
-          dataIndex: 'updatedAt',
-          sorter: true
         },
         {
           title: '操作',

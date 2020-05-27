@@ -53,22 +53,22 @@ export const asyncRouterMap = [
         children: [
           {
             path: '/order/resident',
-            name: 'BaseForm',
-            component: () => import('@/views/form/BasicForm'),
+            name: 'OrderResident',
+            component: () => import('@/views/order/resident/Index'),
             meta: { title: '居民搬家', keepAlive: true, permission: [ 'order' ] }
-          },
-          {
-            path: '/order/company',
-            name: 'StepForm',
-            component: () => import('@/views/form/stepForm/StepForm'),
-            meta: { title: '单位企业搬迁', keepAlive: true, permission: [ 'order' ] }
-          },
-          {
-            path: '/order/international',
-            name: 'AdvanceForm',
-            component: () => import('@/views/form/advancedForm/AdvancedForm'),
-            meta: { title: '国际搬家', keepAlive: true, permission: [ 'order' ] }
           }
+          // {
+          //   path: '/order/company',
+          //   name: 'OrderCompany',
+          //   component: () => import('@/views/order/company/Index'),
+          //   meta: { title: '单位企业搬迁', keepAlive: true, permission: [ 'order' ] }
+          // },
+          // {
+          //   path: '/order/international',
+          //   name: 'OrderInternational',
+          //   component: () => import('@/views/order/international/Index'),
+          //   meta: { title: '国际搬家', keepAlive: true, permission: [ 'order' ] }
+          // }
         ]
       },
       {
@@ -171,8 +171,8 @@ export const asyncRouterMap = [
           },
           {
             path: '/setting/role',
-            name: 'StepForm',
-            component: () => import('@/views/form/stepForm/StepForm'),
+            name: 'SettingRole',
+            component: () => import('@/views/setting/role/Role'),
             meta: { title: '角色管理', keepAlive: true }
           },
           {
