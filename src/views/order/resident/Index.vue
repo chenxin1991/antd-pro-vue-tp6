@@ -15,15 +15,15 @@
             </a-form-item>
           </a-col>
           <a-col
-            :md="5"
+            :md="6"
             :sm="24"
           >
             <a-form-item label="下单日期">
-              <a-range-picker @change="onChange" />
+              <a-range-picker @change="onChange" width="100%"/>
             </a-form-item>
           </a-col>
           <a-col
-            :md="5"
+            :md="6"
             :sm="24"
           >
             <a-form-item label="预约日期">
@@ -31,7 +31,23 @@
             </a-form-item>
           </a-col>
           <a-col
-            :md="5"
+            :md="6"
+            :sm="24"
+          >
+            <a-form-item label="订单来源">
+              <a-select
+                v-model="queryParam.status"
+                placeholder="请选择"
+                default-value="0"
+              >
+                <a-select-option value="0">来电</a-select-option>
+                <a-select-option value="1">上门</a-select-option>
+                <a-select-option value="2">小程序</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col
+            :md="6"
             :sm="24"
           >
             <a-form-item label="订单状态">
@@ -47,7 +63,7 @@
             </a-form-item>
           </a-col>
           <a-col
-            :md="5"
+            :md="6"
             :sm="24"
           >
             <a-form-item label="支付状态">
@@ -63,7 +79,7 @@
             </a-form-item>
           </a-col>
           <a-col
-            :md="5"
+            :md="8"
             :sm="24"
           >
             <span class="table-page-search-submitButtons">
@@ -140,11 +156,25 @@
         <template>
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
-          <a @click="handleSub(record)">禁用</a>
+          <a-dropdown>
+            <a class="ant-dropdown-link">
+              更多 <a-icon type="down" />
+            </a>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a @click="handleDispatch(record)">派单</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="handleGrap(record)">抢单</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
         </template>
       </span>
     </s-table>
     <step-by-step-modal ref="modal" @ok="handleOk"/>
+    <create-form ref="createForm" @ok="handleOk"/>
+    <grap-form ref="grapForm" @ok="handleOk"/>
   </a-card>
 </template>
 
@@ -152,6 +182,8 @@
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
 import StepByStepModal from './StepByStepModal'
+import CreateForm from './CreateForm'
+import GrapForm from './GrapForm'
 import { getRoleList, getServiceList } from '@/api/manage'
 
 const statusMap = {
@@ -178,7 +210,9 @@ export default {
   components: {
     STable,
     Ellipsis,
-    StepByStepModal
+    StepByStepModal,
+    CreateForm,
+    GrapForm
   },
   data () {
     return {
@@ -261,6 +295,14 @@ export default {
     handleEdit (record) {
       console.log(record)
       this.$refs.modal.edit(record)
+    },
+    handleDispatch (record) {
+      console.log(record)
+      this.$refs.createForm.edit(record)
+    },
+    handleGrap (record) {
+      console.log(record)
+      this.$refs.grapForm.edit(record)
     },
     handleSub (record) {
       if (record.status !== 0) {

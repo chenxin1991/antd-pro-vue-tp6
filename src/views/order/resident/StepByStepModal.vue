@@ -1,21 +1,50 @@
 <template>
   <a-modal
     title="新增订单"
-    :width="800"
+    :width="960"
     :visible="visible"
     :confirmLoading="confirmLoading"
+    :bodyStyle="{padding:'12px'}"
     @cancel="handleCancel"
   >
-    <a-form :form="form" :label-col="labelCol" :wrapper-col="wrapperCol">
+    <a-form :form="form" :label-col="labelCol" :wrapper-col="wrapperCol" class="ceshi">
       <a-tabs default-active-key="1" tabPosition="left">
-        <a-tab-pane key="1" tab="预约时间与车辆">
+        <a-tab-pane key="1" tab="预约与车辆">
           <a-form-item
-            label="预约时间"
+            label="预约"
           >
-            <a-date-picker @change="onChange" />
+            <a-form-item :style="{ display: 'inline-block', width: 'calc(20%)' }">
+              <a-date-picker @change="onChange" />
+            </a-form-item>
+            <a-form-item
+              label="时间段"
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 8 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 16 }
+              }"
+              :style="{ display: 'inline-block', width: 'calc(30%)' }">
+              <a-select default-value="lucy" >
+                <a-select-option value="jack">
+                  Jack
+                </a-select-option>
+                <a-select-option value="lucy">
+                  Lucy
+                </a-select-option>
+                <a-select-option value="disabled" disabled>
+                  Disabled
+                </a-select-option>
+                <a-select-option value="Yiminghe">
+                  100米以上或地下室出入
+                </a-select-option>
+              </a-select>
+            </a-form-item>
           </a-form-item>
           <a-form-item
-            label="车辆分配"
+            label="车辆"
           >
             <a-table :columns="columns" :data-source="data" size="small" :pagination="false" :bordered="false">
               <a slot="name" slot-scope="text">{{ text }}</a>
@@ -23,24 +52,24 @@
             </a-table>
           </a-form-item>
           <a-form-item
-            label="费用小计"
+            label="小计"
           >
             <span class="ant-form-text" style="font-size:20px;color:red;">
               1200元
             </span>
           </a-form-item>
         </a-tab-pane>
-        <a-tab-pane key="2" tab="起始地与搬入搬出">
+        <a-tab-pane key="2" tab="起始地">
           <a-form-item
-            label="从哪里搬出"
+            label="起点"
           >
-            <a-auto-complete
-              :data-source="dataSource"
-              :filter-option="filterOption"
-            />
-          </a-form-item>
-          <a-form-item label="搬出楼层" style="margin-bottom:0;">
-            <a-form-item :style="{ display: 'inline-block', width: 'calc(40%)' }">
+            <a-form-item :style="{ display: 'inline-block', width: 'calc(45%)' }">
+              <a-auto-complete
+                :data-source="dataSource"
+                :filter-option="filterOption"
+              />
+            </a-form-item>
+            <a-form-item :style="{ display: 'inline-block', width: 'calc(13%)',padding:'0px 0px 0px 20px' }">
               <a-radio-group v-decorator="['radio-group']">
                 <a-radio value="a">
                   电梯
@@ -50,28 +79,56 @@
                 </a-radio>
               </a-radio-group>
             </a-form-item>
-            <a-form-item label="层数" :style="{ display: 'inline-block', width: 'calc(60%)' }">
+            <a-form-item
+              label="层数"
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 11 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 13 }
+              }"
+              :style="{ display: 'inline-block', width: 'calc(14%)'}">
               <a-input-number :min="8" :max="12" />
             </a-form-item>
+            <a-form-item
+              label="距离"
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 18 }
+              }"
+              :style="{ display: 'inline-block', width: 'calc(28%)' }">
+              <a-select default-value="lucy" >
+                <a-select-option value="jack">
+                  Jack
+                </a-select-option>
+                <a-select-option value="lucy">
+                  Lucy
+                </a-select-option>
+                <a-select-option value="disabled" disabled>
+                  Disabled
+                </a-select-option>
+                <a-select-option value="Yiminghe">
+                  100米以上或地下室出入
+                </a-select-option>
+              </a-select>
+            </a-form-item>
           </a-form-item>
-          <a-form-item
-            label="搬出距离"
-          >
-            <a-auto-complete
-              :data-source="dataSource"
-              :filter-option="filterOption"
-            />
-          </a-form-item>
-          <a-form-item
+          <!-- <a-form-item
             label="途径点"
           >
-            <a-auto-complete
-              :data-source="dataSource"
-              :filter-option="filterOption"
-            />
-          </a-form-item>
-          <a-form-item label="搬出楼层" style="margin-bottom:0;">
-            <a-form-item :style="{ display: 'inline-block', width: 'calc(40%)' }">
+            <a-form-item :style="{ display: 'inline-block', width: 'calc(39%)' }">
+              <a-auto-complete
+                :data-source="dataSource"
+                :filter-option="filterOption"
+              />
+            </a-form-item>
+            <a-form-item :style="{ display: 'inline-block', width: 'calc(19%)',padding:'0px 0px 0px 20px' }">
               <a-radio-group v-decorator="['radio-group']">
                 <a-radio value="a">
                   电梯
@@ -81,20 +138,56 @@
                 </a-radio>
               </a-radio-group>
             </a-form-item>
-            <a-form-item label="层数" :style="{ display: 'inline-block', width: 'calc(60%)' }">
+            <a-form-item
+              label="层数"
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 10 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 14 }
+              }"
+              :style="{ display: 'inline-block', width: 'calc(12%)'}">
               <a-input-number :min="8" :max="12" />
             </a-form-item>
-          </a-form-item>
+            <a-form-item
+              label="距离"
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 18 }
+              }"
+              :style="{ display: 'inline-block', width: 'calc(30%)' }">
+              <a-select default-value="lucy" >
+                <a-select-option value="jack">
+                  Jack
+                </a-select-option>
+                <a-select-option value="lucy">
+                  Lucy
+                </a-select-option>
+                <a-select-option value="disabled" disabled>
+                  Disabled
+                </a-select-option>
+                <a-select-option value="Yiminghe">
+                  100米以上或地下室出入
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-form-item> -->
           <a-form-item
-            label="搬出距离"
+            label="终点"
           >
-            <a-auto-complete
-              :data-source="dataSource"
-              :filter-option="filterOption"
-            />
-          </a-form-item>
-          <a-form-item label="搬入楼层" style="margin-bottom:0;">
-            <a-form-item :style="{ display: 'inline-block', width: 'calc(40%)' }">
+            <a-form-item :style="{ display: 'inline-block', width: 'calc(45%)' }">
+              <a-auto-complete
+                :data-source="dataSource"
+                :filter-option="filterOption"
+              />
+            </a-form-item>
+            <a-form-item :style="{ display: 'inline-block', width: 'calc(13%)',padding:'0px 0px 0px 20px' }">
               <a-radio-group v-decorator="['radio-group']">
                 <a-radio value="a">
                   电梯
@@ -104,58 +197,55 @@
                 </a-radio>
               </a-radio-group>
             </a-form-item>
-            <a-form-item label="层数" :style="{ display: 'inline-block', width: 'calc(60%)' }">
+            <a-form-item
+              label="层数"
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 11 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 13 }
+              }"
+              :style="{ display: 'inline-block', width: 'calc(14%)'}">
               <a-input-number :min="8" :max="12" />
             </a-form-item>
-          </a-form-item>
-          <a-form-item
-            label="搬入距离"
-          >
-            <a-auto-complete
-              :data-source="dataSource"
-              :filter-option="filterOption"
-            />
-          </a-form-item>
-          <a-form-item
-            label="搬到哪里去"
-          >
-            <a-auto-complete
-              :data-source="dataSource"
-              :filter-option="filterOption"
-            />
-          </a-form-item>
-          <a-form-item label="搬入楼层" style="margin-bottom:0;">
-            <a-form-item :style="{ display: 'inline-block', width: 'calc(40%)' }">
-              <a-radio-group v-decorator="['radio-group']">
-                <a-radio value="a">
-                  电梯
-                </a-radio>
-                <a-radio value="b">
-                  楼梯
-                </a-radio>
-              </a-radio-group>
-            </a-form-item>
-            <a-form-item label="层数" :style="{ display: 'inline-block', width: 'calc(60%)' }">
-              <a-input-number :min="8" :max="12" />
+            <a-form-item
+              label="距离"
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 18 }
+              }"
+              :style="{ display: 'inline-block', width: 'calc(28%)' }">
+              <a-select default-value="lucy" >
+                <a-select-option value="jack">
+                  Jack
+                </a-select-option>
+                <a-select-option value="lucy">
+                  Lucy
+                </a-select-option>
+                <a-select-option value="disabled" disabled>
+                  Disabled
+                </a-select-option>
+                <a-select-option value="Yiminghe">
+                  100米以上或地下室出入
+                </a-select-option>
+              </a-select>
             </a-form-item>
           </a-form-item>
           <a-form-item
-            label="搬入距离"
-          >
-            <a-auto-complete
-              :data-source="dataSource"
-              :filter-option="filterOption"
-            />
-          </a-form-item>
-          <a-form-item
-            label="导航距离"
+            label="实际距离"
           >
             <span class="ant-form-text" style="font-size:20px;color:red;">
               10.6km
             </span>
           </a-form-item>
           <a-form-item
-            label="费用小计"
+            label="小计"
           >
             <span class="ant-form-text" style="font-size:20px;color:red;">
               1200元
@@ -164,7 +254,7 @@
         </a-tab-pane>
         <a-tab-pane key="3" tab="拆装">
           <a-form-item
-            label="拆装明细"
+            label="拆装"
           >
             <a-table :columns="columns" :data-source="data" size="small" :pagination="false" :bordered="false">
               <a slot="name" slot-scope="text">{{ text }}</a>
@@ -172,7 +262,7 @@
             </a-table>
           </a-form-item>
           <a-form-item
-            label="费用小计"
+            label="小计"
           >
             <span class="ant-form-text" style="font-size:20px;color:red;">
               1200元
@@ -181,7 +271,7 @@
         </a-tab-pane>
         <a-tab-pane key="4" tab="大件(非拆装)">
           <a-form-item
-            label="大件明细"
+            label="大件"
           >
             <a-table :columns="columns" :data-source="data" size="small" :pagination="false" :bordered="false">
               <a slot="name" slot-scope="text">{{ text }}</a>
@@ -189,7 +279,7 @@
             </a-table>
           </a-form-item>
           <a-form-item
-            label="费用小计"
+            label="小计"
           >
             <span class="ant-form-text" style="font-size:20px;color:red;">
               1200元
@@ -282,11 +372,11 @@ export default {
       dataSource: ['Burns Bay Road', 'Downing Street', 'Wall Street'],
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 4 }
+        sm: { span: 2 }
       },
       wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 16 }
+        sm: { span: 22 }
       },
       visible: false,
       confirmLoading: false,
@@ -355,6 +445,12 @@ export default {
 
 <style lang="less" scoped>
 .ant-form-item {
-    margin-bottom: 12px;
+    margin-bottom: 2px;
+}
+.ant-input-number{
+  width: 100%;
+}
+.ant-tabs /deep/ .ant-tabs-left-content {
+    padding-left: 12px;
 }
 </style>

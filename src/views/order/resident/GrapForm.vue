@@ -11,9 +11,16 @@
         :wrapperCol="wrapperCol"
         label="队长"
       >
-        <a-select v-decorator="['status', { initialValue: 1 }]">
-          <a-select-option :value="1">正常</a-select-option>
-          <a-select-option :value="2">禁用</a-select-option>
+        <a-select
+          mode="multiple"
+          :default-value="['a1', 'b2']"
+          style="width: 100%"
+          placeholder="Please select"
+          @change="handleChange"
+        >
+          <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
+            {{ (i + 9).toString(36) + i }}
+          </a-select-option>
         </a-select>
       </a-form-item>
     </a-form>
