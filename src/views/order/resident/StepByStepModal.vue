@@ -67,7 +67,11 @@
               <a-auto-complete
                 :data-source="dataSource"
                 :filter-option="filterOption"
-              />
+              >
+                <a-input>
+                  <a-icon slot="suffix" type="search" class="certain-category-icon" @click="test"/>
+                </a-input>
+              </a-auto-complete>
             </a-form-item>
             <a-form-item :style="{ display: 'inline-block', width: 'calc(13%)',padding:'0px 0px 0px 20px' }">
               <a-radio-group v-decorator="['radio-group']">
@@ -185,7 +189,11 @@
               <a-auto-complete
                 :data-source="dataSource"
                 :filter-option="filterOption"
-              />
+              >
+                <a-input>
+                  <a-icon slot="suffix" type="search" class="certain-category-icon" @click="test"/>
+                </a-input>
+              </a-auto-complete>
             </a-form-item>
             <a-form-item :style="{ display: 'inline-block', width: 'calc(13%)',padding:'0px 0px 0px 20px' }">
               <a-radio-group v-decorator="['radio-group']">
@@ -392,6 +400,9 @@ export default {
     moment,
     add () {
       this.visible = true
+    },
+    test () {
+      alert('sss')
     },
     edit (record) {
       this.visible = true

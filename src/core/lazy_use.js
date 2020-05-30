@@ -14,6 +14,8 @@ import PageLoading from '@/components/PageLoading'
 import PermissionHelper from '@/utils/helper/permission'
 import './directives/action'
 
+import BaiduMap from 'vue-baidu-map'
+
 VueClipboard.config.autoSetContainer = true
 
 Vue.use(Viser)
@@ -24,4 +26,8 @@ Vue.use(VueClipboard)
 Vue.use(PermissionHelper)
 Vue.use(VueCropper)
 
+Vue.use(BaiduMap, {
+  /* 需要注册百度地图开发者来获取你的ak */
+  ak: 'ZgAYCeb2UwqFqxH8UjTDuljnLO4rNunZ'
+})
 process.env.NODE_ENV !== 'production' && console.warn('[antd-pro] NOTICE: Antd use lazy-load.')

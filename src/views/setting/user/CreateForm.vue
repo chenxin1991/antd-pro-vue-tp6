@@ -37,6 +37,16 @@
           <a-select-option :value="2">禁用</a-select-option>
         </a-select>
       </a-form-item>
+      <!--接入百度地图-->
+      <baidu-map :center="{lng: 116.403765, lat: 39.914850}" :zoom="11">
+        <bm-view class="map"></bm-view>
+        <bm-control :offset="{width: '10px', height: '10px'}">
+          <bm-auto-complete v-model="keyword" :sugStyle="{zIndex: 1000000}" @confirm="test">
+          </bm-auto-complete>
+        </bm-control>
+        <bm-local-search :keyword="keyword" :auto-viewport="true" ></bm-local-search>
+      </baidu-map>
+
     </a-form>
   </a-modal>
 </template>
@@ -58,10 +68,14 @@ export default {
       visible: false,
       confirmLoading: false,
 
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+            keyword: ''
     }
   },
   methods: {
+    test (type, target, item) {
+      console.log(type)
+    },
     add () {
       this.visible = true
     },
@@ -94,3 +108,10 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.map {
+  width: 100%;
+  height: 400px;
+}
+</style>
