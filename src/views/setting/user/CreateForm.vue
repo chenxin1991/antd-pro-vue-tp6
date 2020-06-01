@@ -38,14 +38,14 @@
         </a-select>
       </a-form-item>
       <!--接入百度地图-->
-      <baidu-map :center="{lng: 116.403765, lat: 39.914850}" :zoom="11">
+      <!-- <baidu-map :center="{lng: 116.403765, lat: 39.914850}" :zoom="11">
         <bm-view class="map"></bm-view>
         <bm-control :offset="{width: '10px', height: '10px'}">
           <bm-auto-complete v-model="keyword" :sugStyle="{zIndex: 1000000}" @confirm="test">
           </bm-auto-complete>
         </bm-control>
         <bm-local-search :keyword="keyword" :auto-viewport="true" ></bm-local-search>
-      </baidu-map>
+      </baidu-map> -->
 
     </a-form>
   </a-modal>

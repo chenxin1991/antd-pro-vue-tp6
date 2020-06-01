@@ -5,7 +5,7 @@
         <a-row :gutter="48">
           <a-col :md="6" :sm="24">
             <a-form-item label="角色名">
-              <a-input v-model="queryParam.id" placeholder=""/>
+              <a-input v-model="queryParam.name" placeholder=""/>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="24">
@@ -18,92 +18,48 @@
       </a-form>
     </div>
     <div class="table-operator">
-      <a-button type="primary" icon="plus" @click="$refs.createModal.add()">新建</a-button>
-      <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key="2"><a-icon type="lock" />禁用</a-menu-item>
-          <a-menu-item key="3"><a-icon type="lock" />启用</a-menu-item>
-          <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px">
-          批量操作 <a-icon type="down" />
-        </a-button>
-      </a-dropdown>
+      <a-button type="primary" icon="plus" @click="handleAdd()">新建</a-button>
     </div>
-
     <s-table
       ref="table"
       size="small"
-      rowKey="key"
+      rowKey="id"
       :columns="columns"
       :data="loadData"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-      showPagination="auto"
     >
-      <span slot="status" slot-scope="text">
-        <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-      </span>
-      <span slot="description" slot-scope="text">
-        <ellipsis :length="16" tooltip>{{ text }}</ellipsis>
-      </span>
-
       <span slot="action" slot-scope="text, record">
         <template>
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
-          <a @click="handleSub(record)">删除</a>
+          <a @click="handleDelete(record)">删除</a>
         </template>
       </span>
     </s-table>
-    <create-form ref="createModal" @ok="handleOk" />
+    <role-form ref="roleForm" @ok="handleOk" />
   </a-card>
 </template>
 
 <script>
-import moment from 'moment'
-import { STable, Ellipsis, Tree } from '@/components'
-import CreateForm from './CreateForm'
-import { getRoleList, getServiceList } from '@/api/manage'
-
-const statusMap = {
-  0: {
-    status: 'default',
-    text: '关闭'
-  },
-  1: {
-    status: 'processing',
-    text: '运行中'
-  },
-  2: {
-    status: 'success',
-    text: '已上线'
-  },
-  3: {
-    status: 'error',
-    text: '异常'
-  }
-}
+import { STable, Tree } from '@/components'
+import RoleForm from './RoleForm'
+import { getRoleList } from '@/api/manage'
 
 export default {
   name: 'SettingRole',
   components: {
     STable,
-    Ellipsis,
-    CreateForm,
+    RoleForm,
     Tree
   },
   data () {
     return {
-      mdl: {},
-      // 高级搜索 展开/关闭
-      advanced: false,
       // 查询参数
       queryParam: {},
       // 表头
       columns: [
         {
           title: '角色名',
-          dataIndex: 'no'
+          dataIndex: 'name'
         },
         {
           title: '操作',
@@ -114,53 +70,24 @@ export default {
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        console.log('loadData.parameter', parameter)
-        return getServiceList(Object.assign(parameter, this.queryParam))
+        return getRoleList(Object.assign(parameter, this.queryParam))
           .then(res => {
             return res.result
           })
-      },
-      selectedRowKeys: [],
-      selectedRows: []
+      }
     }
-  },
-  filters: {
-    statusFilter (type) {
-      return statusMap[type].text
-    },
-    statusTypeFilter (type) {
-      return statusMap[type].status
-    }
-  },
-  created () {
-    getRoleList({ t: new Date() })
   },
   methods: {
-    handleEdit (record) {
-      console.log(record)
-      this.$refs.createModal.edit(record)
+    handleAdd () {
+      this.$refs.roleForm.add()
     },
-    handleSub (record) {
-      if (record.status !== 0) {
-        this.$message.info(`${record.no} 订阅成功`)
-      } else {
-        this.$message.error(`${record.no} 订阅失败，规则已关闭`)
-      }
+    handleEdit (record) {
+      this.$refs.roleForm.edit(record)
+    },
+    handleDelete (record) {
     },
     handleOk () {
       this.$refs.table.refresh()
-    },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys
-      this.selectedRows = selectedRows
-    },
-    toggleAdvanced () {
-      this.advanced = !this.advanced
-    },
-    resetSearchForm () {
-      this.queryParam = {
-        date: moment(new Date())
-      }
     }
   }
 }
