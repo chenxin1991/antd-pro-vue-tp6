@@ -79,7 +79,7 @@
             </a-form-item>
           </a-col>
           <a-col
-            :md="8"
+            :md="6"
             :sm="24"
           >
             <span class="table-page-search-submitButtons">

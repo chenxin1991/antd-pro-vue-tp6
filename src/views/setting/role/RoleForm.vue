@@ -1,26 +1,22 @@
 <template>
   <a-modal
-    title="操作"
-    :width="800"
+    :title="config.title"
+    :width="640"
     :visible="visible"
     :confirmLoading="confirmLoading"
     @ok="handleSubmit"
     @cancel="handleCancel"
   >
     <a-spin :spinning="confirmLoading">
-      <a-form :form="form">
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="角色名"
-        >
-          <a-input v-decorator="['name', { rules: [{ required: true, message: '请输入角色名！' }] ,initialValue: data.name}]" />
+      <a-form
+        :form="form"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item label="角色名">
+          <a-input v-decorator="['name', { rules: [{ required: true, message: '请输入角色名！' }]}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="权限"
-        >
+        <a-form-item label="权限">
           <a-tree
             v-model="checkedKeys"
             checkable
@@ -38,8 +34,9 @@
 </template>
 
 <script>
+import pick from 'lodash.pick'
 import { Tree } from '@/components'
-import { roleAdd, roleEdit } from '@/api/role'
+import { addRole, editRole } from '@/api/setting/role'
 const treeData = [
   {
     title: '0-0',
@@ -91,16 +88,15 @@ export default {
     return {
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 5 }
+        sm: { span: 4 }
       },
       wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 16 }
+        sm: { span: 19 }
       },
       visible: false,
       confirmLoading: false,
       config: {},
-      data: {},
       form: this.$form.createForm(this),
       expandedKeys: ['0-0-0', '0-0-1'],
       autoExpandParent: true,
@@ -117,16 +113,19 @@ export default {
   methods: {
     add () {
       this.config.action = 'add'
+      this.config.title = '新增角色'
       this.visible = true
       this.$nextTick(() => {
-        this.data = {}
+        this.form.resetFields()
       })
     },
     edit (record) {
       this.config.action = 'edit'
+      this.config.title = '编辑角色'
+      this.config.id = record.id
       this.visible = true
       this.$nextTick(() => {
-        this.data = record
+        this.form.setFieldsValue(pick(record, ['name']))
       })
     },
     handleSubmit () {
@@ -138,10 +137,9 @@ export default {
       validateFields((errors, values) => {
         if (!errors) {
           if (this.config.action === 'add') {
-            roleAdd(values)
+            addRole(values)
               .then(res => {
                 $message.success('添加成功')
-                this.form.resetFields()
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)
@@ -150,11 +148,10 @@ export default {
                 $message.error(`load user err: ${err.message}`)
               })
           } else if (this.config.action === 'edit') {
-            values.id = this.data.id
-            roleEdit(values)
+            values.id = this.config.id
+            editRole(values)
               .then(res => {
                 $message.success('修改成功')
-                this.form.resetFields()
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)

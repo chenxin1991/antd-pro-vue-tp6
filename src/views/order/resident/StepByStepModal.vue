@@ -7,7 +7,7 @@
     :bodyStyle="{padding:'12px'}"
     @cancel="handleCancel"
   >
-    <a-form :form="form" :label-col="labelCol" :wrapper-col="wrapperCol" class="ceshi">
+    <a-form :form="form" :label-col="labelCol" :wrapper-col="wrapperCol">
       <a-tabs default-active-key="1" tabPosition="left">
         <a-tab-pane key="1" tab="预约与车辆">
           <a-form-item
