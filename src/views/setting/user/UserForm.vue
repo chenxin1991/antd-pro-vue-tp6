@@ -23,7 +23,11 @@
 
         <a-form-item label="角色">
           <a-select v-decorator="['role_id']">
-            <a-select-option :key="index" v-for="(item, index) in roles" :value="item.id">{{ item.name }}</a-select-option>
+            <a-select-option
+              :key="index"
+              v-for="(item, index) in params.roles"
+              :value="item.id"
+            >{{ item.name }}</a-select-option>
           </a-select>
         </a-form-item>
       </a-form>
@@ -33,8 +37,14 @@
 
 <script>
 import pick from 'lodash.pick'
-import { getRoles } from '@/api/common'
+import { addUser, editUser } from '@/api/setting/user'
 export default {
+  props: {
+    params: {
+      type: Object,
+      required: true
+    }
+  },
   data () {
     return {
       labelCol: {
@@ -48,14 +58,8 @@ export default {
       visible: false,
       confirmLoading: false,
       config: {},
-      form: this.$form.createForm(this),
-      roles: []
+      form: this.$form.createForm(this)
     }
-  },
-  created () {
-    getRoles({ t: new Date() }).then(res => {
-      this.roles = res
-      })
   },
   methods: {
     add () {
@@ -80,14 +84,33 @@ export default {
         form: { validateFields }
       } = this
       this.confirmLoading = true
+            const { $message } = this
       validateFields((errors, values) => {
         if (!errors) {
-          console.log('values', values)
-          setTimeout(() => {
-            this.visible = false
-            this.confirmLoading = false
-            this.$emit('ok', values)
-          }, 1500)
+          if (this.config.action === 'add') {
+            addUser(values)
+              .then(res => {
+                $message.success('添加成功')
+                this.visible = false
+                this.confirmLoading = false
+                this.$emit('ok', values)
+              })
+              .catch(err => {
+                $message.error(`load user err: ${err.message}`)
+              })
+          } else if (this.config.action === 'edit') {
+            values.id = this.config.id
+            editUser(values)
+              .then(res => {
+                $message.success('修改成功')
+                this.visible = false
+                this.confirmLoading = false
+                this.$emit('ok', values)
+              })
+              .catch(err => {
+                $message.error(`load user err: ${err.message}`)
+              })
+          }
         } else {
           this.confirmLoading = false
         }

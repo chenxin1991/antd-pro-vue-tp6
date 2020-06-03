@@ -41,7 +41,7 @@
     </div>
     <s-table
       ref="table"
-      size="small"
+      size="default"
       rowKey="id"
       :columns="columns"
       :data="loadData"

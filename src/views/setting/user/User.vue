@@ -22,11 +22,12 @@
               <a-select
                 v-model="queryParam.role_id"
                 placeholder="请选择"
-                default-value="0"
               >
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+                <a-select-option
+                  :key="index"
+                  v-for="(item, index) in roles"
+                  :value="item.id"
+                >{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -38,11 +39,9 @@
               <a-select
                 v-model="queryParam.status"
                 placeholder="请选择"
-                default-value="0"
               >
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+                <a-select-option value="0">启用</a-select-option>
+                <a-select-option value="1">禁用</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -74,21 +73,15 @@
 
     <s-table
       ref="table"
-      size="small"
+      size="default"
       rowKey="id"
       :columns="columns"
       :data="loadData"
     >
-      <span
-        slot="status"
-        slot-scope="text"
-      >
-        <a-badge
-          :status="text | statusTypeFilter"
-          :text="text | statusFilter"
-        />
+      <span slot="status" slot-scope="text">
+        <a-badge v-if="text==='正常'" status="success" :text="text" />
+        <a-badge v-if="text==='禁用'" status="error" :text="text" />
       </span>
-
       <span
         slot="action"
         slot-scope="text, record"
@@ -102,6 +95,7 @@
     </s-table>
     <user-form
       ref="userForm"
+      :params="{roles:roles}"
       @ok="handleOk"
     />
   </a-card>
@@ -111,17 +105,7 @@
 import { STable } from '@/components'
 import UserForm from './UserForm'
 import { getUsers } from '@/api/setting/user'
-
-const statusMap = {
-  0: {
-    status: 'success',
-    text: '正常'
-  },
-  1: {
-    status: 'error',
-    text: '禁用'
-  }
-}
+import { getRoles } from '@/api/common'
 
 export default {
   name: 'SettingUser',
@@ -145,8 +129,7 @@ export default {
         },
         {
           title: '角色',
-          dataIndex: 'role_id',
-          sorter: true
+          dataIndex: 'rolename'
         },
         {
           title: '状态',
@@ -155,8 +138,7 @@ export default {
         },
         {
           title: '创建时间',
-          dataIndex: 'create_time',
-          sorter: true
+          dataIndex: 'create_time'
         },
         {
           title: '操作',
@@ -165,6 +147,7 @@ export default {
           scopedSlots: { customRender: 'action' }
         }
       ],
+      roles: [],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         return getUsers(Object.assign(parameter, this.queryParam)).then(res => {
@@ -173,13 +156,10 @@ export default {
       }
     }
   },
-  filters: {
-    statusFilter (type) {
-      return statusMap[type].text
-    },
-    statusTypeFilter (type) {
-      return statusMap[type].status
-    }
+  created () {
+    getRoles({ t: new Date() }).then(res => {
+      this.roles = res
+    })
   },
   methods: {
     handleAdd () {

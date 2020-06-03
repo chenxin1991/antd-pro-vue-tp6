@@ -127,33 +127,21 @@ export const asyncRouterMap = [
       },
       {
         path: '/basic',
-        redirect: '/basic/captain',
+        redirect: '/basic/car',
         component: PageView,
         meta: { title: '基础数据管理', icon: 'database' },
         children: [
           {
-            path: '/basic/valued',
-            name: 'BaseForm',
-            component: () => import('@/views/form/BasicForm'),
-            meta: { title: '估价管理', keepAlive: true }
-          },
-          {
-            path: '/basic/area',
-            name: 'StepForm',
-            component: () => import('@/views/form/stepForm/StepForm'),
-            meta: { title: '区域管理', keepAlive: true }
-          },
-          {
-            path: '/basic/cartype',
-            name: 'StepForm',
-            component: () => import('@/views/form/stepForm/StepForm'),
+            path: '/basic/car',
+            name: 'BasicCar',
+            component: () => import('@/views/basic/car/Car'),
             meta: { title: '车型管理', keepAlive: true }
           },
           {
-            path: '/basic/news',
-            name: 'StepForm',
-            component: () => import('@/views/form/stepForm/StepForm'),
-            meta: { title: '资讯管理', keepAlive: true }
+            path: '/basic/config',
+            name: 'BasicConfig',
+            component: () => import('@/views/basic/config/Config'),
+            meta: { title: '配置管理', keepAlive: true }
           }
         ]
       },
