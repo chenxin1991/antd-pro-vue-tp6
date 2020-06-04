@@ -7,7 +7,7 @@
             :md="6"
             :sm="24"
           >
-            <a-form-item label="车型">
+            <a-form-item label="名称">
               <a-input
                 v-model="queryParam.name"
                 @keyup.enter.native="$refs.table.refresh(true)"
@@ -58,8 +58,8 @@
         </template>
       </span>
     </s-table>
-    <car-form
-      ref="carForm"
+    <on-off-good-form
+      ref="OnOffGoodsForm"
       @ok="handleOk"
     />
   </a-card>
@@ -67,14 +67,14 @@
 
 <script>
 import { STable } from '@/components'
-import CarForm from './CarForm'
-import { getCars, delCar } from '@/api/basic/car'
+import OnOffGoodForm from './OnOffGoodForm'
+import { getOnOffGoods, delOnOffGood } from '@/api/basic/on_off_good'
 
 export default {
-  name: 'BasicCar',
+  name: 'BasicOnOffGood',
   components: {
     STable,
-    CarForm
+    OnOffGoodForm
   },
   data () {
     return {
@@ -83,32 +83,16 @@ export default {
       // 表头
       columns: [
         {
-          title: '车型',
+          title: '名称',
           dataIndex: 'name'
-        },
-        {
-          title: '载重（吨）',
-          dataIndex: 'load'
-        },
-        {
-          title: '长宽高',
-          dataIndex: 'size'
-        },
-        {
-          title: '体积（方）',
-          dataIndex: 'volume'
         },
         {
           title: '单价（元）',
           dataIndex: 'price'
         },
         {
-          title: '超过多少公里收费',
-          dataIndex: 'km_standard'
-        },
-        {
-          title: '超出公里数单价（元）',
-          dataIndex: 'km_price'
+          title: '单位',
+          dataIndex: 'unit'
         },
         {
           title: '操作',
@@ -120,7 +104,7 @@ export default {
       roles: [],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        return getCars(Object.assign(parameter, this.queryParam)).then(res => {
+        return getOnOffGoods(Object.assign(parameter, this.queryParam)).then(res => {
           return res.result
         })
       }
@@ -128,10 +112,10 @@ export default {
   },
   methods: {
     handleAdd () {
-      this.$refs.carForm.add()
+      this.$refs.OnOffGoodsForm.add()
     },
     handleEdit (record) {
-      this.$refs.carForm.edit(record)
+      this.$refs.OnOffGoodsForm.edit(record)
     },
     handleOk () {
       this.$refs.table.refresh()
@@ -145,7 +129,7 @@ export default {
         okType: 'danger',
         cancelText: '取消',
         onOk () {
-          delCar(record)
+          delOnOffGood(record)
             .then(res => {
               that.$message.success('删除成功')
               that.$refs.table.refresh()

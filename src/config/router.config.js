@@ -138,6 +138,18 @@ export const asyncRouterMap = [
             meta: { title: '车型管理', keepAlive: true }
           },
           {
+            path: '/basic/on_off_good',
+            name: 'BasicOnOffGood',
+            component: () => import('@/views/basic/on_off_good/OnOffGood'),
+            meta: { title: '拆装件管理', keepAlive: true }
+          },
+          {
+            path: '/basic/large_good',
+            name: 'BasicLargeGood',
+            component: () => import('@/views/basic/large_good/LargeGood'),
+            meta: { title: '大件管理', keepAlive: true }
+          },
+          {
             path: '/basic/config',
             name: 'BasicConfig',
             component: () => import('@/views/basic/config/Config'),

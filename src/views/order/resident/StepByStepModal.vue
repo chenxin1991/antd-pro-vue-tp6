@@ -48,7 +48,7 @@
           >
             <a-table :columns="columns" :data-source="data" size="small" :pagination="false" :bordered="false">
               <a slot="name" slot-scope="text">{{ text }}</a>
-              <template slot="age" ><a-input-number/></template>
+              <template slot="age" ><a-input-number style="width:80px;"/></template>
             </a-table>
           </a-form-item>
           <a-form-item
@@ -94,7 +94,7 @@
                 sm: { span: 13 }
               }"
               :style="{ display: 'inline-block', width: 'calc(14%)'}">
-              <a-input-number :min="8" :max="12" />
+              <a-input-number :min="8" :max="12" style="width:100%;"/>
             </a-form-item>
             <a-form-item
               label="距离"
@@ -216,7 +216,7 @@
                 sm: { span: 13 }
               }"
               :style="{ display: 'inline-block', width: 'calc(14%)'}">
-              <a-input-number :min="8" :max="12" />
+              <a-input-number :min="8" :max="12" style="width:100%;"/>
             </a-form-item>
             <a-form-item
               label="距离"
@@ -456,11 +456,9 @@ export default {
 
 <style lang="less" scoped>
 .ant-form-item {
-    margin-bottom: 2px;
+    margin-bottom: 6px;
 }
-.ant-input-number{
-  width: 100%;
-}
+
 .ant-tabs /deep/ .ant-tabs-left-content {
     padding-left: 12px;
 }
