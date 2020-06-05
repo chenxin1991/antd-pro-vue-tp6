@@ -54,7 +54,7 @@ export const asyncRouterMap = [
           {
             path: '/order/resident',
             name: 'OrderResident',
-            component: () => import('@/views/order/resident/Index'),
+            component: () => import('@/views/order/resident/Resident'),
             meta: { title: '居民搬家', keepAlive: true, permission: [ 'order' ] }
           }
           // {
@@ -153,7 +153,7 @@ export const asyncRouterMap = [
             path: '/basic/config',
             name: 'BasicConfig',
             component: () => import('@/views/basic/config/Config'),
-            meta: { title: '配置管理', keepAlive: true }
+            meta: { title: '参数设置', keepAlive: true }
           }
         ]
       },

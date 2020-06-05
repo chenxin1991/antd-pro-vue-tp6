@@ -46,6 +46,7 @@
       rowKey="id"
       :columns="columns"
       :data="loadData"
+      bordered
     >
       <span
         slot="action"
@@ -103,12 +104,46 @@ export default {
           dataIndex: 'price'
         },
         {
-          title: '超过多少公里收费',
+          title: '超过多少公里计费',
           dataIndex: 'km_standard'
         },
         {
           title: '超出公里数单价（元）',
           dataIndex: 'km_price'
+        },
+        {
+          title: '搬入搬出（楼梯）收费标准',
+          children: [
+            {
+              title: '多少楼层开始计费',
+              dataIndex: 'floor_standard'
+            },
+            {
+              title: '单价（元）（每楼层每车）',
+              dataIndex: 'floor_price'
+            }
+          ]
+        },
+        {
+          title: '停车位距离收费标准（元）（每车）',
+          children: [
+            {
+              title: '低于30米',
+              dataIndex: 'distance1'
+            },
+            {
+              title: '30-50米',
+              dataIndex: 'distance2'
+            },
+            {
+              title: '50-100米',
+              dataIndex: 'distance3'
+            },
+            {
+              title: '100米以上或地下室出入',
+              dataIndex: 'distance4'
+            }
+          ]
         },
         {
           title: '操作',

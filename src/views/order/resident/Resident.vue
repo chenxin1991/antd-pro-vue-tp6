@@ -9,8 +9,8 @@
           >
             <a-form-item label="订单号/客户名/手机号">
               <a-input
-                v-model="queryParam.id"
-                placeholder=""
+                v-model="queryParam.keyword"
+                @keyup.enter.native="$refs.table.refresh(true)"
               />
             </a-form-item>
           </a-col>
@@ -19,7 +19,7 @@
             :sm="24"
           >
             <a-form-item label="下单日期">
-              <a-range-picker @change="onChange" width="100%"/>
+              <a-range-picker />
             </a-form-item>
           </a-col>
           <a-col
@@ -27,7 +27,7 @@
             :sm="24"
           >
             <a-form-item label="预约日期">
-              <a-range-picker @change="onChange" />
+              <a-range-picker />
             </a-form-item>
           </a-col>
           <a-col
@@ -38,7 +38,6 @@
               <a-select
                 v-model="queryParam.status"
                 placeholder="请选择"
-                default-value="0"
               >
                 <a-select-option value="0">来电</a-select-option>
                 <a-select-option value="1">上门</a-select-option>
@@ -56,9 +55,13 @@
                 placeholder="请选择"
                 default-value="0"
               >
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+                <a-select-option value="0">待受理</a-select-option>
+                <a-select-option value="1">已受理待派单</a-select-option>
+                <a-select-option value="2">已派单待开工</a-select-option>
+                <a-select-option value="3">已开工待完成</a-select-option>
+                <a-select-option value="4">已完成待评价</a-select-option>
+                <a-select-option value="5">已完成</a-select-option>
+                <a-select-option value="6">已取消</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -70,11 +73,9 @@
               <a-select
                 v-model="queryParam.status"
                 placeholder="请选择"
-                default-value="0"
               >
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+                <a-select-option value="0">未支付</a-select-option>
+                <a-select-option value="1">已支付</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -100,25 +101,8 @@
       <a-button
         type="primary"
         icon="plus"
-        @click="$refs.modal.add()"
+        @click="handleAdd()"
       >新建</a-button>
-      <a-dropdown
-        v-action:edit
-        v-if="selectedRowKeys.length > 0"
-      >
-        <a-menu slot="overlay">
-          <a-menu-item key="2">
-            <a-icon type="lock" />禁用</a-menu-item>
-          <a-menu-item key="3">
-            <a-icon type="lock" />启用</a-menu-item>
-          <a-menu-item key="1">
-            <a-icon type="delete" />删除</a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px">
-          批量操作
-          <a-icon type="down" />
-        </a-button>
-      </a-dropdown>
     </div>
 
     <s-table
@@ -127,28 +111,7 @@
       rowKey="key"
       :columns="columns"
       :data="loadData"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-      showPagination="auto"
     >
-      <span
-        slot="status"
-        slot-scope="text"
-      >
-        <a-badge
-          :status="text | statusTypeFilter"
-          :text="text | statusFilter"
-        />
-      </span>
-      <span
-        slot="description"
-        slot-scope="text"
-      >
-        <ellipsis
-          :length="16"
-          tooltip
-        >{{ text }}</ellipsis>
-      </span>
-
       <span
         slot="action"
         slot-scope="text, record"
@@ -172,53 +135,29 @@
         </template>
       </span>
     </s-table>
-    <step-by-step-modal ref="modal" @ok="handleOk"/>
-    <create-form ref="createForm" @ok="handleOk"/>
+    <resident-form ref="residentForm" @ok="handleOk"/>
+    <dispatch-form ref="dispatchForm" @ok="handleOk"/>
     <grap-form ref="grapForm" @ok="handleOk"/>
   </a-card>
 </template>
 
 <script>
-import moment from 'moment'
-import { STable, Ellipsis } from '@/components'
-import StepByStepModal from './StepByStepModal'
-import CreateForm from './CreateForm'
+import { STable } from '@/components'
+import ResidentForm from './ResidentForm'
+import DispatchForm from './DispatchForm'
 import GrapForm from './GrapForm'
-import { getRoleList, getServiceList } from '@/api/manage'
-
-const statusMap = {
-  0: {
-    status: 'default',
-    text: '关闭'
-  },
-  1: {
-    status: 'processing',
-    text: '运行中'
-  },
-  2: {
-    status: 'success',
-    text: '已上线'
-  },
-  3: {
-    status: 'error',
-    text: '异常'
-  }
-}
+import { getServiceList } from '@/api/manage'
 
 export default {
   name: 'OrderResident',
   components: {
     STable,
-    Ellipsis,
-    StepByStepModal,
-    CreateForm,
-    GrapForm
+    ResidentForm,
+    GrapForm,
+    DispatchForm
   },
   data () {
     return {
-      mdl: {},
-      // 高级搜索 展开/关闭
-      advanced: false,
       // 查询参数
       queryParam: {},
       // 表头
@@ -249,8 +188,7 @@ export default {
         },
         {
           title: '联系电话',
-          dataIndex: 'updatedAt',
-          sorter: true
+          dataIndex: 'updatedAt'
         },
         {
           title: '订单状态',
@@ -259,8 +197,11 @@ export default {
         },
         {
           title: '支付状态',
-          dataIndex: 'updatedAt',
-          sorter: true
+          dataIndex: 'updatedAt'
+        },
+        {
+          title: '跟进人',
+          dataIndex: 'updatedAt'
         },
         {
           title: '操作',
@@ -275,56 +216,49 @@ export default {
         return getServiceList(Object.assign(parameter, this.queryParam)).then(res => {
           return res.result
         })
-      },
-      selectedRowKeys: [],
-      selectedRows: []
-    }
-  },
-  filters: {
-    statusFilter (type) {
-      return statusMap[type].text
-    },
-    statusTypeFilter (type) {
-      return statusMap[type].status
+      }
     }
   },
   created () {
-    getRoleList({ t: new Date() })
   },
   methods: {
+    handleAdd () {
+      this.$refs.residentForm.add()
+    },
     handleEdit (record) {
       console.log(record)
-      this.$refs.modal.edit(record)
+      this.$refs.residentForm.edit(record)
     },
     handleDispatch (record) {
       console.log(record)
-      this.$refs.createForm.edit(record)
+      this.$refs.dispatchForm.edit(record)
     },
     handleGrap (record) {
       console.log(record)
       this.$refs.grapForm.edit(record)
     },
-    handleSub (record) {
-      if (record.status !== 0) {
-        this.$message.info(`${record.no} 订阅成功`)
-      } else {
-        this.$message.error(`${record.no} 订阅失败，规则已关闭`)
-      }
-    },
     handleOk () {
       this.$refs.table.refresh()
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys
-      this.selectedRows = selectedRows
-    },
-    toggleAdvanced () {
-      this.advanced = !this.advanced
-    },
-    resetSearchForm () {
-      this.queryParam = {
-        date: moment(new Date())
-      }
+    handleDelete (record) {
+      // const that = this
+      // this.$confirm({
+      //   title: '警告',
+      //   content: `真的要删除 ${record.name} 吗?`,
+      //   okText: '删除',
+      //   okType: 'danger',
+      //   cancelText: '取消',
+      //   onOk () {
+      //     delLargeGood(record)
+      //       .then(res => {
+      //         that.$message.success('删除成功')
+      //         that.$refs.table.refresh()
+      //       })
+      //       .catch(err => {
+      //         that.$message.error(`load user err: ${err.message}`)
+      //       })
+      //   }
+      // })
     }
   }
 }
