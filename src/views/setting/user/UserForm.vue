@@ -22,7 +22,10 @@
         </a-form-item>
 
         <a-form-item label="角色">
-          <a-select v-decorator="['role_id']">
+          <a-select
+            v-decorator="['role_id', { rules: [{ required: true, message: '请选择角色！' }] }]"
+            placeholder="请选择"
+          >
             <a-select-option
               :key="index"
               v-for="(item, index) in params.roles"
@@ -84,7 +87,7 @@ export default {
         form: { validateFields }
       } = this
       this.confirmLoading = true
-            const { $message } = this
+      const { $message } = this
       validateFields((errors, values) => {
         if (!errors) {
           if (this.config.action === 'add') {
