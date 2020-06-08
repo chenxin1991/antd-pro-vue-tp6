@@ -146,7 +146,7 @@ import { STable } from '@/components'
 import ResidentForm from './ResidentForm'
 import DispatchForm from './DispatchForm'
 import GrapForm from './GrapForm'
-import { getServiceList } from '@/api/manage'
+import { getResidentOrders } from '@/api/order/resident'
 
 export default {
   name: 'OrderResident',
@@ -164,44 +164,39 @@ export default {
       columns: [
         {
           title: '订单号',
-          dataIndex: 'no'
+          dataIndex: 'number'
         },
         {
           title: '订单来源',
-          dataIndex: 'callNo',
-          sorter: true
+          dataIndex: 'source'
         },
         {
           title: '下单时间',
-          dataIndex: 'description',
-          scopedSlots: { customRender: 'description' }
+          dataIndex: 'create_time'
         },
         {
           title: '预约时间',
-          dataIndex: 'description',
-          scopedSlots: { customRender: 'description' }
+          dataIndex: 'appointment'
         },
         {
           title: '客户名',
-          dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
+          dataIndex: 'customer'
         },
         {
           title: '联系电话',
-          dataIndex: 'updatedAt'
+          dataIndex: 'phone'
         },
         {
           title: '订单状态',
-          dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
+          dataIndex: 'order_status'
         },
         {
           title: '支付状态',
-          dataIndex: 'updatedAt'
+          dataIndex: 'pay_status'
         },
         {
           title: '跟进人',
-          dataIndex: 'updatedAt'
+          dataIndex: 'operator'
         },
         {
           title: '操作',
@@ -212,8 +207,7 @@ export default {
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        console.log('loadData.parameter', parameter)
-        return getServiceList(Object.assign(parameter, this.queryParam)).then(res => {
+        return getResidentOrders(Object.assign(parameter, this.queryParam)).then(res => {
           return res.result
         })
       }

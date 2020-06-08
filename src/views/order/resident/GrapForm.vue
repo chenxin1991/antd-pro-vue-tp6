@@ -1,9 +1,11 @@
 <template>
   <a-modal
-    title="派单"
+    title="抢单"
     :width="600"
-    v-model="visible"
-    @ok="handleOk"
+    :visible="visible"
+    :confirmLoading="confirmLoading"
+    @ok="handleSubmit"
+    @cancel="handleCancel"
   >
     <a-form class="permission-form" :form="form">
       <a-form-item
@@ -16,7 +18,6 @@
           :default-value="['a1', 'b2']"
           style="width: 100%"
           placeholder="Please select"
-          @change="handleChange"
         >
           <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
             {{ (i + 9).toString(36) + i }}

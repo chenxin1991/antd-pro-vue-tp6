@@ -1,11 +1,12 @@
 <template>
   <a-modal
     title="新增订单"
-    :width="960"
+    :width="1000"
     :visible="visible"
-    :confirmLoading="confirmLoading"
     :bodyStyle="{padding:'24px 24px 12px 24px'}"
     @cancel="handleCancel"
+    :confirmLoading="confirmLoading"
+    @ok="handleSubmit"
   >
     <a-form
       :form="form"
@@ -13,19 +14,52 @@
       :wrapper-col="wrapperCol"
     >
       <a-tabs
-        default-active-key="1"
+        default-active-key="2"
         tabPosition="left"
       >
         <a-tab-pane
           key="1"
           tab="预约与车辆"
+          forceRender
         >
           <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="预约日期">
+            <a-col :span="8">
+              <a-form-item
+                label="订单来源"
+                :labelCol="{
+                  xs: { span: 24 },
+                  sm: { span: 8 }
+                }"
+                :wrapperCol="{
+                  xs: { span: 24 },
+                  sm: { span: 16 }
+                }"
+              >
+                <a-select
+                  v-decorator="['source', { rules: [{ required: true, message: '请选择订单来源！' }] }]"
+                  placeholder="请选择"
+                >
+                  <a-select-option value="0">来电</a-select-option>
+                  <a-select-option value="1">上门</a-select-option>
+                  <a-select-option value="2">小程序</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item
+                label="预约日期"
+                :labelCol="{
+                  xs: { span: 24 },
+                  sm: { span: 8 }
+                }"
+                :wrapperCol="{
+                  xs: { span: 24 },
+                  sm: { span: 16 }
+                }"
+              >
                 <a-date-picker
                   v-decorator="[
-                    'dateTime',
+                    'appointment',
                     {
                       rules: [{ required: true, message: '请选择预约日期！' }],
                     },
@@ -34,10 +68,20 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="12">
-              <a-form-item label="时间段">
+            <a-col :span="8">
+              <a-form-item
+                label="时间段"
+                :labelCol="{
+                  xs: { span: 24 },
+                  sm: { span: 8 }
+                }"
+                :wrapperCol="{
+                  xs: { span: 24 },
+                  sm: { span: 16 }
+                }"
+              >
                 <a-select
-                  v-decorator="['role_id', { rules: [{ required: true, message: '请选择时间段！' }] }]"
+                  v-decorator="['time', { rules: [{ required: true, message: '请选择时间段！' }] }]"
                   placeholder="请选择时间段"
                 >
                   <a-select-option value="0">07:00</a-select-option>
@@ -86,11 +130,15 @@
                   :pagination="false"
                   size="small"
                 >
-                  <template slot="num">
+                  <template
+                    slot="num"
+                    slot-scope="text, record"
+                  >
                     <a-input-number
                       :min="0"
                       :max="10"
-                      :default-value="0"
+                      v-decorator="[`num[${record.key}]`, { rules: [{ required: true, message: '请输入数量！' }] }]"
+                      style="width:100%"
                     />
                   </template>
                 </a-table>
@@ -113,6 +161,7 @@
         <a-tab-pane
           key="2"
           tab="起始地"
+          forceRender
         >
           <a-row :gutter="16">
             <a-col :span="24">
@@ -128,9 +177,9 @@
               >
                 <a-button
                   class="editable-add-btn"
-                  @click="handleAdd"
+                  @click="handleRouteAdd"
                 >
-                  添加地点
+                  添加途径点
                 </a-button>
                 <a-table
                   :columns="columns_route"
@@ -138,17 +187,23 @@
                   :pagination="false"
                   size="small"
                 >
-                  <template slot="floor_num">
+                  <template
+                    slot="floor_num"
+                    slot-scope="text, record"
+                  >
                     <a-input-number
                       :min="0"
                       :max="10"
-                      :default-value="0"
                       style="width:100%"
+                      v-decorator="[`floor_num[${record.key}]`, { rules: [{ required: true, message: '请输入楼层数！' }] }]"
                     />
                   </template>
-                  <template slot="parking_distance">
+                  <template
+                    slot="parking_distance"
+                    slot-scope="text, record"
+                  >
                     <a-select
-                      v-decorator="['parking_distance[]', { rules: [{ required: true, message: '请选择停车位距离！' }] }]"
+                      v-decorator="[`parking_distance[${record.key}]`, { rules: [{ required: true, message: '请选择停车位距离！' }] }]"
                       placeholder="选择距离"
                     >
                       <a-select-option value="0">低于30米</a-select-option>
@@ -158,9 +213,12 @@
                       <a-select-option value="4">地下室出入</a-select-option>
                     </a-select>
                   </template>
-                  <template slot="location">
+                  <template
+                    slot="location"
+                    slot-scope="text, record"
+                  >
                     <a-auto-complete :data-source="dataSource">
-                      <a-input>
+                      <a-input v-decorator="[`location[${record.key}]`, { rules: [{ required: true, message: '请选择地址！' }]}]">
                         <a-icon
                           slot="suffix"
                           type="search"
@@ -170,18 +228,38 @@
                       </a-input>
                     </a-auto-complete>
                   </template>
-                  <template slot="room_number">
-                    <a-input />
+                  <template
+                    slot="door_number"
+                    slot-scope="text, record"
+                  >
+                    <a-input v-decorator="[`door_number[${record.key}]`, { rules: [{ required: true, message: '请输入门牌号！' }]}]" />
                   </template>
-                  <template slot="stairs_or_elevators">
+                  <template
+                    slot="stairs_or_elevators"
+                    slot-scope="text, record"
+                  >
                     <a-select
-                      v-decorator="['stairs_or_elevators[]', { rules: [{ required: true, message: '请选择电梯或楼梯！' }] }]"
+                      v-decorator="[`stairs_or_elevators[${record.key}]`, { rules: [{ required: true, message: '请选择电梯或楼梯！' }] }]"
                       placeholder="选择"
                     >
                       <a-select-option value="elevators">电梯</a-select-option>
                       <a-select-option value="stairs">楼梯</a-select-option>
                     </a-select>
                   </template>
+                  <span
+                    slot="action"
+                    slot-scope="text, record"
+                  >
+                    <template>
+                      <a-popconfirm
+                        v-if="route.length && record.key!=0 && record.key!=1"
+                        title="确定删除吗?"
+                        @confirm="() => handleRouteDelete(record.key)"
+                      >
+                        <a href="javascript:;">删除</a>
+                      </a-popconfirm>
+                    </template>
+                  </span>
                 </a-table>
               </a-form-item>
             </a-col>
@@ -212,6 +290,7 @@
         <a-tab-pane
           key="3"
           tab="拆装件"
+          forceRender
         >
           <a-row :gutter="16">
             <a-col :span="24">
@@ -227,7 +306,7 @@
               >
                 <a-button
                   class="editable-add-btn"
-                  @click="handleAdd"
+                  @click="handleOnoffAdd"
                 >
                   添加拆装件
                 </a-button>
@@ -237,13 +316,44 @@
                   :pagination="false"
                   size="small"
                 >
-                  <template slot="num">
+                  <template
+                    slot="name"
+                    slot-scope="text, record"
+                  >
+                    <a-select
+                      show-search
+                      v-decorator="[`name[${record.key}]`, { rules: [{ required: true, message: '请选择拆装件！' }] }]"
+                      placeholder="选择拆装件"
+                    >
+                      <a-select-option value="elevators">2-3门或推拉门衣柜/书柜</a-select-option>
+                      <a-select-option value="stairs">楼梯</a-select-option>
+                    </a-select>
+                  </template>
+                  <template
+                    slot="num"
+                    slot-scope="text, record"
+                  >
                     <a-input-number
                       :min="1"
                       :max="10"
-                      :default-value="1"
+                      v-decorator="[`num[${record.key}]`, { rules: [{ required: true, message: '请输入数量！' }]}]"
+                      style="width:100%"
                     />
                   </template>
+                  <span
+                    slot="action"
+                    slot-scope="text, record"
+                  >
+                    <template>
+                      <a-popconfirm
+                        v-if="onoff.length"
+                        title="确定删除吗?"
+                        @confirm="() => handleOnoffDelete(record.key)"
+                      >
+                        <a href="javascript:;">删除</a>
+                      </a-popconfirm>
+                    </template>
+                  </span>
                 </a-table>
               </a-form-item>
             </a-col>
@@ -264,6 +374,7 @@
         <a-tab-pane
           key="4"
           tab="大件(非拆装)"
+          forceRender
         >
           <a-row :gutter="16">
             <a-col :span="24">
@@ -279,7 +390,7 @@
               >
                 <a-button
                   class="editable-add-btn"
-                  @click="handleAdd"
+                  @click="handleLargeAdd"
                 >
                   添加大件
                 </a-button>
@@ -289,13 +400,41 @@
                   :pagination="false"
                   size="small"
                 >
-                  <template slot="num">
+                  <template
+                    slot="name"
+                    slot-scope="text, record"
+                  >
+                    <a-select
+                      show-search
+                      v-decorator="[`name[${record.key}]`, { rules: [{ required: true, message: '请选择大件！' }]}]"
+                      placeholder="选择大件"
+                    >
+                      <a-select-option value="elevators">2-3门或推拉门衣柜/书柜</a-select-option>
+                      <a-select-option value="stairs">楼梯</a-select-option>
+                    </a-select>
+                  </template>
+                  <template slot="num" slot-scope="text, record">
                     <a-input-number
                       :min="1"
                       :max="10"
-                      :default-value="1"
+                      v-decorator="[`num[${record.key}]`, { rules: [{ required: true, message: '请选择数量！' }]}]"
+                      style="width:100%"
                     />
                   </template>
+                  <span
+                    slot="action"
+                    slot-scope="text, record"
+                  >
+                    <template>
+                      <a-popconfirm
+                        v-if="large.length"
+                        title="确定删除吗?"
+                        @confirm="() => handleLargeDelete(record.key)"
+                      >
+                        <a href="javascript:;">删除</a>
+                      </a-popconfirm>
+                    </template>
+                  </span>
                 </a-table>
               </a-form-item>
             </a-col>
@@ -315,23 +454,6 @@
         </a-tab-pane>
       </a-tabs>
     </a-form>
-    <template slot="footer">
-      <h2 style="float:left;color:red;">总报价：80000元</h2>
-      <a-button
-        key="back"
-        @click="handleCancel"
-      >
-        取消
-      </a-button>
-      <a-button
-        key="submit"
-        type="primary"
-        :loading="loading"
-        @click="handleOk"
-      >
-        确定
-      </a-button>
-    </template>
   </a-modal>
 </template>
 <script>
@@ -362,21 +484,22 @@ export default {
       ],
       columns_route: [
         {
-          title: '坐标',
+          title: '地址',
           dataIndex: 'location',
-          width: '40%',
+          width: '37%',
           scopedSlots: { customRender: 'location' }
         },
         {
           title: '门牌号',
-          dataIndex: 'room_number',
+          dataIndex: 'door_number',
           width: '20%',
-          scopedSlots: { customRender: 'room_number' }
+          scopedSlots: { customRender: 'door_number' }
         },
         {
           title: '电梯或楼梯',
           dataIndex: 'stairs_or_elevators',
-          scopedSlots: { customRender: 'stairs_or_elevators' }
+          scopedSlots: { customRender: 'stairs_or_elevators' },
+          width: '90px'
         },
         {
           title: '楼层数',
@@ -389,44 +512,67 @@ export default {
           dataIndex: 'parking_distance',
           scopedSlots: { customRender: 'parking_distance' },
           width: '120px'
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' }
         }
       ],
       columns_onoff: [
         {
           title: '名称',
-          dataIndex: 'name'
+          dataIndex: 'name',
+          width: '40%',
+          scopedSlots: { customRender: 'name' }
         },
         {
           title: '单价',
-          dataIndex: 'price'
+          dataIndex: 'price',
+          width: '15%'
         },
         {
           title: '数量',
           dataIndex: 'num',
+          width: '15%',
           scopedSlots: { customRender: 'num' }
         },
         {
           title: '总计',
           dataIndex: 'total'
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' }
         }
       ],
       columns_large: [
         {
           title: '名称',
-          dataIndex: 'name'
+          dataIndex: 'name',
+          width: '40%',
+          scopedSlots: { customRender: 'name' }
         },
         {
           title: '单价',
-          dataIndex: 'price'
+          dataIndex: 'price',
+          width: '15%'
         },
         {
           title: '数量',
           dataIndex: 'num',
+          width: '15%',
           scopedSlots: { customRender: 'num' }
         },
         {
           title: '总计',
           dataIndex: 'total'
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' }
         }
       ],
       dataSource: ['Burns Bay Road', 'Downing Street', 'Wall Street'],
@@ -443,19 +589,19 @@ export default {
       form: this.$form.createForm(this),
       cars: [
         {
-          key: '1',
+          key: 0,
           name: 'John Brown',
           price: 300,
           total: 0
         },
         {
-          key: '2',
+          key: 1,
           name: 'Jim Green',
           price: 400,
           total: 0
         },
         {
-          key: '3',
+          key: 2,
           name: 'Joe Black',
           price: 400,
           total: 0
@@ -463,22 +609,27 @@ export default {
       ],
       route: [
         {
-          key: '1',
-          name: 'John Brown',
-          age: 32,
-          price: 300,
-          total: 0
+          key: 0,
+          location: undefined,
+          room_number: '',
+          stairs_or_elevators: '',
+          floor_num: 0,
+          parking_distance: 0
         },
         {
-          key: '2',
-          name: 'Jim Green',
-          age: 42,
-          price: 400,
-          total: 0
+          key: 1,
+          location: 'Jim Green',
+          room_number: '203',
+          stairs_or_elevators: 'stairs',
+          floor_num: 0,
+          parking_distance: 0
         }
       ],
       onoff: [],
-      large: []
+      large: [],
+      routeCount: 2,
+      onoffCount: 0,
+      largeCount: 0
     }
   },
   methods: {
@@ -498,8 +649,66 @@ export default {
         setFieldsValue(pick(record, []))
       })
     },
+    handleRouteAdd () {
+      const { routeCount } = this
+      const newData = {
+        key: routeCount,
+        name: '2-3门或推拉门衣柜/书柜',
+        price: 0,
+        num: 1,
+        total: 0
+      }
+      this.route.splice(-1, 0, newData)
+      this.routeCount = routeCount + 1
+    },
+    handleRouteDelete (key) {
+      this.route = this.route.filter(item => item.key !== key)
+    },
+    handleOnoffAdd () {
+      const { onoff, onoffCount } = this
+      const newData = {
+        key: onoffCount,
+        name: '2-3门或推拉门衣柜/书柜',
+        price: 0,
+        num: 1,
+        total: 0
+      }
+      this.onoff = [...onoff, newData]
+      this.onoffCount = onoffCount + 1
+    },
+    handleOnoffDelete (key) {
+      this.onoff = this.route.filter(item => item.key !== key)
+    },
+    handleLargeAdd () {
+      const { large, largeCount } = this
+      const newData = {
+        key: largeCount,
+        name: '2-3门或推拉门衣柜/书柜',
+        price: 0,
+        num: 1,
+        total: 0
+      }
+      this.large = [...large, newData]
+      this.largeCount = largeCount + 1
+    },
+    handleLargeDelete (key) {
+      this.large = this.large.filter(item => item.key !== key)
+    },
     handleCancel () {
       this.visible = false
+    },
+    handleSubmit () {
+      const {
+        form: { validateFields }
+      } = this
+      // this.confirmLoading = true
+      validateFields((errors, values) => {
+        if (!errors) {
+          console.log(values)
+        } else {
+          // this.confirmLoading = false
+        }
+      })
     }
   }
 }

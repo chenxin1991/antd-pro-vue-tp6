@@ -2,8 +2,10 @@
   <a-modal
     title="派单"
     :width="600"
-    v-model="visible"
-    @ok="handleOk"
+    :visible="visible"
+    :confirmLoading="confirmLoading"
+    @ok="handleSubmit"
+    @cancel="handleCancel"
   >
     <a-form class="permission-form" :form="form">
       <a-form-item
