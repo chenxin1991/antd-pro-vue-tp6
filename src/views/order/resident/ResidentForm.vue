@@ -14,7 +14,7 @@
       :wrapper-col="wrapperCol"
     >
       <a-tabs
-        default-active-key="2"
+        default-active-key="1"
         tabPosition="left"
       >
         <a-tab-pane
@@ -137,8 +137,9 @@
                     <a-input-number
                       :min="0"
                       :max="10"
-                      v-decorator="[`num[${record.key}]`, { rules: [{ required: true, message: '请输入数量！' }] }]"
+                      :value="text"
                       style="width:100%"
+                      @change="value => handleCarNumChange(value, record.key)"
                     />
                   </template>
                 </a-table>
@@ -215,24 +216,30 @@
                   </template>
                   <template
                     slot="location"
-                    slot-scope="text, record"
                   >
                     <a-auto-complete :data-source="dataSource">
-                      <a-input v-decorator="[`location[${record.key}]`, { rules: [{ required: true, message: '请选择地址！' }]}]">
+                      <!-- <a-input
+                        :value="text"
+                        @change="e => handleRouteInputChange(e.target.value, record.key, 'location')"
+                      >
                         <a-icon
                           slot="suffix"
                           type="search"
                           class="certain-category-icon"
                           @click="test"
                         />
-                      </a-input>
+                      </a-input> -->
                     </a-auto-complete>
                   </template>
                   <template
-                    slot="door_number"
+                    slot="room_number"
                     slot-scope="text, record"
                   >
-                    <a-input v-decorator="[`door_number[${record.key}]`, { rules: [{ required: true, message: '请输入门牌号！' }]}]" />
+                    <a-input
+                      :value="text"
+                      @change="e => handleRouteInputChange(e.target.value, record.key, 'room_number')"
+                    >/>
+                    </a-input>
                   </template>
                   <template
                     slot="stairs_or_elevators"
@@ -413,7 +420,10 @@
                       <a-select-option value="stairs">楼梯</a-select-option>
                     </a-select>
                   </template>
-                  <template slot="num" slot-scope="text, record">
+                  <template
+                    slot="num"
+                    slot-scope="text, record"
+                  >
                     <a-input-number
                       :min="1"
                       :max="10"
@@ -491,9 +501,9 @@ export default {
         },
         {
           title: '门牌号',
-          dataIndex: 'door_number',
+          dataIndex: 'room_number',
           width: '20%',
-          scopedSlots: { customRender: 'door_number' }
+          scopedSlots: { customRender: 'room_number' }
         },
         {
           title: '电梯或楼梯',
@@ -592,25 +602,28 @@ export default {
           key: 0,
           name: 'John Brown',
           price: 300,
+          num: 0,
           total: 0
         },
         {
           key: 1,
           name: 'Jim Green',
           price: 400,
+          num: 0,
           total: 0
         },
         {
           key: 2,
           name: 'Joe Black',
           price: 400,
+          num: 0,
           total: 0
         }
       ],
       route: [
         {
           key: 0,
-          location: undefined,
+          location: '',
           room_number: '',
           stairs_or_elevators: '',
           floor_num: 0,
@@ -619,7 +632,7 @@ export default {
         {
           key: 1,
           location: 'Jim Green',
-          room_number: '203',
+          room_number: '',
           stairs_or_elevators: 'stairs',
           floor_num: 0,
           parking_distance: 0
@@ -636,6 +649,24 @@ export default {
     moment,
     add () {
       this.visible = true
+    },
+    handleCarNumChange (value, key) {
+      const newData = [...this.cars]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target['num'] = value
+        target['total'] = target['num'] * target['price']
+        this.cars = newData
+      }
+    },
+    handleRouteInputChange (value, key, column) {
+      const newData = [...this.route]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target[column] = value
+        this.route = newData
+      }
+      console.log(this.route)
     },
     test () {
       alert('sss')

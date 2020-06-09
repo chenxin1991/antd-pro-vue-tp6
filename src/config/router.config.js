@@ -56,6 +56,12 @@ export const asyncRouterMap = [
             name: 'OrderResident',
             component: () => import('@/views/order/resident/Resident'),
             meta: { title: '居民搬家', keepAlive: true, permission: [ 'order' ] }
+          },
+          {
+            path: '/order/test',
+            name: 'OrderTest',
+            component: () => import('@/views/order/resident/Test'),
+            meta: { title: '测试', keepAlive: true, permission: [ 'order' ] }
           }
           // {
           //   path: '/order/company',
