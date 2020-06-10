@@ -32,21 +32,23 @@
         </div>
       </template>
     </a-table>
-    <baidu-map :zoom="11">
-      <bm-view class="map"></bm-view>
-      <bm-control >
-        <bm-auto-complete v-model="keyword" :sugStyle="{zIndex: 1000000}" @confirm="test">
-          <a-input placeholder="请输入地名关键字"></a-input> <!-- 这里指代一个自定义搜索框组件 -->
-        </bm-auto-complete>
+
+    <baidu-map class="map" :center="{lng: 116.404, lat: 39.915}" :zoom="15">
+      <bm-control style="padding:10px; ">
+        <a-auto-complete
+          style="width: 300px"
+          placeholder="关键词"
+        />
       </bm-control>
-      <bm-local-search :keyword="keyword" :auto-viewport="true" :panel="false"></bm-local-search>
+      <bm-marker :position="{lng: 116.404, lat: 39.915}" :dragging="true" animation="BMAP_ANIMATION_BOUNCE">
+      </bm-marker>
     </baidu-map>
   </div>
 </template>
 <script>
 import BaiduMap from 'vue-baidu-map/components/map/Map.vue'
-import BmView from 'vue-baidu-map/components/map/MapView.vue'
-import BmLocalSearch from 'vue-baidu-map/components/search/LocalSearch.vue'
+
+import BmControl from 'vue-baidu-map/components/controls/Control.vue'
 const columns = [
   {
     title: 'name',
@@ -85,8 +87,7 @@ for (let i = 0; i < 100; i++) {
 export default {
     components: {
       BaiduMap,
-      BmView,
-      BmLocalSearch
+      BmControl
   },
   data () {
     this.cacheData = data.map(item => ({ ...item }))

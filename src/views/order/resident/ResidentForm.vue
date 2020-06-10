@@ -216,20 +216,24 @@
                   </template>
                   <template
                     slot="location"
+                    slot-scope="text, record"
                   >
-                    <a-auto-complete :data-source="dataSource">
-                      <!-- <a-input
-                        :value="text"
-                        @change="e => handleRouteInputChange(e.target.value, record.key, 'location')"
-                      >
-                        <a-icon
-                          slot="suffix"
-                          type="search"
-                          class="certain-category-icon"
-                          @click="test"
-                        />
-                      </a-input> -->
-                    </a-auto-complete>
+                    <a-select
+                      show-search
+                      :value="text"
+                      placeholder="input search text"
+                      :default-active-first-option="false"
+                      :show-arrow="false"
+                      :filter-option="false"
+                      :not-found-content="null"
+                      @search="handleRouteLocationSearch"
+                      @change="value => handleRouteLocationChange(value, record.key)"
+                    >
+                      <a-select-option v-for="d in data" :key="d.value">
+                        <p>{{ d.text }}</p>
+                        <p>{{ d.text }}</p>
+                      </a-select-option>
+                    </a-select>
                   </template>
                   <template
                     slot="room_number"
@@ -469,7 +473,44 @@
 <script>
 import pick from 'lodash.pick'
 import moment from 'moment'
+import jsonp from 'fetch-jsonp'
 
+let timeout
+
+function fetch (value, callback) {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
+  function fake () {
+    // const str = querystring.encode({
+    //   ak: 'ZgAYCeb2UwqFqxH8UjTDuljnLO4rNunZ',
+    //   query: value,
+    //   region: '全国',
+    //   output: 'json'
+    // })
+    jsonp('https://bird.ioliu.cn/v1/?url=' + 'https://apis.map.qq.com/ws/place/v1/suggestion/?region=北京&keyword=美食&key=SF7BZ-5R4OF-65AJI-J6CZQ-MIGHJ-MAFOI', { timeout: 20000 })
+      .then(response => response.json())
+      .then(d => {
+        console.log(d.data)
+        // if (currentValue === value) {
+        //   const result = d.result
+        //   console.log(result)
+        //   const data = []
+        //   result.forEach(r => {
+        //     data.push({
+        //       value: r.name,
+        //       text: r.name
+        //     })
+        //   })
+        //   callback(data)
+        // }
+      })
+  }
+
+  timeout = setTimeout(fake, 300)
+}
 export default {
   data () {
     return {
@@ -585,7 +626,6 @@ export default {
           scopedSlots: { customRender: 'action' }
         }
       ],
-      dataSource: ['Burns Bay Road', 'Downing Street', 'Wall Street'],
       labelCol: {
         xs: { span: 24 },
         sm: { span: 6 }
@@ -620,6 +660,7 @@ export default {
           total: 0
         }
       ],
+      data: [],
       route: [
         {
           key: 0,
@@ -658,6 +699,19 @@ export default {
         target['total'] = target['num'] * target['price']
         this.cars = newData
       }
+    },
+    handleRouteLocationSearch (value) {
+      fetch(value, data => (this.data = data))
+    },
+    handleRouteLocationChange (value, key) {
+            const newData = [...this.route]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target['location'] = value
+        this.route = newData
+      }
+      console.log(value)
+      fetch(value, data => (this.data = data))
     },
     handleRouteInputChange (value, key, column) {
       const newData = [...this.route]
