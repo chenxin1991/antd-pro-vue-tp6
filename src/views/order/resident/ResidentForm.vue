@@ -218,22 +218,26 @@
                     slot="location"
                     slot-scope="text, record"
                   >
-                    <a-select
-                      show-search
+                    <a-auto-complete
                       :value="text"
-                      placeholder="input search text"
-                      :default-active-first-option="false"
-                      :show-arrow="false"
-                      :filter-option="false"
-                      :not-found-content="null"
-                      @search="handleRouteLocationSearch"
-                      @change="value => handleRouteLocationChange(value, record.key)"
+                      placeholder="请输入搜索地址"
+                      :dropdown-match-select-width="false"
+                      :dropdown-style="{ width: '800px'}"
+                      @search="value=>onLocationSearch(value,record.key)"
+                      @select="(value,option)=>onLocationSelect(value,option,record.key)"
+                      @change="value=>onLocationChange(value,record.key)"
+                      @blur="onLacationBlur(record.key)"
+                      optionLabelProp="title"
                     >
-                      <a-select-option v-for="d in data" :key="d.value">
-                        <p>{{ d.text }}</p>
-                        <p>{{ d.text }}</p>
-                      </a-select-option>
-                    </a-select>
+                      <template slot="dataSource">
+                        <a-select-option
+                          v-for="place in places"
+                          :key="place.id"
+                          :title="place.title"
+                          :option="{'title':place.title,'location':place.location,'address':place.address}"
+                        ><span style="font-weight:bold;">{{ place.title }}</span><span style="padding-left:10px;">{{ place.address }}</span></a-select-option>
+                      </template>
+                    </a-auto-complete>
                   </template>
                   <template
                     slot="room_number"
@@ -484,33 +488,37 @@ function fetch (value, callback) {
   }
 
   function fake () {
-    // const str = querystring.encode({
-    //   ak: 'ZgAYCeb2UwqFqxH8UjTDuljnLO4rNunZ',
-    //   query: value,
-    //   region: '全国',
-    //   output: 'json'
-    // })
-    jsonp('https://bird.ioliu.cn/v1/?url=' + 'https://apis.map.qq.com/ws/place/v1/suggestion/?region=北京&keyword=美食&key=SF7BZ-5R4OF-65AJI-J6CZQ-MIGHJ-MAFOI', { timeout: 20000 })
+    jsonp(
+      'https://bird.ioliu.cn/v1/?url=' +
+        'https://apis.map.qq.com/ws/place/v1/suggestion/?region=深圳&region_fix=0&keyword=' +
+        value +
+        '&key=OI7BZ-EGOWU-H5YVZ-4HLVW-MDUUQ-ZCFGJ'
+    )
       .then(response => response.json())
       .then(d => {
-        console.log(d.data)
-        // if (currentValue === value) {
-        //   const result = d.result
-        //   console.log(result)
-        //   const data = []
-        //   result.forEach(r => {
-        //     data.push({
-        //       value: r.name,
-        //       text: r.name
-        //     })
-        //   })
-        //   callback(data)
-        // }
+        const result = d.data
+        const data = []
+        result.forEach(r => {
+          if (!r.address.includes(r.province)) {
+            r.address = r.province + r.city + r.district + r.address
+          }
+          data.push({
+            id: r.id,
+            title: r.title,
+            province: r.province,
+            city: r.city,
+            district: r.district,
+            location: JSON.stringify(r.location),
+            address: r.address
+          })
+        })
+        callback(data)
       })
   }
 
   timeout = setTimeout(fake, 300)
 }
+
 export default {
   data () {
     return {
@@ -536,7 +544,7 @@ export default {
       columns_route: [
         {
           title: '地址',
-          dataIndex: 'location',
+          dataIndex: 'title',
           width: '37%',
           scopedSlots: { customRender: 'location' }
         },
@@ -660,10 +668,12 @@ export default {
           total: 0
         }
       ],
-      data: [],
+      places: [],
       route: [
         {
           key: 0,
+          title: '',
+          address: '',
           location: '',
           room_number: '',
           stairs_or_elevators: '',
@@ -672,9 +682,11 @@ export default {
         },
         {
           key: 1,
-          location: 'Jim Green',
+          title: '',
+          address: '',
+          location: '',
           room_number: '',
-          stairs_or_elevators: 'stairs',
+          stairs_or_elevators: '',
           floor_num: 0,
           parking_distance: 0
         }
@@ -700,18 +712,40 @@ export default {
         this.cars = newData
       }
     },
-    handleRouteLocationSearch (value) {
-      fetch(value, data => (this.data = data))
+    onLocationSearch (value, key) {
+      if (value) {
+        fetch(value, data => (this.places = data))
+      }
     },
-    handleRouteLocationChange (value, key) {
-            const newData = [...this.route]
+    onLocationSelect (value, option, key) {
+      const data = option.data.attrs.option
+      const newData = [...this.route]
       const target = newData.filter(item => key === item.key)[0]
       if (target) {
-        target['location'] = value
+        target['title'] = data.title
+        target['location'] = data.location
+        target['address'] = data.address
+        target['select_title'] = data.title
         this.route = newData
       }
-      console.log(value)
-      fetch(value, data => (this.data = data))
+    },
+    onLocationChange (value, key) {
+      const newData = [...this.route]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target['title'] = value
+        this.route = newData
+      }
+    },
+    onLacationBlur (key) {
+        const newData = [...this.route]
+        const target = newData.filter(item => key === item.key)[0]
+        if (target) {
+          if (target['select_title'] && target['select_title'] !== target['title']) {
+            target['title'] = target['select_title']
+          }
+          this.route = newData
+        }
     },
     handleRouteInputChange (value, key, column) {
       const newData = [...this.route]
@@ -720,10 +754,6 @@ export default {
         target[column] = value
         this.route = newData
       }
-      console.log(this.route)
-    },
-    test () {
-      alert('sss')
     },
     edit (record) {
       this.visible = true
