@@ -195,7 +195,7 @@ export default {
           dataIndex: 'pay_status'
         },
         {
-          title: '跟进人',
+          title: '接线员',
           dataIndex: 'operator'
         },
         {
@@ -212,8 +212,6 @@ export default {
         })
       }
     }
-  },
-  created () {
   },
   methods: {
     handleAdd () {

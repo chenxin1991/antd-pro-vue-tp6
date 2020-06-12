@@ -126,7 +126,7 @@
               >
                 <a-table
                   :columns="columns_car"
-                  :data-source="cars"
+                  :data-source="select_cars"
                   :pagination="false"
                   size="small"
                 >
@@ -190,13 +190,13 @@
                 >
                   <template
                     slot="floor_num"
-                    slot-scope="text, record"
+                    slot-scope="text"
                   >
                     <a-input-number
+                      :value="text"
                       :min="0"
                       :max="10"
                       style="width:100%"
-                      v-decorator="[`floor_num[${record.key}]`, { rules: [{ required: true, message: '请输入楼层数！' }] }]"
                     />
                   </template>
                   <template
@@ -286,7 +286,7 @@
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
                 >
-                  10.6km
+                  {{ Math.round(distance.distance / 1000) || 0 }}公里
                 </span>
               </a-form-item>
             </a-col>
@@ -327,31 +327,35 @@
                 </a-button>
                 <a-table
                   :columns="columns_onoff"
-                  :data-source="onoff"
+                  :data-source="selectOnoff"
                   :pagination="false"
                   size="small"
                 >
                   <template
                     slot="name"
-                    slot-scope="text, record"
+                    slot-scope="text"
                   >
                     <a-select
                       show-search
-                      v-decorator="[`name[${record.key}]`, { rules: [{ required: true, message: '请选择拆装件！' }] }]"
+                      :value="text"
                       placeholder="选择拆装件"
+                      :filter-option="filterOnoff"
                     >
-                      <a-select-option value="elevators">2-3门或推拉门衣柜/书柜</a-select-option>
-                      <a-select-option value="stairs">楼梯</a-select-option>
+                      <a-select-option
+                        :key="index"
+                        v-for="(item, index) in onoff"
+                        :value="item.id"
+                      >{{ item.name }}</a-select-option>
                     </a-select>
                   </template>
                   <template
                     slot="num"
-                    slot-scope="text, record"
+                    slot-scope="text"
                   >
                     <a-input-number
+                      :value="text"
                       :min="1"
                       :max="10"
-                      v-decorator="[`num[${record.key}]`, { rules: [{ required: true, message: '请输入数量！' }]}]"
                       style="width:100%"
                     />
                   </template>
@@ -361,7 +365,7 @@
                   >
                     <template>
                       <a-popconfirm
-                        v-if="onoff.length"
+                        v-if="selectOnoff.length"
                         title="确定删除吗?"
                         @confirm="() => handleOnoffDelete(record.key)"
                       >
@@ -375,7 +379,7 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="车辆费用">
+              <a-form-item label="拆装费用">
                 <span
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
@@ -388,7 +392,7 @@
         </a-tab-pane>
         <a-tab-pane
           key="4"
-          tab="大件(非拆装)"
+          tab="大件"
           forceRender
         >
           <a-row :gutter="16">
@@ -411,17 +415,17 @@
                 </a-button>
                 <a-table
                   :columns="columns_large"
-                  :data-source="large"
+                  :data-source="selectLarge"
                   :pagination="false"
                   size="small"
                 >
                   <template
                     slot="name"
-                    slot-scope="text, record"
+                    slot-scope="text"
                   >
                     <a-select
                       show-search
-                      v-decorator="[`name[${record.key}]`, { rules: [{ required: true, message: '请选择大件！' }]}]"
+                      :value="text"
                       placeholder="选择大件"
                     >
                       <a-select-option value="elevators">2-3门或推拉门衣柜/书柜</a-select-option>
@@ -430,12 +434,12 @@
                   </template>
                   <template
                     slot="num"
-                    slot-scope="text, record"
+                    slot-scope="text"
                   >
                     <a-input-number
+                      :value="text"
                       :min="1"
                       :max="10"
-                      v-decorator="[`num[${record.key}]`, { rules: [{ required: true, message: '请选择数量！' }]}]"
                       style="width:100%"
                     />
                   </template>
@@ -445,7 +449,7 @@
                   >
                     <template>
                       <a-popconfirm
-                        v-if="large.length"
+                        v-if="selectLarge.length"
                         title="确定删除吗?"
                         @confirm="() => handleLargeDelete(record.key)"
                       >
@@ -459,7 +463,7 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="车辆费用">
+              <a-form-item label="大件费用">
                 <span
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
@@ -478,6 +482,7 @@
 import pick from 'lodash.pick'
 import moment from 'moment'
 import jsonp from 'fetch-jsonp'
+import { getCars, getOnOffGoods, getLargeGoods } from '@/api/common'
 
 let timeout
 
@@ -500,7 +505,11 @@ function fetch (value, callback) {
         const data = []
         result.forEach(r => {
           if (!r.address.includes(r.province)) {
-            r.address = r.province + r.city + r.district + r.address
+            if (r.address.hasOwnProperty('district')) {
+              r.address = r.province + r.city + r.district + r.address
+            } else {
+              r.address = r.province + r.city + r.address
+            }
           }
           data.push({
             id: r.id,
@@ -517,6 +526,57 @@ function fetch (value, callback) {
   }
 
   timeout = setTimeout(fake, 300)
+}
+
+function distance (value, callback) {
+  let from = ''
+  let to = ''
+  let waypoints = ''
+  let url = ''
+  const data = {}
+  value.forEach(r => {
+    const location = JSON.parse(r.location)
+    if (r.key === 0) {
+      from = location.lat + ',' + location.lng
+    } else if (r.key === 1) {
+      to = location.lat + ',' + location.lng
+    } else {
+      if (waypoints) {
+        waypoints = waypoints + ';' + location.lat + ',' + location.lng
+      } else {
+        waypoints = location.lat + ',' + location.lng
+      }
+    }
+  })
+
+  if (from && to) {
+    url =
+      'https://bird.ioliu.cn/v1/?url=' +
+      'https://apis.map.qq.com/ws/direction/v1/driving/?from=' +
+      from +
+      '&to=' +
+      to +
+      '&output=json&key=OI7BZ-EGOWU-H5YVZ-4HLVW-MDUUQ-ZCFGJ'
+    if (waypoints) {
+      url = url + '&waypoints=' + waypoints
+    }
+    jsonp(url)
+      .then(response => response.json())
+      .then(d => {
+        if (d.status === 0) {
+          const route = d.result.routes[0]
+          data.distance = route.distance
+          data.duration = route.duration
+          callback(data)
+        } else {
+          callback(data)
+        }
+      })
+      .catch(err => {
+        console.log(err)
+        callback(data)
+      })
+  }
 }
 
 export default {
@@ -645,30 +705,10 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-      cars: [
-        {
-          key: 0,
-          name: 'John Brown',
-          price: 300,
-          num: 0,
-          total: 0
-        },
-        {
-          key: 1,
-          name: 'Jim Green',
-          price: 400,
-          num: 0,
-          total: 0
-        },
-        {
-          key: 2,
-          name: 'Joe Black',
-          price: 400,
-          num: 0,
-          total: 0
-        }
-      ],
+      cars: [],
+      select_cars: [],
       places: [],
+      distance: {},
       route: [
         {
           key: 0,
@@ -677,8 +717,8 @@ export default {
           location: '',
           room_number: '',
           stairs_or_elevators: '',
-          floor_num: 0,
-          parking_distance: 0
+          floor_num: '',
+          parking_distance: ''
         },
         {
           key: 1,
@@ -687,29 +727,60 @@ export default {
           location: '',
           room_number: '',
           stairs_or_elevators: '',
-          floor_num: 0,
-          parking_distance: 0
+          floor_num: '',
+          parking_distance: ''
         }
       ],
       onoff: [],
+      selectOnoff: [],
       large: [],
+      selectLarge: [],
       routeCount: 2,
       onoffCount: 0,
       largeCount: 0
     }
   },
+  created () {
+    getCars({ t: new Date() }).then(res => {
+      this.cars = res
+    })
+    getOnOffGoods({ t: new Date() }).then(res => {
+      this.onoff = res
+    })
+    getLargeGoods({ t: new Date() }).then(res => {
+      this.large = res
+    })
+  },
   methods: {
     moment,
     add () {
       this.visible = true
+      this.cars.forEach(r => {
+        this.select_cars.push({
+          key: r.id,
+          name: r.name,
+          price: r.price,
+          num: 0,
+          total: 0
+        })
+      })
+    },
+    edit (record) {
+      this.visible = true
+      const {
+        form: { setFieldsValue }
+      } = this
+      this.$nextTick(() => {
+        setFieldsValue(pick(record, []))
+      })
     },
     handleCarNumChange (value, key) {
-      const newData = [...this.cars]
+      const newData = [...this.select_cars]
       const target = newData.filter(item => key === item.key)[0]
       if (target) {
         target['num'] = value
         target['total'] = target['num'] * target['price']
-        this.cars = newData
+        this.select_cars = newData
       }
     },
     onLocationSearch (value, key) {
@@ -718,6 +789,7 @@ export default {
       }
     },
     onLocationSelect (value, option, key) {
+      let flag = true
       const data = option.data.attrs.option
       const newData = [...this.route]
       const target = newData.filter(item => key === item.key)[0]
@@ -727,6 +799,14 @@ export default {
         target['address'] = data.address
         target['select_title'] = data.title
         this.route = newData
+      }
+      this.route.forEach(r => {
+        if (!r.location) {
+          flag = false
+        }
+      })
+      if (flag) {
+        distance(this.route, data => (this.distance = data))
       }
     },
     onLocationChange (value, key) {
@@ -738,14 +818,14 @@ export default {
       }
     },
     onLacationBlur (key) {
-        const newData = [...this.route]
-        const target = newData.filter(item => key === item.key)[0]
-        if (target) {
-          if (target['select_title'] && target['select_title'] !== target['title']) {
-            target['title'] = target['select_title']
-          }
-          this.route = newData
+      const newData = [...this.route]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        if (target['select_title'] !== target['title']) {
+          target['title'] = target['select_title']
         }
+        this.route = newData
+      }
     },
     handleRouteInputChange (value, key, column) {
       const newData = [...this.route]
@@ -755,59 +835,66 @@ export default {
         this.route = newData
       }
     },
-    edit (record) {
-      this.visible = true
-      const {
-        form: { setFieldsValue }
-      } = this
-      this.$nextTick(() => {
-        setFieldsValue(pick(record, []))
-      })
-    },
+
     handleRouteAdd () {
       const { routeCount } = this
       const newData = {
         key: routeCount,
-        name: '2-3门或推拉门衣柜/书柜',
-        price: 0,
-        num: 1,
-        total: 0
+        title: '',
+        address: '',
+        location: '',
+        room_number: '',
+        stairs_or_elevators: '',
+        floor_num: '',
+        parking_distance: ''
       }
       this.route.splice(-1, 0, newData)
       this.routeCount = routeCount + 1
     },
     handleRouteDelete (key) {
+      let flag = true
       this.route = this.route.filter(item => item.key !== key)
+      this.route.forEach(r => {
+        if (!r.location) {
+          flag = false
+        }
+      })
+      if (flag) {
+        distance(this.route, data => (this.distance = data))
+      }
     },
     handleOnoffAdd () {
-      const { onoff, onoffCount } = this
+      const { selectOnoff, onoffCount } = this
       const newData = {
         key: onoffCount,
-        name: '2-3门或推拉门衣柜/书柜',
+        name: '',
         price: 0,
         num: 1,
         total: 0
       }
-      this.onoff = [...onoff, newData]
+      this.selectOnoff = [...selectOnoff, newData]
       this.onoffCount = onoffCount + 1
     },
     handleOnoffDelete (key) {
-      this.onoff = this.route.filter(item => item.key !== key)
+      this.selectOnoff = this.selectOnoff.filter(item => item.key !== key)
     },
     handleLargeAdd () {
-      const { large, largeCount } = this
+      const { selectLarge, largeCount } = this
       const newData = {
         key: largeCount,
-        name: '2-3门或推拉门衣柜/书柜',
+        name: '',
         price: 0,
         num: 1,
         total: 0
       }
-      this.large = [...large, newData]
+      this.selectLarge = [...selectLarge, newData]
       this.largeCount = largeCount + 1
     },
     handleLargeDelete (key) {
-      this.large = this.large.filter(item => item.key !== key)
+      this.selectLarge = this.selectLarge.filter(item => item.key !== key)
+    },
+    filterOnoff (input, option) {
+      return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     },
     handleCancel () {
       this.visible = false
