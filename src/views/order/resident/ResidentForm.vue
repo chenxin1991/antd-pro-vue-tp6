@@ -84,30 +84,11 @@
                   v-decorator="['time', { rules: [{ required: true, message: '请选择时间段！' }] }]"
                   placeholder="请选择时间段"
                 >
-                  <a-select-option value="0">07:00</a-select-option>
-                  <a-select-option value="1">08:00</a-select-option>
-                  <a-select-option value="2">09:00</a-select-option>
-                  <a-select-option value="3">10:00</a-select-option>
-                  <a-select-option value="4">11:00</a-select-option>
-                  <a-select-option value="5">12:00</a-select-option>
-                  <a-select-option value="6">13:00</a-select-option>
-                  <a-select-option value="7">14:00</a-select-option>
-                  <a-select-option value="8">15:00</a-select-option>
-                  <a-select-option value="9">16:00</a-select-option>
-                  <a-select-option value="10">17:00</a-select-option>
-                  <a-select-option value="11">18:00</a-select-option>
-                  <a-select-option value="12">19:00</a-select-option>
-                  <a-select-option value="13">20:00</a-select-option>
-                  <a-select-option value="14">21:00</a-select-option>
-                  <a-select-option value="15">22:00</a-select-option>
-                  <a-select-option value="16">23:00</a-select-option>
-                  <a-select-option value="17">00:00</a-select-option>
-                  <a-select-option value="18">01:00</a-select-option>
-                  <a-select-option value="19">02:00</a-select-option>
-                  <a-select-option value="20">03:00</a-select-option>
-                  <a-select-option value="21">04:00</a-select-option>
-                  <a-select-option value="22">05:00</a-select-option>
-                  <a-select-option value="23">06:00</a-select-option>
+                  <a-select-option
+                    v-for="t in time"
+                    :key="t"
+                    :value="t"
+                  >{{ t }}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -124,24 +105,63 @@
                   sm: { span: 24 }
                 }"
               >
+                <a-button
+                  class="editable-add-btn"
+                  @click="handleCarAdd"
+                >
+                  添加车辆
+                </a-button>
                 <a-table
                   :columns="columns_car"
-                  :data-source="select_cars"
+                  :data-source="selectCar"
                   :pagination="false"
                   size="small"
                 >
                   <template
+                    slot="id"
+                    slot-scope="text,record"
+                  >
+                    <a-select
+                      show-search
+                      :value="text"
+                      placeholder="选择车辆"
+                      :filter-option="filterOnoff"
+                      @change="(value,option) => handleCarIDChange(value,record.key,option)"
+                    >
+                      <a-select-option
+                        :key="index"
+                        v-for="(item, index) in car"
+                        :value="item.id"
+                        :option="{'price':item.price}"
+                      >{{ item.name }}</a-select-option>
+                    </a-select>
+                  </template>
+                  <template
                     slot="num"
-                    slot-scope="text, record"
+                    slot-scope="text,record"
                   >
                     <a-input-number
-                      :min="0"
-                      :max="10"
                       :value="text"
+                      :min="1"
+                      :max="10"
                       style="width:100%"
                       @change="value => handleCarNumChange(value, record.key)"
                     />
                   </template>
+                  <span
+                    slot="action"
+                    slot-scope="text, record"
+                  >
+                    <template>
+                      <a-popconfirm
+                        v-if="selectCar.length"
+                        title="确定删除吗?"
+                        @confirm="() => handleCarDelete(record.key)"
+                      >
+                        <a href="javascript:;">删除</a>
+                      </a-popconfirm>
+                    </template>
+                  </span>
                 </a-table>
               </a-form-item>
             </a-col>
@@ -153,7 +173,7 @@
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
                 >
-                  1200元
+                  {{ carCost }}元
                 </span>
               </a-form-item>
             </a-col>
@@ -190,13 +210,14 @@
                 >
                   <template
                     slot="floor_num"
-                    slot-scope="text"
+                    slot-scope="text,record"
                   >
                     <a-input-number
                       :value="text"
                       :min="0"
-                      :max="10"
+                      :max="100"
                       style="width:100%"
+                      @change="value => handleRouteChange(value, record.key,'floor_num')"
                     />
                   </template>
                   <template
@@ -204,7 +225,8 @@
                     slot-scope="text, record"
                   >
                     <a-select
-                      v-decorator="[`parking_distance[${record.key}]`, { rules: [{ required: true, message: '请选择停车位距离！' }] }]"
+                      :value="text"
+                      @change="value => handleRouteChange(value,record.key,'parking_distance')"
                       placeholder="选择距离"
                     >
                       <a-select-option value="0">低于30米</a-select-option>
@@ -245,7 +267,7 @@
                   >
                     <a-input
                       :value="text"
-                      @change="e => handleRouteInputChange(e.target.value, record.key, 'room_number')"
+                      @change="e => handleRouteChange(e.target.value, record.key, 'room_number')"
                     >/>
                     </a-input>
                   </template>
@@ -254,11 +276,12 @@
                     slot-scope="text, record"
                   >
                     <a-select
-                      v-decorator="[`stairs_or_elevators[${record.key}]`, { rules: [{ required: true, message: '请选择电梯或楼梯！' }] }]"
+                      :value="text"
                       placeholder="选择"
+                      @change="value => handleRouteChange(value,record.key,'stairs_or_elevators')"
                     >
-                      <a-select-option value="elevators">电梯</a-select-option>
-                      <a-select-option value="stairs">楼梯</a-select-option>
+                      <a-select-option value="0">电梯</a-select-option>
+                      <a-select-option value="1">楼梯</a-select-option>
                     </a-select>
                   </template>
                   <span
@@ -286,7 +309,7 @@
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
                 >
-                  {{ Math.round(distance.distance / 1000) || 0 }}公里
+                  {{ distance || 0 }}公里
                 </span>
               </a-form-item>
             </a-col>
@@ -296,7 +319,7 @@
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
                 >
-                  1200元
+                  {{ distanceCost }}元
                 </span>
               </a-form-item>
             </a-col>
@@ -332,31 +355,34 @@
                   size="small"
                 >
                   <template
-                    slot="name"
-                    slot-scope="text"
+                    slot="id"
+                    slot-scope="text,record"
                   >
                     <a-select
                       show-search
                       :value="text"
                       placeholder="选择拆装件"
                       :filter-option="filterOnoff"
+                      @change="(value,option) => handleOnoffIDChange(value,record.key,option)"
                     >
                       <a-select-option
                         :key="index"
                         v-for="(item, index) in onoff"
                         :value="item.id"
+                        :option="{'price':item.price}"
                       >{{ item.name }}</a-select-option>
                     </a-select>
                   </template>
                   <template
                     slot="num"
-                    slot-scope="text"
+                    slot-scope="text,record"
                   >
                     <a-input-number
                       :value="text"
                       :min="1"
                       :max="10"
                       style="width:100%"
+                      @change="value => handleOnoffNumChange(value, record.key)"
                     />
                   </template>
                   <span
@@ -420,27 +446,34 @@
                   size="small"
                 >
                   <template
-                    slot="name"
-                    slot-scope="text"
+                    slot="id"
+                    slot-scope="text,record"
                   >
                     <a-select
                       show-search
                       :value="text"
                       placeholder="选择大件"
+                      :filter-option="filterOnoff"
+                      @change="(value,option) => handleLargeIDChange(value,record.key,option)"
                     >
-                      <a-select-option value="elevators">2-3门或推拉门衣柜/书柜</a-select-option>
-                      <a-select-option value="stairs">楼梯</a-select-option>
+                      <a-select-option
+                        :key="index"
+                        v-for="(item, index) in large"
+                        :value="item.id"
+                        :option="{'price':item.price}"
+                      >{{ item.name }}</a-select-option>
                     </a-select>
                   </template>
                   <template
                     slot="num"
-                    slot-scope="text"
+                    slot-scope="text,record"
                   >
                     <a-input-number
                       :value="text"
                       :min="1"
                       :max="10"
                       style="width:100%"
+                      @change="value => handleLargeNumChange(value, record.key)"
                     />
                   </template>
                   <span
@@ -533,7 +566,7 @@ function distance (value, callback) {
   let to = ''
   let waypoints = ''
   let url = ''
-  const data = {}
+  let distance = 0
   value.forEach(r => {
     const location = JSON.parse(r.location)
     if (r.key === 0) {
@@ -565,16 +598,15 @@ function distance (value, callback) {
       .then(d => {
         if (d.status === 0) {
           const route = d.result.routes[0]
-          data.distance = route.distance
-          data.duration = route.duration
-          callback(data)
+          distance = Math.round(route.distance / 1000)
+          callback(distance)
         } else {
-          callback(data)
+          callback(distance)
         }
       })
       .catch(err => {
         console.log(err)
-        callback(data)
+        callback(distance)
       })
   }
 }
@@ -585,7 +617,9 @@ export default {
       columns_car: [
         {
           title: '车型',
-          dataIndex: 'name'
+          dataIndex: 'id',
+          width: '40%',
+          scopedSlots: { customRender: 'id' }
         },
         {
           title: '单价',
@@ -599,6 +633,11 @@ export default {
         {
           title: '总计',
           dataIndex: 'total'
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' }
         }
       ],
       columns_route: [
@@ -641,9 +680,9 @@ export default {
       columns_onoff: [
         {
           title: '名称',
-          dataIndex: 'name',
+          dataIndex: 'id',
           width: '40%',
-          scopedSlots: { customRender: 'name' }
+          scopedSlots: { customRender: 'id' }
         },
         {
           title: '单价',
@@ -669,9 +708,9 @@ export default {
       columns_large: [
         {
           title: '名称',
-          dataIndex: 'name',
+          dataIndex: 'id',
           width: '40%',
-          scopedSlots: { customRender: 'name' }
+          scopedSlots: { customRender: 'id' }
         },
         {
           title: '单价',
@@ -705,10 +744,36 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-      cars: [],
-      select_cars: [],
+      time: [
+        '07:00',
+        '08:00',
+        '09:00',
+        '10:00',
+        '11:00',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+        '16:00',
+        '17:00',
+        '18:00',
+        '19:00',
+        '20:00',
+        '21:00',
+        '22:00',
+        '23:00',
+        '00:00',
+        '01:00',
+        '02:00',
+        '03:00',
+        '04:00',
+        '05:00',
+        '06:00'
+      ],
+      car: [],
+      selectCar: [],
       places: [],
-      distance: {},
+      distance: 0,
       route: [
         {
           key: 0,
@@ -716,9 +781,9 @@ export default {
           address: '',
           location: '',
           room_number: '',
-          stairs_or_elevators: '',
+          stairs_or_elevators: undefined,
           floor_num: '',
-          parking_distance: ''
+          parking_distance: undefined
         },
         {
           key: 1,
@@ -726,23 +791,25 @@ export default {
           address: '',
           location: '',
           room_number: '',
-          stairs_or_elevators: '',
+          stairs_or_elevators: undefined,
           floor_num: '',
-          parking_distance: ''
+          parking_distance: undefined
         }
       ],
       onoff: [],
       selectOnoff: [],
       large: [],
       selectLarge: [],
+      carCount: 0,
       routeCount: 2,
       onoffCount: 0,
-      largeCount: 0
+      largeCount: 0,
+      carCost: 0
     }
   },
   created () {
     getCars({ t: new Date() }).then(res => {
-      this.cars = res
+      this.car = res
     })
     getOnOffGoods({ t: new Date() }).then(res => {
       this.onoff = res
@@ -751,19 +818,22 @@ export default {
       this.large = res
     })
   },
+  computed: {
+    distanceCost: function () {
+      if (this.distance > 15 && this.distance < 300) {
+        return (this.distance - 15) * 10
+      } else if (this.distance >= 300 && this.distance < 500) {
+        return (this.distance - 15) * 10 * 0.9
+      } else if (this.distance >= 500) {
+        return (this.distance - 15) * 10 * 0.8
+      }
+      return 0
+    }
+  },
   methods: {
     moment,
     add () {
       this.visible = true
-      this.cars.forEach(r => {
-        this.select_cars.push({
-          key: r.id,
-          name: r.name,
-          price: r.price,
-          num: 0,
-          total: 0
-        })
-      })
     },
     edit (record) {
       this.visible = true
@@ -774,14 +844,54 @@ export default {
         setFieldsValue(pick(record, []))
       })
     },
-    handleCarNumChange (value, key) {
-      const newData = [...this.select_cars]
+    handleCarAdd () {
+      const { selectCar, carCount } = this
+      const newData = {
+        key: carCount,
+        id: undefined,
+        price: 0,
+        num: 1,
+        total: 0,
+        km_price: 0,
+        floor_standard: 0,
+        floor_price: 0,
+        distance1: 0,
+        distance2: 0,
+        distance3: 0,
+        distance4: 0
+      }
+      this.selectCar = [...selectCar, newData]
+      this.carCount = carCount + 1
+    },
+    handleCarIDChange (value, key, option) {
+      const newData = [...this.selectCar]
       const target = newData.filter(item => key === item.key)[0]
+      const oldTotal = target['total']
+      if (target) {
+        target['id'] = value
+        target['price'] = option.data.attrs.option.price
+        target['total'] = target['price'] * target['num']
+        this.selectCar = newData
+      }
+      this.carCost = this.carCost + target['total'] - oldTotal
+    },
+    handleCarNumChange (value, key) {
+      const newData = [...this.selectCar]
+      const target = newData.filter(item => key === item.key)[0]
+      const oldTotal = target['total']
       if (target) {
         target['num'] = value
         target['total'] = target['num'] * target['price']
-        this.select_cars = newData
+        this.selectCar = newData
       }
+      this.carCost = this.carCost + target['total'] - oldTotal
+    },
+    handleCarDelete (key) {
+      const newData = [...this.selectCar]
+      const target = newData.filter(item => key === item.key)[0]
+      const oldTotal = target['total']
+      this.carCost = this.carCost - oldTotal
+      this.selectCar = this.selectCar.filter(item => item.key !== key)
     },
     onLocationSearch (value, key) {
       if (value) {
@@ -827,7 +937,7 @@ export default {
         this.route = newData
       }
     },
-    handleRouteInputChange (value, key, column) {
+    handleRouteChange (value, key, column) {
       const newData = [...this.route]
       const target = newData.filter(item => key === item.key)[0]
       if (target) {
@@ -835,7 +945,6 @@ export default {
         this.route = newData
       }
     },
-
     handleRouteAdd () {
       const { routeCount } = this
       const newData = {
@@ -867,13 +976,32 @@ export default {
       const { selectOnoff, onoffCount } = this
       const newData = {
         key: onoffCount,
-        name: '',
+        id: undefined,
         price: 0,
         num: 1,
         total: 0
       }
       this.selectOnoff = [...selectOnoff, newData]
       this.onoffCount = onoffCount + 1
+    },
+    handleOnoffIDChange (value, key, option) {
+      const newData = [...this.selectOnoff]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target['id'] = value
+        target['price'] = option.data.attrs.option.price
+        target['total'] = target['price'] * target['num']
+        this.selectOnoff = newData
+      }
+    },
+    handleOnoffNumChange (value, key) {
+      const newData = [...this.selectOnoff]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target['num'] = value
+        target['total'] = target['num'] * target['price']
+        this.selectOnoff = newData
+      }
     },
     handleOnoffDelete (key) {
       this.selectOnoff = this.selectOnoff.filter(item => item.key !== key)
@@ -882,13 +1010,32 @@ export default {
       const { selectLarge, largeCount } = this
       const newData = {
         key: largeCount,
-        name: '',
+        id: undefined,
         price: 0,
         num: 1,
         total: 0
       }
       this.selectLarge = [...selectLarge, newData]
       this.largeCount = largeCount + 1
+    },
+    handleLargeIDChange (value, key, option) {
+      const newData = [...this.selectLarge]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target['id'] = value
+        target['price'] = option.data.attrs.option.price
+        target['total'] = target['price'] * target['num']
+        this.selectLarge = newData
+      }
+    },
+    handleLargeNumChange (value, key) {
+      const newData = [...this.selectLarge]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target['num'] = value
+        target['total'] = target['num'] * target['price']
+        this.selectLarge = newData
+      }
     },
     handleLargeDelete (key) {
       this.selectLarge = this.selectLarge.filter(item => item.key !== key)
