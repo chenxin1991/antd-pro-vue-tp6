@@ -150,9 +150,9 @@ export const asyncRouterMap = [
             meta: { title: '大件管理', keepAlive: true }
           },
           {
-            path: '/basic/config',
+            path: '/basic/applet_config',
             name: 'BasicConfig',
-            component: () => import('@/views/basic/config/Config'),
+            component: () => import('@/views/basic/applet_config/AppletConfig'),
             meta: { title: '参数设置', keepAlive: true }
           }
         ]

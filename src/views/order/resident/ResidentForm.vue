@@ -8,6 +8,15 @@
     :confirmLoading="confirmLoading"
     @ok="handleSubmit"
   >
+    <template slot="footer">
+      <h2 style="dispaly:inline;float:left;color:red;">总报价：120404元</h2>
+      <a-button key="back" @click="handleCancel">
+        Return
+      </a-button>
+      <a-button key="submit" type="primary" :loading="loading" @click="handleOk">
+        Submit
+      </a-button>
+    </template>
     <a-form
       :form="form"
       :label-col="labelCol"
@@ -132,7 +141,7 @@
                         :key="index"
                         v-for="(item, index) in car"
                         :value="item.id"
-                        :option="{'price':item.price}"
+                        :option="{'price':item.price,'item':item}"
                       >{{ item.name }}</a-select-option>
                     </a-select>
                   </template>
@@ -324,6 +333,28 @@
               </a-form-item>
             </a-col>
           </a-row>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="楼层费用">
+                <span
+                  class="ant-form-text"
+                  style="font-size:20px;color:red;"
+                >
+                  {{ floorCost }}元
+                </span>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="停车距离费用">
+                <span
+                  class="ant-form-text"
+                  style="font-size:20px;color:red;"
+                >
+                  {{ parkingCost }}元
+                </span>
+              </a-form-item>
+            </a-col>
+          </a-row>
         </a-tab-pane>
         <a-tab-pane
           key="3"
@@ -410,7 +441,7 @@
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
                 >
-                  1200元
+                  {{ onoffCost }}元
                 </span>
               </a-form-item>
             </a-col>
@@ -501,7 +532,7 @@
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
                 >
-                  1200元
+                  {{ largeCost }}元
                 </span>
               </a-form-item>
             </a-col>
@@ -515,7 +546,7 @@
 import pick from 'lodash.pick'
 import moment from 'moment'
 import jsonp from 'fetch-jsonp'
-import { getCars, getOnOffGoods, getLargeGoods } from '@/api/common'
+import { getCars, getOnOffGoods, getLargeGoods, getAppletConfig } from '@/api/common'
 
 let timeout
 
@@ -527,8 +558,7 @@ function fetch (value, callback) {
 
   function fake () {
     jsonp(
-      'https://bird.ioliu.cn/v1/?url=' +
-        'https://apis.map.qq.com/ws/place/v1/suggestion/?region=深圳&region_fix=0&keyword=' +
+      'https://apis.map.qq.com/ws/place/v1/suggestion/?region=深圳&region_fix=0&output=jsonp&keyword=' +
         value +
         '&key=OI7BZ-EGOWU-H5YVZ-4HLVW-MDUUQ-ZCFGJ'
     )
@@ -584,12 +614,11 @@ function distance (value, callback) {
 
   if (from && to) {
     url =
-      'https://bird.ioliu.cn/v1/?url=' +
       'https://apis.map.qq.com/ws/direction/v1/driving/?from=' +
       from +
       '&to=' +
       to +
-      '&output=json&key=OI7BZ-EGOWU-H5YVZ-4HLVW-MDUUQ-ZCFGJ'
+      '&output=jsonp&key=OI7BZ-EGOWU-H5YVZ-4HLVW-MDUUQ-ZCFGJ'
     if (waypoints) {
       url = url + '&waypoints=' + waypoints
     }
@@ -804,7 +833,7 @@ export default {
       routeCount: 2,
       onoffCount: 0,
       largeCount: 0,
-      carCost: 0
+      appletConfig: {}
     }
   },
   created () {
@@ -817,17 +846,107 @@ export default {
     getLargeGoods({ t: new Date() }).then(res => {
       this.large = res
     })
+    getAppletConfig({ id: 1 }).then(res => {
+      this.appletConfig = res
+    })
   },
   computed: {
+    carCost: function () {
+      let cost = 0
+      this.selectCar.forEach(r => {
+        if (r.id > 0) {
+          cost = cost + r.total
+        }
+      })
+      return cost
+    },
     distanceCost: function () {
-      if (this.distance > 15 && this.distance < 300) {
-        return (this.distance - 15) * 10
-      } else if (this.distance >= 300 && this.distance < 500) {
-        return (this.distance - 15) * 10 * 0.9
-      } else if (this.distance >= 500) {
-        return (this.distance - 15) * 10 * 0.8
+      const that = this
+      let cost = 0
+      this.selectCar.forEach(r => {
+        if (r.id > 0) {
+          if (that.distance > r.km_standard && that.distance <= 300) {
+            cost = cost + r.km_price * (that.distance - r.km_standard) * r.num
+          } else if (that.distance > 300 && that.distance <= 500) {
+            cost = cost + r.km_price * (that.distance - r.km_standard) * r.num * that.appletConfig.discount1 / 10
+          } else if (that.distance > 500) {
+            cost = cost + r.km_price * (that.distance - r.km_standard) * r.num * that.appletConfig.discount2 / 10
+          }
+        }
+      })
+      return cost
+    },
+    floorCost: function () {
+      let cost = 0
+      const floors = []
+      this.route.forEach(r => {
+        if (r.location && r.floor_num > 0 && r.stairs_or_elevators === '1') {
+          floors.push(r.floor_num)
+        }
+      })
+      if (floors.length > 0) {
+        this.selectCar.forEach(s => {
+          if (s.id > 0) {
+            for (let i = 0; i < floors.length; i++) {
+              if (s.floor_standard <= floors[i]) {
+                cost = cost + (floors[i] - s.floor_standard + 1) * s.floor_price * s.num
+              }
+            }
+          }
+        })
       }
-      return 0
+      return cost
+    },
+    parkingCost: function () {
+      let cost = 0
+      const parking = []
+      this.route.forEach(r => {
+        if (r.location && r.parking_distance >= 0) {
+          parking.push(r.parking_distance)
+        }
+      })
+      if (parking.length > 0) {
+        this.selectCar.forEach(s => {
+          if (s.id > 0) {
+            for (let i = 0; i < parking.length; i++) {
+              switch (parking[i]) {
+                case '0':
+                  cost = cost + s.distance1 * s.num
+                  break
+                case '1':
+                  cost = cost + s.distance2 * s.num
+                  break
+                case '2':
+                  cost = cost + s.distance3 * s.num
+                  break
+                case '3':
+                case '4':
+                  cost = cost + s.distance4 * s.num
+                  break
+              }
+            }
+          }
+        })
+      }
+      return cost
+    },
+    onoffCost: function () {
+      let cost = 0
+      this.selectOnoff.forEach(r => {
+        if (r.id > 0) {
+          cost = cost + r.total
+        }
+      })
+      return cost
+    },
+    largeCost: function () {
+      let cost = 0
+      this.selectLarge.forEach(r => {
+        if (r.id > 0) {
+          cost = cost + r.total
+        }
+      })
+      return cost
     }
   },
   methods: {
@@ -866,31 +985,32 @@ export default {
     handleCarIDChange (value, key, option) {
       const newData = [...this.selectCar]
       const target = newData.filter(item => key === item.key)[0]
-      const oldTotal = target['total']
+      const item = option.data.attrs.option.item
       if (target) {
         target['id'] = value
-        target['price'] = option.data.attrs.option.price
+        target['price'] = item.price
+        target['km_price'] = item.km_price
+        target['km_standard'] = item.km_standard
+        target['floor_price'] = item.floor_price
+        target['floor_standard'] = item.floor_standard
+        target['distance1'] = item.distance1
+        target['distance2'] = item.distance2
+        target['distance3'] = item.distance3
+        target['distance4'] = item.distance4
         target['total'] = target['price'] * target['num']
         this.selectCar = newData
       }
-      this.carCost = this.carCost + target['total'] - oldTotal
     },
     handleCarNumChange (value, key) {
       const newData = [...this.selectCar]
       const target = newData.filter(item => key === item.key)[0]
-      const oldTotal = target['total']
       if (target) {
         target['num'] = value
         target['total'] = target['num'] * target['price']
         this.selectCar = newData
       }
-      this.carCost = this.carCost + target['total'] - oldTotal
     },
     handleCarDelete (key) {
-      const newData = [...this.selectCar]
-      const target = newData.filter(item => key === item.key)[0]
-      const oldTotal = target['total']
-      this.carCost = this.carCost - oldTotal
       this.selectCar = this.selectCar.filter(item => item.key !== key)
     },
     onLocationSearch (value, key) {
