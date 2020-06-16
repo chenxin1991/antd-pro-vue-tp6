@@ -1,20 +1,25 @@
 <template>
   <a-modal
-    title="新增订单"
+    :title="config.title"
     :width="1000"
     :visible="visible"
     :bodyStyle="{padding:'24px 24px 12px 24px'}"
-    @cancel="handleCancel"
-    :confirmLoading="confirmLoading"
-    @ok="handleSubmit"
   >
     <template slot="footer">
-      <h2 style="dispaly:inline;float:left;color:red;">总报价：120404元</h2>
-      <a-button key="back" @click="handleCancel">
-        Return
+      <h2 style="dispaly:inline;float:left;color:red;">总报价：{{ totalCost }}元</h2>
+      <a-button
+        key="back"
+        @click="handleCancel"
+      >
+        取消
       </a-button>
-      <a-button key="submit" type="primary" :loading="loading" @click="handleOk">
-        Submit
+      <a-button
+        key="submit"
+        type="primary"
+        :loading="confirmLoading"
+        @click="handleSubmit"
+      >
+        确定
       </a-button>
     </template>
     <a-form
@@ -56,6 +61,38 @@
             </a-col>
             <a-col :span="8">
               <a-form-item
+                label="客户名"
+                :labelCol="{
+                  xs: { span: 24 },
+                  sm: { span: 8 }
+                }"
+                :wrapperCol="{
+                  xs: { span: 24 },
+                  sm: { span: 16 }
+                }"
+              >
+                <a-input v-decorator="['customer',{ rules: [{ required: true, message: '请输入客户名！' }] }]" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item
+                label="联系电话"
+                :labelCol="{
+                  xs: { span: 24 },
+                  sm: { span: 8 }
+                }"
+                :wrapperCol="{
+                  xs: { span: 24 },
+                  sm: { span: 16 }
+                }"
+              >
+                <a-input v-decorator="['phone',{ rules: [{ required: true, message: '请输入联系电话！' }] }]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-form-item
                 label="预约日期"
                 :labelCol="{
                   xs: { span: 24 },
@@ -90,8 +127,9 @@
                 }"
               >
                 <a-select
-                  v-decorator="['time', { rules: [{ required: true, message: '请选择时间段！' }] }]"
+                  v-decorator="['selectTime', { rules: [{ required: true, message: '请选择时间段！' }] }]"
                   placeholder="请选择时间段"
+                  @change="value=>this.selectTime=value"
                 >
                   <a-select-option
                     v-for="t in time"
@@ -186,6 +224,26 @@
                 </span>
               </a-form-item>
             </a-col>
+            <a-col :span="12">
+              <a-form-item
+                :labelCol="{
+                  xs: { span: 24 },
+                  sm: { span: 12 }
+                }"
+                :wrapperCol="{
+                  xs: { span: 24 },
+                  sm: { span: 12 }
+                }"
+                label="特殊时间段费用"
+              >
+                <span
+                  class="ant-form-text"
+                  style="font-size:20px;color:red;"
+                >
+                  {{ specialTimeCost }}元
+                </span>
+              </a-form-item>
+            </a-col>
           </a-row>
         </a-tab-pane>
         <a-tab-pane
@@ -251,7 +309,7 @@
                   >
                     <a-auto-complete
                       :value="text"
-                      placeholder="请输入搜索地址"
+                      :placeholder="record.placeholder"
                       :dropdown-match-select-width="false"
                       :dropdown-style="{ width: '800px'}"
                       @search="value=>onLocationSearch(value,record.key)"
@@ -400,7 +458,7 @@
                         :key="index"
                         v-for="(item, index) in onoff"
                         :value="item.id"
-                        :option="{'price':item.price}"
+                        :option="{'price':item.price,'name':item.name}"
                       >{{ item.name }}</a-select-option>
                     </a-select>
                   </template>
@@ -491,7 +549,7 @@
                         :key="index"
                         v-for="(item, index) in large"
                         :value="item.id"
-                        :option="{'price':item.price}"
+                        :option="{'price':item.price,'name':item.name}"
                       >{{ item.name }}</a-select-option>
                     </a-select>
                   </template>
@@ -546,6 +604,7 @@
 import pick from 'lodash.pick'
 import moment from 'moment'
 import jsonp from 'fetch-jsonp'
+import { addResidentOrder } from '@/api/order/resident'
 import { getCars, getOnOffGoods, getLargeGoods, getAppletConfig } from '@/api/common'
 
 let timeout
@@ -773,6 +832,7 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
+      config: {},
       time: [
         '07:00',
         '08:00',
@@ -799,6 +859,7 @@ export default {
         '05:00',
         '06:00'
       ],
+      selectTime: '',
       car: [],
       selectCar: [],
       places: [],
@@ -812,7 +873,8 @@ export default {
           room_number: '',
           stairs_or_elevators: undefined,
           floor_num: '',
-          parking_distance: undefined
+          parking_distance: undefined,
+          placeholder: '请输入起点'
         },
         {
           key: 1,
@@ -822,7 +884,8 @@ export default {
           room_number: '',
           stairs_or_elevators: undefined,
           floor_num: '',
-          parking_distance: undefined
+          parking_distance: undefined,
+          placeholder: '请输入起点'
         }
       ],
       onoff: [],
@@ -868,9 +931,9 @@ export default {
           if (that.distance > r.km_standard && that.distance <= 300) {
             cost = cost + r.km_price * (that.distance - r.km_standard) * r.num
           } else if (that.distance > 300 && that.distance <= 500) {
-            cost = cost + r.km_price * (that.distance - r.km_standard) * r.num * that.appletConfig.discount1 / 10
+            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.appletConfig.discount1) / 10
           } else if (that.distance > 500) {
-            cost = cost + r.km_price * (that.distance - r.km_standard) * r.num * that.appletConfig.discount2 / 10
+            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.appletConfig.discount2) / 10
           }
         }
       })
@@ -947,12 +1010,71 @@ export default {
         }
       })
       return cost
+    },
+    specialTimeCost: function () {
+      if (this.selectTime) {
+        if (this.selectTime >= '19:00' && this.selectTime <= '23:00') {
+          return (
+            (this.appletConfig.add_ratio1 / 100) *
+            (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
+          )
+        } else if (this.selectTime > '23:00' || this.selectTime <= '07:00') {
+          return (
+            (this.appletConfig.add_ratio2 / 100) *
+            (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
+          )
+        }
+      }
+      return 0
+    },
+    totalCost: function () {
+      return (
+        this.carCost +
+        this.distanceCost +
+        this.floorCost +
+        this.parkingCost +
+        this.onoffCost +
+        this.largeCost +
+        this.specialTimeCost
+      )
     }
   },
   methods: {
     moment,
     add () {
+      this.config.action = 'add'
+      this.config.title = '新增订单'
       this.visible = true
+      this.$nextTick(() => {
+        this.form.resetFields()
+        this.selectCar = []
+        this.route = [
+        {
+          key: 0,
+          title: '',
+          address: '',
+          location: '',
+          room_number: '',
+          stairs_or_elevators: undefined,
+          floor_num: '',
+          parking_distance: undefined,
+          placeholder: '请输入起点'
+        },
+        {
+          key: 1,
+          title: '',
+          address: '',
+          location: '',
+          room_number: '',
+          stairs_or_elevators: undefined,
+          floor_num: '',
+          parking_distance: undefined,
+          placeholder: '请输入终点'
+        }
+      ]
+        this.selectOnoff = []
+        this.selectLarge = []
+      })
     },
     edit (record) {
       this.visible = true
@@ -968,6 +1090,7 @@ export default {
       const newData = {
         key: carCount,
         id: undefined,
+        name: '',
         price: 0,
         num: 1,
         total: 0,
@@ -988,6 +1111,7 @@ export default {
       const item = option.data.attrs.option.item
       if (target) {
         target['id'] = value
+        target['name'] = item.name
         target['price'] = item.price
         target['km_price'] = item.km_price
         target['km_standard'] = item.km_standard
@@ -1075,7 +1199,8 @@ export default {
         room_number: '',
         stairs_or_elevators: '',
         floor_num: '',
-        parking_distance: ''
+        parking_distance: '',
+        placeholder: '请输入途径点'
       }
       this.route.splice(-1, 0, newData)
       this.routeCount = routeCount + 1
@@ -1097,6 +1222,7 @@ export default {
       const newData = {
         key: onoffCount,
         id: undefined,
+        name: '',
         price: 0,
         num: 1,
         total: 0
@@ -1109,6 +1235,7 @@ export default {
       const target = newData.filter(item => key === item.key)[0]
       if (target) {
         target['id'] = value
+        target['name'] = option.data.attrs.option.name
         target['price'] = option.data.attrs.option.price
         target['total'] = target['price'] * target['num']
         this.selectOnoff = newData
@@ -1131,6 +1258,7 @@ export default {
       const newData = {
         key: largeCount,
         id: undefined,
+        name: '',
         price: 0,
         num: 1,
         total: 0
@@ -1143,6 +1271,7 @@ export default {
       const target = newData.filter(item => key === item.key)[0]
       if (target) {
         target['id'] = value
+        target['name'] = option.data.attrs.option.name
         target['price'] = option.data.attrs.option.price
         target['total'] = target['price'] * target['num']
         this.selectLarge = newData
@@ -1168,12 +1297,127 @@ export default {
     },
     handleSubmit () {
       const {
-        form: { validateFields }
+        form: { validateFields },
+        $message
       } = this
       // this.confirmLoading = true
       validateFields((errors, values) => {
         if (!errors) {
-          console.log(values)
+          values.appointment = values.appointment.format('YYYY-MM-DD')
+          const cars = []
+          let carFlag = true
+          this.selectCar.forEach(r => {
+            if (r.key >= 0 && r.id > 0 && r.num > 0) {
+              cars.push({
+                key: r.key,
+                id: r.id,
+                name: r.name,
+                price: r.price,
+                num: r.num,
+                total: r.total
+              })
+            } else {
+              carFlag = false
+            }
+          })
+          if (!cars.length || !carFlag) {
+            $message.error('请检查车辆信息是否填写完整!')
+            return false
+          }
+          values.cars = cars
+          const routes = []
+          let routeFlag = true
+          this.route.forEach(r => {
+            if (
+              r.key >= 0 &&
+              r.location &&
+              r.room_number &&
+              r.title &&
+              r.address &&
+              r.floor_num &&
+              r.parking_distance &&
+              r.stairs_or_elevators
+            ) {
+              routes.push({
+                key: r.key,
+                title: r.title,
+                location: r.location,
+                address: r.address,
+                room_number: r.room_number,
+                stairs_or_elevators: r.stairs_or_elevators,
+                floor_num: r.floor_num,
+                parking_distance: r.parking_distance
+              })
+            } else {
+              routeFlag = false
+            }
+          })
+          if (!routes.length || !routeFlag) {
+            $message.error('请检查路线信息是否填写完整!')
+            return false
+          }
+          values.routes = routes
+          const onoffs = []
+          let onoffFlag = true
+          this.selectOnoff.forEach(r => {
+            if (r.key >= 0 && r.id && r.name && r.num > 0) {
+              onoffs.push({
+                key: r.key,
+                id: r.id,
+                name: r.name,
+                price: r.price,
+                num: r.num,
+                total: r.total
+              })
+            } else {
+              onoffFlag = false
+            }
+          })
+          if (!onoffFlag) {
+            $message.error('请检查拆装信息是否填写完整!')
+            return false
+          }
+          values.onoffs = onoffs
+          const larges = []
+          let largeFlag = true
+          this.selectLarge.forEach(r => {
+            if (r.key >= 0 && r.id && r.name && r.num > 0) {
+              larges.push({
+                key: r.key,
+                id: r.id,
+                name: r.name,
+                price: r.price,
+                num: r.num,
+                total: r.total
+              })
+            } else {
+              largeFlag = false
+            }
+          })
+          if (!largeFlag) {
+            $message.error('请检查大件信息是否填写完整!')
+            return false
+          }
+          values.larges = larges
+          values.carCost = this.carCost
+          values.distanceCost = this.distanceCost
+          values.floorCost = this.floorCost
+          values.parkingCost = this.parkingCost
+          values.onoffCost = this.onoffCost
+          values.largeCost = this.largeCost
+          values.specialTimeCost = this.specialTimeCost
+          values.totalCost = this.totalCost
+          if (this.config.action === 'add') {
+            addResidentOrder(values).then(res => {
+                $message.success('添加成功')
+                this.visible = false
+                this.confirmLoading = false
+                this.$emit('ok', values)
+              })
+              .catch(err => {
+                $message.error(`load user err: ${err.message}`)
+              })
+          }
         } else {
           // this.confirmLoading = false
         }
