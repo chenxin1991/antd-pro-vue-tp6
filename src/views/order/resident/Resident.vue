@@ -56,11 +56,11 @@
                 default-value="0"
               >
                 <a-select-option value="0">待受理</a-select-option>
-                <a-select-option value="1">已受理待派单</a-select-option>
-                <a-select-option value="2">已派单待开工</a-select-option>
-                <a-select-option value="3">已开工待完成</a-select-option>
-                <a-select-option value="4">已完成待评价</a-select-option>
-                <a-select-option value="5">已完成</a-select-option>
+                <a-select-option value="1">待派单</a-select-option>
+                <a-select-option value="2">待开工</a-select-option>
+                <a-select-option value="3">待完成</a-select-option>
+                <a-select-option value="4">待评价</a-select-option>
+                <a-select-option value="5">已关闭</a-select-option>
                 <a-select-option value="6">已取消</a-select-option>
               </a-select>
             </a-form-item>
@@ -108,7 +108,7 @@
     <s-table
       ref="table"
       size="small"
-      rowKey="key"
+      rowKey="id"
       :columns="columns"
       :data="loadData"
     >
@@ -121,7 +121,8 @@
           <a-divider type="vertical" />
           <a-dropdown>
             <a class="ant-dropdown-link">
-              更多 <a-icon type="down" />
+              更多
+              <a-icon type="down" />
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
@@ -130,14 +131,26 @@
               <a-menu-item>
                 <a @click="handleGrap(record)">抢单</a>
               </a-menu-item>
+              <a-menu-item>
+                <a @click="handleDelete(record)">删除</a>
+              </a-menu-item>
             </a-menu>
           </a-dropdown>
         </template>
       </span>
     </s-table>
-    <resident-form ref="residentForm" @ok="handleOk"/>
-    <dispatch-form ref="dispatchForm" @ok="handleOk"/>
-    <grap-form ref="grapForm" @ok="handleOk"/>
+    <resident-form
+      ref="residentForm"
+      @ok="handleOk"
+    />
+    <dispatch-form
+      ref="dispatchForm"
+      @ok="handleOk"
+    />
+    <grap-form
+      ref="grapForm"
+      @ok="handleOk"
+    />
   </a-card>
 </template>
 
@@ -146,7 +159,7 @@ import { STable } from '@/components'
 import ResidentForm from './ResidentForm'
 import DispatchForm from './DispatchForm'
 import GrapForm from './GrapForm'
-import { getResidentOrders } from '@/api/order/resident'
+import { getResidentOrders, delResidentOrder } from '@/api/order/resident'
 
 export default {
   name: 'OrderResident',
@@ -168,8 +181,7 @@ export default {
         },
         {
           title: '订单来源',
-          dataIndex: 'source'
-        },
+          dataIndex: 'source' },
         {
           title: '下单时间',
           dataIndex: 'create_time'
@@ -196,7 +208,7 @@ export default {
         },
         {
           title: '接线员',
-          dataIndex: 'operator'
+          dataIndex: 'username'
         },
         {
           title: '操作',
@@ -218,7 +230,6 @@ export default {
       this.$refs.residentForm.add()
     },
     handleEdit (record) {
-      console.log(record)
       this.$refs.residentForm.edit(record)
     },
     handleDispatch (record) {
@@ -229,28 +240,28 @@ export default {
       console.log(record)
       this.$refs.grapForm.edit(record)
     },
+    handleDelete (record) {
+      const that = this
+      this.$confirm({
+        title: '警告',
+        content: `真的要删除 ${record.number} 吗?`,
+        okText: '删除',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk () {
+          delResidentOrder(record)
+            .then(res => {
+              that.$message.success('删除成功')
+              that.$refs.table.refresh()
+            })
+            .catch(err => {
+              that.$message.error(`load user err: ${err.message}`)
+            })
+        }
+      })
+    },
     handleOk () {
       this.$refs.table.refresh()
-    },
-    handleDelete (record) {
-      // const that = this
-      // this.$confirm({
-      //   title: '警告',
-      //   content: `真的要删除 ${record.name} 吗?`,
-      //   okText: '删除',
-      //   okType: 'danger',
-      //   cancelText: '取消',
-      //   onOk () {
-      //     delLargeGood(record)
-      //       .then(res => {
-      //         that.$message.success('删除成功')
-      //         that.$refs.table.refresh()
-      //       })
-      //       .catch(err => {
-      //         that.$message.error(`load user err: ${err.message}`)
-      //       })
-      //   }
-      // })
     }
   }
 }

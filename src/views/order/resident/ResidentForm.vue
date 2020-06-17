@@ -3,6 +3,8 @@
     :title="config.title"
     :width="1000"
     :visible="visible"
+    :confirmLoading="confirmLoading"
+    @cancel="handleCancel"
     :bodyStyle="{padding:'24px 24px 12px 24px'}"
   >
     <template slot="footer">
@@ -127,12 +129,12 @@
                 }"
               >
                 <a-select
-                  v-decorator="['selectTime', { rules: [{ required: true, message: '请选择时间段！' }] }]"
+                  v-decorator="['time', { rules: [{ required: true, message: '请选择时间段！' }] }]"
                   placeholder="请选择时间段"
-                  @change="value=>this.selectTime=value"
+                  @change="value=>this.time=value"
                 >
                   <a-select-option
-                    v-for="t in time"
+                    v-for="t in times"
                     :key="t"
                     :value="t"
                   >{{ t }}</a-select-option>
@@ -604,7 +606,7 @@
 import pick from 'lodash.pick'
 import moment from 'moment'
 import jsonp from 'fetch-jsonp'
-import { addResidentOrder } from '@/api/order/resident'
+import { addResidentOrder, editResidentOrder } from '@/api/order/resident'
 import { getCars, getOnOffGoods, getLargeGoods, getAppletConfig } from '@/api/common'
 
 let timeout
@@ -833,7 +835,7 @@ export default {
       confirmLoading: false,
       form: this.$form.createForm(this),
       config: {},
-      time: [
+      times: [
         '07:00',
         '08:00',
         '09:00',
@@ -859,7 +861,7 @@ export default {
         '05:00',
         '06:00'
       ],
-      selectTime: '',
+      time: '',
       car: [],
       selectCar: [],
       places: [],
@@ -1012,13 +1014,13 @@ export default {
       return cost
     },
     specialTimeCost: function () {
-      if (this.selectTime) {
-        if (this.selectTime >= '19:00' && this.selectTime <= '23:00') {
+      if (this.time) {
+        if (this.time >= '19:00' && this.time <= '23:00') {
           return (
             (this.appletConfig.add_ratio1 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
           )
-        } else if (this.selectTime > '23:00' || this.selectTime <= '07:00') {
+        } else if (this.time > '23:00' || this.time < '07:00') {
           return (
             (this.appletConfig.add_ratio2 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
@@ -1049,40 +1051,56 @@ export default {
         this.form.resetFields()
         this.selectCar = []
         this.route = [
-        {
-          key: 0,
-          title: '',
-          address: '',
-          location: '',
-          room_number: '',
-          stairs_or_elevators: undefined,
-          floor_num: '',
-          parking_distance: undefined,
-          placeholder: '请输入起点'
-        },
-        {
-          key: 1,
-          title: '',
-          address: '',
-          location: '',
-          room_number: '',
-          stairs_or_elevators: undefined,
-          floor_num: '',
-          parking_distance: undefined,
-          placeholder: '请输入终点'
-        }
-      ]
+          {
+            key: 0,
+            title: '',
+            address: '',
+            location: '',
+            room_number: '',
+            stairs_or_elevators: undefined,
+            floor_num: '',
+            parking_distance: undefined,
+            placeholder: '请输入起点'
+          },
+          {
+            key: 1,
+            title: '',
+            address: '',
+            location: '',
+            room_number: '',
+            stairs_or_elevators: undefined,
+            floor_num: '',
+            parking_distance: undefined,
+            placeholder: '请输入终点'
+          }
+        ]
         this.selectOnoff = []
         this.selectLarge = []
+        this.distance = 0
       })
     },
     edit (record) {
+      this.config.action = 'edit'
+      this.config.title = '修改订单'
+      this.config.id = record.id
       this.visible = true
       const {
         form: { setFieldsValue }
       } = this
       this.$nextTick(() => {
-        setFieldsValue(pick(record, []))
+        const formData = pick(record, ['source', 'customer', 'phone', 'time'])
+        formData.appointment = moment(record.appointment)
+        setFieldsValue(formData)
+        this.time = record.time
+        this.selectCar = JSON.parse(JSON.stringify(record.cars))
+        this.carCount = record.cars.length
+        this.route = JSON.parse(JSON.stringify(record.routes))
+        this.routeCount = record.routes.length
+        this.distance = record.distance
+        this.selectOnoff = JSON.parse(JSON.stringify(record.onoffs))
+        this.onoffCount = record.onoffs.length
+        this.selectLarge = JSON.parse(JSON.stringify(record.larges))
+        this.largeCount = record.larges.length
       })
     },
     handleCarAdd () {
@@ -1308,14 +1326,7 @@ export default {
           let carFlag = true
           this.selectCar.forEach(r => {
             if (r.key >= 0 && r.id > 0 && r.num > 0) {
-              cars.push({
-                key: r.key,
-                id: r.id,
-                name: r.name,
-                price: r.price,
-                num: r.num,
-                total: r.total
-              })
+              cars.push(r)
             } else {
               carFlag = false
             }
@@ -1338,16 +1349,7 @@ export default {
               r.parking_distance &&
               r.stairs_or_elevators
             ) {
-              routes.push({
-                key: r.key,
-                title: r.title,
-                location: r.location,
-                address: r.address,
-                room_number: r.room_number,
-                stairs_or_elevators: r.stairs_or_elevators,
-                floor_num: r.floor_num,
-                parking_distance: r.parking_distance
-              })
+              routes.push(r)
             } else {
               routeFlag = false
             }
@@ -1361,14 +1363,7 @@ export default {
           let onoffFlag = true
           this.selectOnoff.forEach(r => {
             if (r.key >= 0 && r.id && r.name && r.num > 0) {
-              onoffs.push({
-                key: r.key,
-                id: r.id,
-                name: r.name,
-                price: r.price,
-                num: r.num,
-                total: r.total
-              })
+              onoffs.push(r)
             } else {
               onoffFlag = false
             }
@@ -1382,14 +1377,7 @@ export default {
           let largeFlag = true
           this.selectLarge.forEach(r => {
             if (r.key >= 0 && r.id && r.name && r.num > 0) {
-              larges.push({
-                key: r.key,
-                id: r.id,
-                name: r.name,
-                price: r.price,
-                num: r.num,
-                total: r.total
-              })
+              larges.push(r)
             } else {
               largeFlag = false
             }
@@ -1399,6 +1387,7 @@ export default {
             return false
           }
           values.larges = larges
+          values.distance = this.distance
           values.carCost = this.carCost
           values.distanceCost = this.distanceCost
           values.floorCost = this.floorCost
@@ -1408,8 +1397,21 @@ export default {
           values.specialTimeCost = this.specialTimeCost
           values.totalCost = this.totalCost
           if (this.config.action === 'add') {
-            addResidentOrder(values).then(res => {
+            addResidentOrder(values)
+              .then(res => {
                 $message.success('添加成功')
+                this.visible = false
+                this.confirmLoading = false
+                this.$emit('ok', values)
+              })
+              .catch(err => {
+                $message.error(`load user err: ${err.message}`)
+              })
+          } else if (this.config.action === 'edit') {
+            values.id = this.config.id
+            editResidentOrder(values)
+              .then(res => {
+                $message.success('修改成功')
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)

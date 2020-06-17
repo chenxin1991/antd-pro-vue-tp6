@@ -1,14 +1,14 @@
 import { axios } from '@/utils/request'
 
 const api = {
-  applet_config: '/applet_config'
+  AppletConfig: '/AppletConfig'
 }
 
 export default api
 
 export function editAppletConfig (parameter) {
   return axios({
-    url: api.applet_config + '/' + parameter.id,
+    url: api.AppletConfig + '/' + parameter.id,
     method: 'put',
     data: parameter
   })
@@ -16,7 +16,7 @@ export function editAppletConfig (parameter) {
 
 export function getAppletConfig (parameter) {
   return axios({
-    url: api.applet_config + '/' + parameter.id,
+    url: api.AppletConfig + '/' + parameter.id,
     method: 'get',
     params: parameter
   })

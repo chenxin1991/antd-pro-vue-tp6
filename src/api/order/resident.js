@@ -1,14 +1,14 @@
 import { axios } from '@/utils/request'
 
 const api = {
-  residentOrder: '/residentOrder'
+  ResidentOrder: '/ResidentOrder'
 }
 
 export default api
 
 export function addResidentOrder (parameter) {
   return axios({
-    url: api.residentOrder,
+    url: api.ResidentOrder,
     method: 'post',
     data: parameter
   })
@@ -16,7 +16,7 @@ export function addResidentOrder (parameter) {
 
 export function editResidentOrder (parameter) {
   return axios({
-    url: api.residentOrder + '/' + parameter.id,
+    url: api.ResidentOrder + '/' + parameter.id,
     method: 'put',
     data: parameter
   })
@@ -24,7 +24,7 @@ export function editResidentOrder (parameter) {
 
 export function delResidentOrder (parameter) {
   return axios({
-      url: api.residentOrder + '/' + parameter.id,
+      url: api.ResidentOrder + '/' + parameter.id,
       method: 'delete',
       data: parameter
   })
@@ -32,7 +32,7 @@ export function delResidentOrder (parameter) {
 
 export function getResidentOrders (parameter) {
   return axios({
-    url: api.residentOrder,
+    url: api.ResidentOrder,
     method: 'get',
     params: parameter
   })
