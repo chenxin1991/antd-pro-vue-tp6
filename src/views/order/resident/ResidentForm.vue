@@ -923,7 +923,7 @@ export default {
           cost = cost + r.total
         }
       })
-      return cost
+      return Math.round(cost)
     },
     distanceCost: function () {
       const that = this
@@ -939,7 +939,7 @@ export default {
           }
         }
       })
-      return cost
+      return Math.round(cost)
     },
     floorCost: function () {
       let cost = 0
@@ -960,7 +960,7 @@ export default {
           }
         })
       }
-      return cost
+      return Math.round(cost)
     },
     parkingCost: function () {
       let cost = 0
@@ -975,15 +975,19 @@ export default {
           if (s.id > 0) {
             for (let i = 0; i < parking.length; i++) {
               switch (parking[i]) {
+                // 低于30米
                 case '0':
                   cost = cost + s.distance1 * s.num
                   break
+                // 30-50米
                 case '1':
                   cost = cost + s.distance2 * s.num
                   break
+                // 50-100米
                 case '2':
                   cost = cost + s.distance3 * s.num
                   break
+                // 100米以上或地下室出入
                 case '3':
                 case '4':
                   cost = cost + s.distance4 * s.num
@@ -993,7 +997,7 @@ export default {
           }
         })
       }
-      return cost
+      return Math.round(cost)
     },
     onoffCost: function () {
       let cost = 0
@@ -1002,7 +1006,7 @@ export default {
           cost = cost + r.total
         }
       })
-      return cost
+      return Math.round(cost)
     },
     largeCost: function () {
       let cost = 0
@@ -1011,23 +1015,24 @@ export default {
           cost = cost + r.total
         }
       })
-      return cost
+      return Math.round(cost)
     },
     specialTimeCost: function () {
+      let cost = 0
       if (this.time) {
         if (this.time >= '19:00' && this.time <= '23:00') {
-          return (
+          cost = (
             (this.appletConfig.add_ratio1 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
           )
         } else if (this.time > '23:00' || this.time < '07:00') {
-          return (
+          cost = (
             (this.appletConfig.add_ratio2 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
           )
         }
       }
-      return 0
+      return Math.round(cost)
     },
     totalCost: function () {
       return (
@@ -1077,6 +1082,7 @@ export default {
         this.selectOnoff = []
         this.selectLarge = []
         this.distance = 0
+        this.time = ''
       })
     },
     edit (record) {

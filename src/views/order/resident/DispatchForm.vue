@@ -7,15 +7,22 @@
     @ok="handleSubmit"
     @cancel="handleCancel"
   >
-    <a-form class="permission-form" :form="form">
+    <a-form :form="form">
       <a-form-item
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
         label="队长"
       >
-        <a-select v-decorator="['status', { initialValue: 1 }]">
-          <a-select-option :value="1">正常</a-select-option>
-          <a-select-option :value="2">禁用</a-select-option>
+        <a-select
+          show-search
+          :filter-option="filter"
+          v-decorator="['leader',{ rules: [{ required: true, message: '请选择队长!' }] }]"
+        >
+          <a-select-option
+            :key="index"
+            v-for="(item, index) in leaders"
+            :value="item.id"
+          >{{ item.name }}</a-select-option>
         </a-select>
       </a-form-item>
     </a-form>
@@ -24,7 +31,7 @@
 
 <script>
 import pick from 'lodash.pick'
-
+import { getLeaders } from '@/api/common'
 export default {
   data () {
     return {
@@ -38,23 +45,38 @@ export default {
       },
       visible: false,
       confirmLoading: false,
-
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      leaders: []
     }
+  },
+  created () {
+    getLeaders({ t: new Date() }).then(res => {
+      this.leaders = res
+    })
   },
   methods: {
     add () {
       this.visible = true
     },
     edit (record) {
+      if (record.leader === 0) {
+        record.leader = ''
+      }
       this.visible = true
-      const { form: { setFieldsValue } } = this
+      const {
+        form: { setFieldsValue }
+      } = this
       this.$nextTick(() => {
-        setFieldsValue(pick(record, []))
+        setFieldsValue(pick(record, ['leader']))
       })
     },
+    filter (input, option) {
+      return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    },
     handleSubmit () {
-      const { form: { validateFields } } = this
+      const {
+        form: { validateFields }
+      } = this
       this.confirmLoading = true
       validateFields((errors, values) => {
         if (!errors) {

@@ -1,0 +1,107 @@
+<template>
+  <a-modal
+    :title="config.title"
+    :width="640"
+    :visible="visible"
+    :confirmLoading="confirmLoading"
+    @ok="handleSubmit"
+    @cancel="handleCancel"
+  >
+    <a-spin :spinning="confirmLoading">
+      <a-form
+        :form="form"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-item label="姓名">
+          <a-input v-decorator="['name', { rules: [{ required: true, message: '请输入姓名！' }] }]" />
+        </a-form-item>
+        <a-form-item label="手机号">
+          <a-input v-decorator="['phone', { rules: [{ required: true, message: '请输入手机号！' }] }]" />
+        </a-form-item>
+      </a-form>
+    </a-spin>
+  </a-modal>
+</template>
+
+<script>
+import pick from 'lodash.pick'
+import { addLeader, editLeader } from '@/api/basic/leader'
+export default {
+  data () {
+    return {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 5 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 }
+      },
+      visible: false,
+      confirmLoading: false,
+      config: {},
+      form: this.$form.createForm(this)
+    }
+  },
+  methods: {
+    add () {
+      this.config.action = 'add'
+      this.config.title = '新增队长'
+      this.visible = true
+      this.$nextTick(() => {
+        this.form.resetFields()
+      })
+    },
+    edit (record) {
+      this.config.action = 'edit'
+      this.config.title = '编辑队长'
+      this.config.id = record.id
+      this.visible = true
+      this.$nextTick(() => {
+        this.form.setFieldsValue(pick(record, ['name', 'phone']))
+      })
+    },
+    handleSubmit () {
+      const {
+        form: { validateFields }
+      } = this
+      this.confirmLoading = true
+      const { $message } = this
+      validateFields((errors, values) => {
+        if (!errors) {
+          if (this.config.action === 'add') {
+            addLeader(values)
+              .then(res => {
+                $message.success('添加成功')
+                this.visible = false
+                this.confirmLoading = false
+                this.$emit('ok', values)
+              })
+              .catch(err => {
+                $message.error(`load user err: ${err.message}`)
+              })
+          } else if (this.config.action === 'edit') {
+            values.id = this.config.id
+            editLeader(values)
+              .then(res => {
+                $message.success('修改成功')
+                this.visible = false
+                this.confirmLoading = false
+                this.$emit('ok', values)
+              })
+              .catch(err => {
+                $message.error(`load user err: ${err.message}`)
+              })
+          }
+        } else {
+          this.confirmLoading = false
+        }
+      })
+    },
+    handleCancel () {
+      this.visible = false
+    }
+  }
+}
+</script>

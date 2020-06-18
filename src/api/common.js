@@ -5,7 +5,8 @@ const api = {
   car: '/common/getCars',
   on_off_good: '/common/getOnOffGoods',
   large_good: '/common/getLargeGoods',
-  applet_config: '/common/getAppletConfig'
+  applet_config: '/common/getAppletConfig',
+  leader: '/common/getLeaders'
 }
 
 export default api
@@ -45,6 +46,14 @@ export function getLargeGoods (parameter) {
 export function getAppletConfig (parameter) {
   return axios({
     url: api.applet_config + '/' + parameter.id,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getLeaders (parameter) {
+  return axios({
+    url: api.leader,
     method: 'get',
     params: parameter
   })

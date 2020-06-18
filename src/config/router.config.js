@@ -150,6 +150,12 @@ export const asyncRouterMap = [
             meta: { title: '大件管理', keepAlive: true }
           },
           {
+            path: '/basic/leader',
+            name: 'BasicLeader',
+            component: () => import('@/views/basic/leader/Leader'),
+            meta: { title: '队长管理', keepAlive: true }
+          },
+          {
             path: '/basic/applet_config',
             name: 'BasicConfig',
             component: () => import('@/views/basic/applet_config/AppletConfig'),

@@ -199,6 +199,10 @@ export default {
           dataIndex: 'phone'
         },
         {
+          title: '总报价',
+          dataIndex: 'total_cost'
+        },
+        {
           title: '订单状态',
           dataIndex: 'order_status'
         },
@@ -209,6 +213,10 @@ export default {
         {
           title: '接线员',
           dataIndex: 'username'
+        },
+        {
+          title: '队长',
+          dataIndex: 'leadername'
         },
         {
           title: '操作',
@@ -233,12 +241,11 @@ export default {
       this.$refs.residentForm.edit(record)
     },
     handleDispatch (record) {
-      console.log(record)
       this.$refs.dispatchForm.edit(record)
     },
     handleGrap (record) {
-      console.log(record)
-      this.$refs.grapForm.edit(record)
+      this.$message.warning('功能暂未开放！')
+      // this.$refs.grapForm.edit(record)
     },
     handleDelete (record) {
       const that = this
