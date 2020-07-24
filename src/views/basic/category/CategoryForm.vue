@@ -16,40 +16,6 @@
         <a-form-item label="名称">
           <a-input v-decorator="['name', { rules: [{ required: true, message: '请输入名称！' }] }]" />
         </a-form-item>
-        <a-form-item label="单价（元）">
-          <a-input-number
-            :min="0"
-            v-decorator="[
-              'price',
-              {
-                rules: [{ required: true, message: '请输入单价！' }],
-              },
-            ]"
-            style="width: 100%"
-          />
-        </a-form-item>
-        <a-form-item label="单位">
-          <a-input v-decorator="['unit', { rules: [{ required: true, message: '请输入单位！' }] }]" />
-        </a-form-item>
-        <a-form-item label="上传图片">
-          <a-upload
-            name="avatar"
-            list-type="picture-card"
-            class="avatar-uploader"
-            :show-upload-list="false"
-            action="/admin/test/avatar"
-            :before-upload="beforeUpload"
-            @change="handleChange"
-          >
-            <img v-if="imageUrl" :src="imageUrl" alt="avatar" width="100%"/>
-            <div v-else>
-              <a-icon :type="loading ? 'loading' : 'plus'" />
-              <div class="ant-upload-text">
-                Upload
-              </div>
-            </div>
-          </a-upload>
-        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -57,7 +23,7 @@
 
 <script>
 import pick from 'lodash.pick'
-import { addOnOffGood, editOnOffGood } from '@/api/basic/on_off_good'
+import { addLargeGood, editLargeGood } from '@/api/basic/large_good'
 export default {
   data () {
     return {
@@ -72,9 +38,7 @@ export default {
       visible: false,
       confirmLoading: false,
       config: {},
-      form: this.$form.createForm(this),
-      loading: false,
-      imageUrl: ''
+      form: this.$form.createForm(this)
     }
   },
   methods: {
@@ -95,22 +59,6 @@ export default {
         this.form.setFieldsValue(pick(record, ['name', 'price', 'unit']))
       })
     },
-    handleChange (info) {
-      if (info.file.status === 'done' && info.file.response.status === 'done') {
-          this.imageUrl = info.file.response.url
-      }
-    },
-    beforeUpload (file) {
-      const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
-      if (!isJpgOrPng) {
-        this.$message.error('You can only upload JPG file!')
-      }
-      const isLt2M = file.size / 1024 / 1024 < 2
-      if (!isLt2M) {
-        this.$message.error('Image must smaller than 2MB!')
-      }
-      return isJpgOrPng && isLt2M
-    },
     handleSubmit () {
       const {
         form: { validateFields }
@@ -120,7 +68,7 @@ export default {
       validateFields((errors, values) => {
         if (!errors) {
           if (this.config.action === 'add') {
-            addOnOffGood(values)
+            addLargeGood(values)
               .then(res => {
                 $message.success('添加成功')
                 this.visible = false
@@ -132,7 +80,7 @@ export default {
               })
           } else if (this.config.action === 'edit') {
             values.id = this.config.id
-            editOnOffGood(values)
+            editLargeGood(values)
               .then(res => {
                 $message.success('修改成功')
                 this.visible = false
@@ -154,9 +102,3 @@ export default {
   }
 }
 </script>
-<style>
-.avatar-uploader > .ant-upload {
-  width: 300px;
-  height: 300px;
-}
-</style>

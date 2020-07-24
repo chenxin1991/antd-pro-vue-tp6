@@ -160,6 +160,12 @@ export const asyncRouterMap = [
             name: 'BasicConfig',
             component: () => import('@/views/basic/applet_config/AppletConfig'),
             meta: { title: '参数设置', keepAlive: true }
+          },
+          {
+            path: '/basic/category',
+            name: 'BasicCategory',
+            component: () => import('@/views/basic/category/Category'),
+            meta: { title: '物品分类', keepAlive: true }
           }
         ]
       },
