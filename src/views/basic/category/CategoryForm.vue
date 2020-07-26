@@ -23,7 +23,7 @@
 
 <script>
 import pick from 'lodash.pick'
-import { addLargeGood, editLargeGood } from '@/api/basic/large_good'
+import { addCategory, editCategory } from '@/api/basic/category'
 export default {
   data () {
     return {
@@ -68,7 +68,7 @@ export default {
       validateFields((errors, values) => {
         if (!errors) {
           if (this.config.action === 'add') {
-            addLargeGood(values)
+            addCategory(values)
               .then(res => {
                 $message.success('添加成功')
                 this.visible = false
@@ -80,7 +80,7 @@ export default {
               })
           } else if (this.config.action === 'edit') {
             values.id = this.config.id
-            editLargeGood(values)
+            editCategory(values)
               .then(res => {
                 $message.success('修改成功')
                 this.visible = false

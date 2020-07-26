@@ -162,6 +162,12 @@ export const asyncRouterMap = [
             meta: { title: '参数设置', keepAlive: true }
           },
           {
+            path: '/basic/goods',
+            name: 'BasicGoods',
+            component: () => import('@/views/basic/goods/Goods'),
+            meta: { title: '物品管理', keepAlive: true }
+          },
+          {
             path: '/basic/category',
             name: 'BasicCategory',
             component: () => import('@/views/basic/category/Category'),

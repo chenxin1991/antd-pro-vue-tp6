@@ -36,7 +36,7 @@
 <script>
 import { STable } from '@/components'
 import CategoryForm from './CategoryForm'
-import { getLargeGoods, delLargeGood } from '@/api/basic/large_good'
+import { getCategorys, delCategory } from '@/api/basic/category'
 
 export default {
   name: 'BasicCategory',
@@ -55,14 +55,6 @@ export default {
           dataIndex: 'name'
         },
         {
-          title: '单价（元）',
-          dataIndex: 'price'
-        },
-        {
-          title: '单位',
-          dataIndex: 'unit'
-        },
-        {
           title: '操作',
           dataIndex: 'action',
           width: '150px',
@@ -72,7 +64,7 @@ export default {
       roles: [],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        return getLargeGoods(Object.assign(parameter, this.queryParam)).then(res => {
+        return getCategorys(Object.assign(parameter, this.queryParam)).then(res => {
           return res.result
         })
       }
@@ -80,10 +72,10 @@ export default {
   },
   methods: {
     handleAdd () {
-      this.$refs.LargeGoodForm.add()
+      this.$refs.CategoryForm.add()
     },
     handleEdit (record) {
-      this.$refs.LargeGoodForm.edit(record)
+      this.$refs.CategoryForm.edit(record)
     },
     handleOk () {
       this.$refs.table.refresh()
@@ -97,7 +89,7 @@ export default {
         okType: 'danger',
         cancelText: '取消',
         onOk () {
-          delLargeGood(record)
+          delCategory(record)
             .then(res => {
               that.$message.success('删除成功')
               that.$refs.table.refresh()

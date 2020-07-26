@@ -1,38 +1,38 @@
 import { axios } from '@/utils/request'
 
 const api = {
-  Category: '/Category'
+  Goods: '/Goods'
 }
 
 export default api
 
-export function addCategory (parameter) {
+export function addGoods (parameter) {
   return axios({
-    url: api.Category,
+    url: api.Goods,
     method: 'post',
     data: parameter
   })
 }
 
-export function editCategory (parameter) {
+export function editGoods (parameter) {
   return axios({
-    url: api.Category + '/' + parameter.id,
+    url: api.Goods + '/' + parameter.id,
     method: 'put',
     data: parameter
   })
 }
 
-export function delCategory (parameter) {
+export function delGoods (parameter) {
   return axios({
-      url: api.Category + '/' + parameter.id,
+      url: api.Goods + '/' + parameter.id,
       method: 'delete',
       data: parameter
   })
 }
 
-export function getCategorys (parameter) {
+export function getGoods (parameter) {
   return axios({
-    url: api.Category,
+    url: api.Goods,
     method: 'get',
     params: parameter
   })

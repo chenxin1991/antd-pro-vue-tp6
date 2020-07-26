@@ -7,11 +7,28 @@
             :md="6"
             :sm="24"
           >
-            <a-form-item label="车型">
+            <a-form-item label="名称">
               <a-input
                 v-model="queryParam.name"
                 @keyup.enter.native="$refs.table.refresh(true)"
               />
+            </a-form-item>
+          </a-col>
+          <a-col
+            :md="6"
+            :sm="24"
+          >
+            <a-form-item label="分类">
+              <a-select
+                v-model="queryParam.role_id"
+                placeholder="请选择"
+              >
+                <a-select-option
+                  :key="index"
+                  v-for="(item, index) in category"
+                  :value="item.id"
+                >{{ item.name }}</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col
@@ -46,8 +63,15 @@
       rowKey="id"
       :columns="columns"
       :data="loadData"
-      bordered
     >
+      <template
+        slot="image"
+        slot-scope="text"
+      >
+
+        <img v-if="text" :src="text" width="100"/>
+
+      </template>
       <span
         slot="action"
         slot-scope="text, record"
@@ -59,8 +83,9 @@
         </template>
       </span>
     </s-table>
-    <car-form
-      ref="carForm"
+    <goods-form
+      ref="GoodsForm"
+      :params="{category:category}"
       @ok="handleOk"
     />
   </a-card>
@@ -68,14 +93,15 @@
 
 <script>
 import { STable } from '@/components'
-import CarForm from './CarForm'
-import { getCars, delCar } from '@/api/basic/car'
+import GoodsForm from './GoodsForm'
+import { getGoods, delGoods } from '@/api/basic/goods'
+import { getCategory } from '@/api/common'
 
 export default {
-  name: 'BasicCar',
+  name: 'BasicGoods',
   components: {
     STable,
-    CarForm
+    GoodsForm
   },
   data () {
     return {
@@ -84,7 +110,7 @@ export default {
       // 表头
       columns: [
         {
-          title: '车型',
+          title: '名称',
           dataIndex: 'name'
         },
         {
@@ -92,46 +118,13 @@ export default {
           dataIndex: 'price'
         },
         {
-          title: '超过多少公里计费',
-          dataIndex: 'km_standard'
+          title: '物品图片',
+          dataIndex: 'image_url',
+          scopedSlots: { customRender: 'image' }
         },
         {
-          title: '超出公里数单价（元）',
-          dataIndex: 'km_price'
-        },
-        {
-          title: '搬入搬出（楼梯）收费标准',
-          children: [
-            {
-              title: '多少楼层开始计费',
-              dataIndex: 'floor_standard'
-            },
-            {
-              title: '单价（元）（每楼层每车）',
-              dataIndex: 'floor_price'
-            }
-          ]
-        },
-        {
-          title: '停车位距离收费标准（元）（每车）',
-          children: [
-            {
-              title: '低于30米',
-              dataIndex: 'distance1'
-            },
-            {
-              title: '30-50米',
-              dataIndex: 'distance2'
-            },
-            {
-              title: '50-100米',
-              dataIndex: 'distance3'
-            },
-            {
-              title: '100米以上或地下室出入',
-              dataIndex: 'distance4'
-            }
-          ]
+          title: '分类',
+          dataIndex: 'category'
         },
         {
           title: '操作',
@@ -140,21 +133,26 @@ export default {
           scopedSlots: { customRender: 'action' }
         }
       ],
-      roles: [],
+      category: [],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        return getCars(Object.assign(parameter, this.queryParam)).then(res => {
+        return getGoods(Object.assign(parameter, this.queryParam)).then(res => {
           return res.result
         })
       }
     }
   },
+  created () {
+    getCategory({ t: new Date() }).then(res => {
+      this.category = res
+    })
+  },
   methods: {
     handleAdd () {
-      this.$refs.carForm.add()
+      this.$refs.GoodsForm.add()
     },
     handleEdit (record) {
-      this.$refs.carForm.edit(record)
+      this.$refs.GoodsForm.edit(record)
     },
     handleOk () {
       this.$refs.table.refresh()
@@ -168,7 +166,7 @@ export default {
         okType: 'danger',
         cancelText: '取消',
         onOk () {
-          delCar(record)
+          delGoods(record)
             .then(res => {
               that.$message.success('删除成功')
               that.$refs.table.refresh()

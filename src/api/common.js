@@ -6,7 +6,8 @@ const api = {
   on_off_good: '/common/getOnOffGoods',
   large_good: '/common/getLargeGoods',
   applet_config: '/common/getAppletConfig',
-  leader: '/common/getLeaders'
+  leader: '/common/getLeaders',
+  category: '/common/getCategory'
 }
 
 export default api
@@ -54,6 +55,14 @@ export function getAppletConfig (parameter) {
 export function getLeaders (parameter) {
   return axios({
     url: api.leader,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getCategory (parameter) {
+  return axios({
+    url: api.category,
     method: 'get',
     params: parameter
   })

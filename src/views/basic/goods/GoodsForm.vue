@@ -28,8 +28,17 @@
             style="width: 100%"
           />
         </a-form-item>
-        <a-form-item label="单位">
-          <a-input v-decorator="['unit', { rules: [{ required: true, message: '请输入单位！' }] }]" />
+        <a-form-item label="分类">
+          <a-select
+            v-decorator="['cid', { rules: [{ required: true, message: '请选择分类！' }] }]"
+            placeholder="请选择"
+          >
+            <a-select-option
+              :key="index"
+              v-for="(item, index) in params.category"
+              :value="item.id"
+            >{{ item.name }}</a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item label="上传图片">
           <a-upload
@@ -41,7 +50,7 @@
             :before-upload="beforeUpload"
             @change="handleChange"
           >
-            <img v-if="imageUrl" :src="imageUrl" alt="avatar" width="100%" height="100"/>
+            <img v-if="image_url" :src="image_url" alt="avatar" style="max-width:202px;max-height:202px;"/>
             <div v-else>
               <a-icon :type="loading ? 'loading' : 'plus'" />
               <div class="ant-upload-text">
@@ -57,8 +66,14 @@
 
 <script>
 import pick from 'lodash.pick'
-import { addOnOffGood, editOnOffGood } from '@/api/basic/on_off_good'
+import { addGoods, editGoods } from '@/api/basic/goods'
 export default {
+  props: {
+    params: {
+      type: Object,
+      required: true
+    }
+  },
   data () {
     return {
       labelCol: {
@@ -74,30 +89,32 @@ export default {
       config: {},
       form: this.$form.createForm(this),
       loading: false,
-      imageUrl: ''
+      image_url: ''
     }
   },
   methods: {
     add () {
       this.config.action = 'add'
-      this.config.title = '新增拆装件'
+      this.config.title = '新增物品'
       this.visible = true
       this.$nextTick(() => {
         this.form.resetFields()
+        this.image_url = ''
       })
     },
     edit (record) {
       this.config.action = 'edit'
-      this.config.title = '编辑拆装件'
+      this.config.title = '编辑物品'
       this.config.id = record.id
+      this.image_url = record.image_url
       this.visible = true
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(record, ['name', 'price', 'unit']))
+        this.form.setFieldsValue(pick(record, ['name', 'price', 'cid']))
       })
     },
     handleChange (info) {
       if (info.file.status === 'done' && info.file.response.status === 'done') {
-          this.imageUrl = info.file.response.url
+          this.image_url = info.file.response.url
       }
     },
     beforeUpload (file) {
@@ -118,9 +135,10 @@ export default {
       this.confirmLoading = true
       const { $message } = this
       validateFields((errors, values) => {
+        values.image_url = this.image_url
         if (!errors) {
           if (this.config.action === 'add') {
-            addOnOffGood(values)
+            addGoods(values)
               .then(res => {
                 $message.success('添加成功')
                 this.visible = false
@@ -132,7 +150,7 @@ export default {
               })
           } else if (this.config.action === 'edit') {
             values.id = this.config.id
-            editOnOffGood(values)
+            editGoods(values)
               .then(res => {
                 $message.success('修改成功')
                 this.visible = false
@@ -154,9 +172,9 @@ export default {
   }
 }
 </script>
-<style>
-.avatar-uploader > .ant-upload {
-  width: 300px;
-  height: 300px;
+<style lang="less" scoped>
+.avatar-uploader /deep/ .ant-upload {
+  width: 220px;
+  height: 220px;
 }
 </style>

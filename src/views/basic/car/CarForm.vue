@@ -7,101 +7,92 @@
     :confirmLoading="confirmLoading"
     @ok="handleSubmit"
     @cancel="handleCancel"
-    :bodyStyle="{padding:'8px 24px'}"
   >
     <a-spin :spinning="confirmLoading">
       <a-form
         :form="form"
-        layout="vertical"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
       >
+        <a-form-item
+          :labelCol="{
+            xs: { span: 24 },
+            sm: { span: 5 }
+          }"
+          :wrapperCol="{
+            xs: { span: 24 },
+            sm: { span: 16 }
+          }"
+          label="名称">
+          <a-input v-decorator="['name', { rules: [{ required: true, message: '请输入名称！' }] }]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="{
+            xs: { span: 24 },
+            sm: { span: 5 }
+          }"
+          :wrapperCol="{
+            xs: { span: 24 },
+            sm: { span: 16 }
+          }"
+          label="单价（元）">
+          <a-input-number
+            :min="0"
+            v-decorator="[
+              'price',
+              {
+                rules: [{ required: true, message: '请输入单价！' }],
+              },
+            ]"
+            style="width: 100%"
+          />
+        </a-form-item>
+        <a-form-item
+          :labelCol="{
+            xs: { span: 24 },
+            sm: { span: 5 }
+          }"
+          :wrapperCol="{
+            xs: { span: 24 },
+            sm: { span: 16 }
+          }"
+          label="上传图片">
+          <a-upload
+            name="avatar"
+            list-type="picture-card"
+            class="avatar-uploader"
+            :show-upload-list="false"
+            action="/admin/test/avatar"
+            :before-upload="beforeUpload"
+            @change="handleChange"
+          >
+            <img v-if="image_url" :src="image_url" alt="avatar" style="max-width:202px;max-height:202px;"/>
+            <div v-else>
+              <a-icon :type="loading ? 'loading' : 'plus'" />
+              <div class="ant-upload-text">
+                Upload
+              </div>
+            </div>
+          </a-upload>
+        </a-form-item>
         <a-divider orientation="left">
-          车型信息
+          超出公里数收费标准
         </a-divider>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="车型">
-              <a-input
-                v-decorator="[
-                  'name',
-                  {
-                    rules: [{ required: true, message: '请输入车型！' }],
-                  },
-                ]" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="载重（吨）">
-              <a-input-number
-                :min="0"
-                v-decorator="[
-                  'load',
-                  {
-                    rules: [{ required: true, message: '请输入载重！' }],
-                  },
-                ]"
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="长宽高（米）">
-              <a-input
-                v-decorator="[
-                  'size',
-                  {
-                    rules: [{ required: true, message: '请输入长宽高！' }],
-                  },
-                ]" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="体积（方）">
-              <a-input-number
-                :min="0"
-                v-decorator="[
-                  'volume',
-                  {
-                    rules: [{ required: true, message: '请输入体积！' }],
-                  },
-                ]"
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="单价（元/车）">
-              <a-input-number
-                :min="0"
-                v-decorator="[
-                  'price',
-                  {
-                    rules: [{ required: true, message: '请输入单价！' }],
-                  },
-                ]"
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="超多少公里计费">
+            <a-form-item label="超出多少公里开始计费">
               <a-input-number
                 :min="0"
                 v-decorator="[
                   'km_standard',
                   {
-                    rules: [{ required: true, message: '请输入超多少公里计费！' }],
+                    rules: [{ required: true, message: '请输入超出多少公里开始计费！' }],
                   },
                 ]"
                 style="width: 100%"
               />
             </a-form-item>
           </a-col>
-        </a-row>
-        <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="超出公里数单价（元）">
               <a-input-number
@@ -226,16 +217,18 @@ export default {
     return {
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 5 }
+        sm: { span: 16 }
       },
       wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 18 }
+        sm: { span: 8 }
       },
       visible: false,
       confirmLoading: false,
       config: {},
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      loading: false,
+      image_url: ''
     }
   },
   methods: {
@@ -245,6 +238,7 @@ export default {
       this.visible = true
       this.$nextTick(() => {
         this.form.resetFields()
+        this.image_url = ''
       })
     },
     edit (record) {
@@ -252,13 +246,11 @@ export default {
       this.config.title = '编辑车型'
       this.config.id = record.id
       this.visible = true
+      this.image_url = record.image_url
       this.$nextTick(() => {
         this.form.setFieldsValue(
           pick(record, [
             'name',
-            'load',
-            'size',
-            'volume',
             'price',
             'km_standard',
             'km_price',
@@ -272,6 +264,22 @@ export default {
         )
       })
     },
+    handleChange (info) {
+      if (info.file.status === 'done' && info.file.response.status === 'done') {
+          this.image_url = info.file.response.url
+      }
+    },
+    beforeUpload (file) {
+      const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+      if (!isJpgOrPng) {
+        this.$message.error('You can only upload JPG file!')
+      }
+      const isLt2M = file.size / 1024 / 1024 < 2
+      if (!isLt2M) {
+        this.$message.error('Image must smaller than 2MB!')
+      }
+      return isJpgOrPng && isLt2M
+    },
     handleSubmit () {
       const {
         form: { validateFields }
@@ -279,6 +287,7 @@ export default {
       this.confirmLoading = true
       const { $message } = this
       validateFields((errors, values) => {
+        values.image_url = this.image_url
         if (!errors) {
           if (this.config.action === 'add') {
             addCar(values)
@@ -317,7 +326,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.avatar-uploader /deep/ .ant-upload {
+  width: 220px;
+  height: 220px;
+}
 .ant-form-item {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 </style>
