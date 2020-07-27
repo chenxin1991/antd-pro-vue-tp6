@@ -44,7 +44,7 @@ export default {
   methods: {
     add () {
       this.config.action = 'add'
-      this.config.title = '新增拆装件'
+      this.config.title = '新增物品分类'
       this.visible = true
       this.$nextTick(() => {
         this.form.resetFields()
@@ -52,11 +52,11 @@ export default {
     },
     edit (record) {
       this.config.action = 'edit'
-      this.config.title = '编辑拆装件'
+      this.config.title = '编辑物品分类'
       this.config.id = record.id
       this.visible = true
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(record, ['name', 'price', 'unit']))
+        this.form.setFieldsValue(pick(record, ['name']))
       })
     },
     handleSubmit () {
