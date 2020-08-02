@@ -1025,7 +1025,7 @@ export default {
             (this.appletConfig.add_ratio1 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
           )
-        } else if (this.time > '23:00' || this.time < '07:00') {
+        } else if (this.time > '23:00' || this.time <= '07:00') {
           cost = (
             (this.appletConfig.add_ratio2 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
