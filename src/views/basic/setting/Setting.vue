@@ -178,23 +178,23 @@
 
 <script>
 import pick from 'lodash.pick'
-import { getAppletConfig, editAppletConfig } from '@/api/basic/applet_config'
+import { getSetting, editSetting } from '@/api/basic/setting'
 export default {
   data () {
     return {
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 6 }
+        sm: { span: 8 }
       },
       wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 18 }
+        sm: { span: 16 }
       },
       form: this.$form.createForm(this)
     }
   },
   created () {
-    getAppletConfig({ id: 1 }).then(res => {
+    getSetting({ id: 1 }).then(res => {
       this.form.setFieldsValue(
         pick(res.result.data, [
           'discount1',
@@ -218,7 +218,7 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           values.id = 1
-          editAppletConfig(values)
+          editSetting(values)
             .then(res => {
               $message.success('修改成功')
             })

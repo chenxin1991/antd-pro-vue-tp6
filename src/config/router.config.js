@@ -144,9 +144,9 @@ export const asyncRouterMap = [
             meta: { title: '队长管理', keepAlive: true }
           },
           {
-            path: '/basic/applet_config',
-            name: 'BasicConfig',
-            component: () => import('@/views/basic/applet_config/AppletConfig'),
+            path: '/basic/setting',
+            name: 'BasicSetting',
+            component: () => import('@/views/basic/setting/Setting'),
             meta: { title: '参数设置', keepAlive: true }
           },
           {

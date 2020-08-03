@@ -3,9 +3,8 @@ import { axios } from '@/utils/request'
 const api = {
   role: '/common/getRoles',
   car: '/common/getCars',
-  on_off_good: '/common/getOnOffGoods',
-  large_good: '/common/getLargeGoods',
-  applet_config: '/common/getAppletConfig',
+  goods: '/common/getGoods',
+  setting: '/common/getSetting',
   leader: '/common/getLeaders',
   category: '/common/getCategory'
 }
@@ -28,25 +27,17 @@ export function getCars (parameter) {
   })
 }
 
-export function getOnOffGoods (parameter) {
+export function getGoods (parameter) {
   return axios({
-    url: api.on_off_good,
+    url: api.goods,
     method: 'get',
     params: parameter
   })
 }
 
-export function getLargeGoods (parameter) {
+export function getSetting (parameter) {
   return axios({
-    url: api.large_good,
-    method: 'get',
-    params: parameter
-  })
-}
-
-export function getAppletConfig (parameter) {
-  return axios({
-    url: api.applet_config + '/' + parameter.id,
+    url: api.setting + '/' + parameter.id,
     method: 'get',
     params: parameter
   })

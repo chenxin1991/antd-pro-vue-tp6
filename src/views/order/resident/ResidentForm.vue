@@ -174,7 +174,7 @@
                       show-search
                       :value="text"
                       placeholder="选择车辆"
-                      :filter-option="filterOnoff"
+                      :filter-option="filterGoods"
                       @change="(value,option) => handleCarIDChange(value,record.key,option)"
                     >
                       <a-select-option
@@ -418,7 +418,7 @@
         </a-tab-pane>
         <a-tab-pane
           key="3"
-          tab="拆装件"
+          tab="物品"
           forceRender
         >
           <a-row :gutter="16">
@@ -435,13 +435,13 @@
               >
                 <a-button
                   class="editable-add-btn"
-                  @click="handleOnoffAdd"
+                  @click="handleGoodsAdd"
                 >
-                  添加拆装件
+                  添加物品
                 </a-button>
                 <a-table
-                  :columns="columns_onoff"
-                  :data-source="selectOnoff"
+                  :columns="columns_goods"
+                  :data-source="selectGoods"
                   :pagination="false"
                   size="small"
                 >
@@ -452,13 +452,13 @@
                     <a-select
                       show-search
                       :value="text"
-                      placeholder="选择拆装件"
-                      :filter-option="filterOnoff"
-                      @change="(value,option) => handleOnoffIDChange(value,record.key,option)"
+                      placeholder="选择物品"
+                      :filter-option="filterGoods"
+                      @change="(value,option) => handleGoodsIDChange(value,record.key,option)"
                     >
                       <a-select-option
                         :key="index"
-                        v-for="(item, index) in onoff"
+                        v-for="(item, index) in goods"
                         :value="item.id"
                         :option="{'price':item.price,'name':item.name}"
                       >{{ item.name }}</a-select-option>
@@ -473,7 +473,7 @@
                       :min="1"
                       :max="10"
                       style="width:100%"
-                      @change="value => handleOnoffNumChange(value, record.key)"
+                      @change="value => handleGoodsNumChange(value, record.key)"
                     />
                   </template>
                   <span
@@ -482,9 +482,9 @@
                   >
                     <template>
                       <a-popconfirm
-                        v-if="selectOnoff.length"
+                        v-if="selectGoods.length"
                         title="确定删除吗?"
-                        @confirm="() => handleOnoffDelete(record.key)"
+                        @confirm="() => handleGoodsDelete(record.key)"
                       >
                         <a href="javascript:;">删除</a>
                       </a-popconfirm>
@@ -496,103 +496,12 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="拆装费用">
+              <a-form-item label="物品费用">
                 <span
                   class="ant-form-text"
                   style="font-size:20px;color:red;"
                 >
-                  {{ onoffCost }}元
-                </span>
-              </a-form-item>
-            </a-col>
-          </a-row>
-        </a-tab-pane>
-        <a-tab-pane
-          key="4"
-          tab="大件"
-          forceRender
-        >
-          <a-row :gutter="16">
-            <a-col :span="24">
-              <a-form-item
-                :labelCol="{
-                  xs: { span: 24 },
-                  sm: { span: 0 }
-                }"
-                :wrapperCol="{
-                  xs: { span: 24 },
-                  sm: { span: 24 }
-                }"
-              >
-                <a-button
-                  class="editable-add-btn"
-                  @click="handleLargeAdd"
-                >
-                  添加大件
-                </a-button>
-                <a-table
-                  :columns="columns_large"
-                  :data-source="selectLarge"
-                  :pagination="false"
-                  size="small"
-                >
-                  <template
-                    slot="id"
-                    slot-scope="text,record"
-                  >
-                    <a-select
-                      show-search
-                      :value="text"
-                      placeholder="选择大件"
-                      :filter-option="filterOnoff"
-                      @change="(value,option) => handleLargeIDChange(value,record.key,option)"
-                    >
-                      <a-select-option
-                        :key="index"
-                        v-for="(item, index) in large"
-                        :value="item.id"
-                        :option="{'price':item.price,'name':item.name}"
-                      >{{ item.name }}</a-select-option>
-                    </a-select>
-                  </template>
-                  <template
-                    slot="num"
-                    slot-scope="text,record"
-                  >
-                    <a-input-number
-                      :value="text"
-                      :min="1"
-                      :max="10"
-                      style="width:100%"
-                      @change="value => handleLargeNumChange(value, record.key)"
-                    />
-                  </template>
-                  <span
-                    slot="action"
-                    slot-scope="text, record"
-                  >
-                    <template>
-                      <a-popconfirm
-                        v-if="selectLarge.length"
-                        title="确定删除吗?"
-                        @confirm="() => handleLargeDelete(record.key)"
-                      >
-                        <a href="javascript:;">删除</a>
-                      </a-popconfirm>
-                    </template>
-                  </span>
-                </a-table>
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="大件费用">
-                <span
-                  class="ant-form-text"
-                  style="font-size:20px;color:red;"
-                >
-                  {{ largeCost }}元
+                  {{ goodsCost }}元
                 </span>
               </a-form-item>
             </a-col>
@@ -607,7 +516,7 @@ import pick from 'lodash.pick'
 import moment from 'moment'
 import jsonp from 'fetch-jsonp'
 import { addResidentOrder, editResidentOrder } from '@/api/order/resident'
-import { getCars, getOnOffGoods, getLargeGoods, getAppletConfig } from '@/api/common'
+import { getCars, getGoods, getSetting } from '@/api/common'
 
 let timeout
 
@@ -767,35 +676,7 @@ export default {
           scopedSlots: { customRender: 'action' }
         }
       ],
-      columns_onoff: [
-        {
-          title: '名称',
-          dataIndex: 'id',
-          width: '40%',
-          scopedSlots: { customRender: 'id' }
-        },
-        {
-          title: '单价',
-          dataIndex: 'price',
-          width: '15%'
-        },
-        {
-          title: '数量',
-          dataIndex: 'num',
-          width: '15%',
-          scopedSlots: { customRender: 'num' }
-        },
-        {
-          title: '总计',
-          dataIndex: 'total'
-        },
-        {
-          title: '操作',
-          dataIndex: 'action',
-          scopedSlots: { customRender: 'action' }
-        }
-      ],
-      columns_large: [
+      columns_goods: [
         {
           title: '名称',
           dataIndex: 'id',
@@ -836,7 +717,6 @@ export default {
       form: this.$form.createForm(this),
       config: {},
       times: [
-        '07:00',
         '08:00',
         '09:00',
         '10:00',
@@ -859,7 +739,8 @@ export default {
         '03:00',
         '04:00',
         '05:00',
-        '06:00'
+        '06:00',
+        '07:00'
       ],
       time: '',
       car: [],
@@ -890,29 +771,23 @@ export default {
           placeholder: '请输入起点'
         }
       ],
-      onoff: [],
-      selectOnoff: [],
-      large: [],
-      selectLarge: [],
+      goods: [],
+      selectGoods: [],
       carCount: 0,
       routeCount: 2,
-      onoffCount: 0,
-      largeCount: 0,
-      appletConfig: {}
+      goodsCount: 0,
+      setting: {}
     }
   },
   created () {
     getCars({ t: new Date() }).then(res => {
       this.car = res
     })
-    getOnOffGoods({ t: new Date() }).then(res => {
-      this.onoff = res
+    getGoods({ t: new Date() }).then(res => {
+      this.goods = res
     })
-    getLargeGoods({ t: new Date() }).then(res => {
-      this.large = res
-    })
-    getAppletConfig({ id: 1 }).then(res => {
-      this.appletConfig = res
+    getSetting({ id: 1 }).then(res => {
+      this.setting = res
     })
   },
   computed: {
@@ -933,9 +808,9 @@ export default {
           if (that.distance > r.km_standard && that.distance <= 300) {
             cost = cost + r.km_price * (that.distance - r.km_standard) * r.num
           } else if (that.distance > 300 && that.distance <= 500) {
-            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.appletConfig.discount1) / 10
+            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.setting.discount1) / 10
           } else if (that.distance > 500) {
-            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.appletConfig.discount2) / 10
+            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.setting.discount2) / 10
           }
         }
       })
@@ -999,18 +874,9 @@ export default {
       }
       return Math.round(cost)
     },
-    onoffCost: function () {
+    goodsCost: function () {
       let cost = 0
-      this.selectOnoff.forEach(r => {
-        if (r.id > 0) {
-          cost = cost + r.total
-        }
-      })
-      return Math.round(cost)
-    },
-    largeCost: function () {
-      let cost = 0
-      this.selectLarge.forEach(r => {
+      this.selectGoods.forEach(r => {
         if (r.id > 0) {
           cost = cost + r.total
         }
@@ -1022,13 +888,13 @@ export default {
       if (this.time) {
         if (this.time >= '19:00' && this.time <= '23:00') {
           cost = (
-            (this.appletConfig.add_ratio1 / 100) *
-            (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
+            (this.setting.add_ratio1 / 100) *
+            (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.goodsCost)
           )
         } else if (this.time > '23:00' || this.time <= '07:00') {
           cost = (
-            (this.appletConfig.add_ratio2 / 100) *
-            (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.onoffCost + this.largeCost)
+            (this.setting.add_ratio2 / 100) *
+            (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.goodsCost)
           )
         }
       }
@@ -1040,8 +906,7 @@ export default {
         this.distanceCost +
         this.floorCost +
         this.parkingCost +
-        this.onoffCost +
-        this.largeCost +
+        this.goodsCost +
         this.specialTimeCost
       )
     }
@@ -1079,8 +944,7 @@ export default {
             placeholder: '请输入终点'
           }
         ]
-        this.selectOnoff = []
-        this.selectLarge = []
+        this.selectGoods = []
         this.distance = 0
         this.time = ''
       })
@@ -1103,10 +967,8 @@ export default {
         this.route = JSON.parse(JSON.stringify(record.routes))
         this.routeCount = record.routes.length
         this.distance = record.distance
-        this.selectOnoff = JSON.parse(JSON.stringify(record.onoffs))
-        this.onoffCount = record.onoffs.length
-        this.selectLarge = JSON.parse(JSON.stringify(record.larges))
-        this.largeCount = record.larges.length
+        this.selectGoods = JSON.parse(JSON.stringify(record.goods))
+        this.goodsCount = record.goods.length
       })
     },
     handleCarAdd () {
@@ -1241,79 +1103,43 @@ export default {
         distance(this.route, data => (this.distance = data))
       }
     },
-    handleOnoffAdd () {
-      const { selectOnoff, onoffCount } = this
+    handleGoodsAdd () {
+      const { selectGoods, goodsCount } = this
       const newData = {
-        key: onoffCount,
+        key: goodsCount,
         id: undefined,
         name: '',
         price: 0,
         num: 1,
         total: 0
       }
-      this.selectOnoff = [...selectOnoff, newData]
-      this.onoffCount = onoffCount + 1
+      this.selectGoods = [...selectGoods, newData]
+      this.goodsCount = goodsCount + 1
     },
-    handleOnoffIDChange (value, key, option) {
-      const newData = [...this.selectOnoff]
+    handleGoodsIDChange (value, key, option) {
+      const newData = [...this.selectGoods]
       const target = newData.filter(item => key === item.key)[0]
       if (target) {
         target['id'] = value
         target['name'] = option.data.attrs.option.name
         target['price'] = option.data.attrs.option.price
         target['total'] = target['price'] * target['num']
-        this.selectOnoff = newData
+        this.selectGoods = newData
       }
     },
-    handleOnoffNumChange (value, key) {
-      const newData = [...this.selectOnoff]
+    handleGoodsNumChange (value, key) {
+      const newData = [...this.selectGoods]
       const target = newData.filter(item => key === item.key)[0]
       if (target) {
         target['num'] = value
         target['total'] = target['num'] * target['price']
-        this.selectOnoff = newData
+        this.selectGoods = newData
       }
     },
-    handleOnoffDelete (key) {
-      this.selectOnoff = this.selectOnoff.filter(item => item.key !== key)
+    handleGoodsDelete (key) {
+      this.selectGoods = this.selectGoods.filter(item => item.key !== key)
     },
-    handleLargeAdd () {
-      const { selectLarge, largeCount } = this
-      const newData = {
-        key: largeCount,
-        id: undefined,
-        name: '',
-        price: 0,
-        num: 1,
-        total: 0
-      }
-      this.selectLarge = [...selectLarge, newData]
-      this.largeCount = largeCount + 1
-    },
-    handleLargeIDChange (value, key, option) {
-      const newData = [...this.selectLarge]
-      const target = newData.filter(item => key === item.key)[0]
-      if (target) {
-        target['id'] = value
-        target['name'] = option.data.attrs.option.name
-        target['price'] = option.data.attrs.option.price
-        target['total'] = target['price'] * target['num']
-        this.selectLarge = newData
-      }
-    },
-    handleLargeNumChange (value, key) {
-      const newData = [...this.selectLarge]
-      const target = newData.filter(item => key === item.key)[0]
-      if (target) {
-        target['num'] = value
-        target['total'] = target['num'] * target['price']
-        this.selectLarge = newData
-      }
-    },
-    handleLargeDelete (key) {
-      this.selectLarge = this.selectLarge.filter(item => item.key !== key)
-    },
-    filterOnoff (input, option) {
+    filterGoods (input, option) {
       return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     },
     handleCancel () {
@@ -1365,41 +1191,26 @@ export default {
             return false
           }
           values.routes = routes
-          const onoffs = []
-          let onoffFlag = true
-          this.selectOnoff.forEach(r => {
+          const goods = []
+          let goodsFlag = true
+          this.selectGoods.forEach(r => {
             if (r.key >= 0 && r.id && r.name && r.num > 0) {
-              onoffs.push(r)
+              goods.push(r)
             } else {
-              onoffFlag = false
+              goodsFlag = false
             }
           })
-          if (!onoffFlag) {
+          if (!goodsFlag) {
             $message.error('请检查拆装信息是否填写完整!')
             return false
           }
-          values.onoffs = onoffs
-          const larges = []
-          let largeFlag = true
-          this.selectLarge.forEach(r => {
-            if (r.key >= 0 && r.id && r.name && r.num > 0) {
-              larges.push(r)
-            } else {
-              largeFlag = false
-            }
-          })
-          if (!largeFlag) {
-            $message.error('请检查大件信息是否填写完整!')
-            return false
-          }
-          values.larges = larges
+          values.goods = goods
           values.distance = this.distance
           values.carCost = this.carCost
           values.distanceCost = this.distanceCost
           values.floorCost = this.floorCost
           values.parkingCost = this.parkingCost
-          values.onoffCost = this.onoffCost
-          values.largeCost = this.largeCost
+          values.goodsCost = this.goodsCost
           values.specialTimeCost = this.specialTimeCost
           values.totalCost = this.totalCost
           if (this.config.action === 'add') {
