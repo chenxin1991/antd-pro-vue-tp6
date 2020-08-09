@@ -37,7 +37,6 @@ const vueConfig = {
     // if prod, add externals
     externals: isProd ? assetsCDN.externals : {}
   },
-
   chainWebpack: (config) => {
     config.resolve.alias
       .set('@$', resolve('src'))
@@ -90,7 +89,7 @@ const vueConfig = {
     // If you want to turn on the proxy, please remove the mockjs /src/main.jsL11
     proxy: {
       '/admin': {
-        target: 'http://demo.tp6.cn/',
+        target: 'https://demo.wjdhbq.com',
         ws: false,
         changeOrigin: true
       }
