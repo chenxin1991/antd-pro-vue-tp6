@@ -14,6 +14,7 @@
       rowKey="id"
       :columns="columns"
       :data="loadData"
+      :pageSize="20"
     >
       <span
         slot="action"
@@ -53,6 +54,14 @@ export default {
         {
           title: '名称',
           dataIndex: 'name'
+        },
+        {
+          title: '排序',
+          dataIndex: 'sort'
+        },
+                {
+          title: '是否为几车内免费',
+          dataIndex: 'is_free'
         },
         {
           title: '操作',

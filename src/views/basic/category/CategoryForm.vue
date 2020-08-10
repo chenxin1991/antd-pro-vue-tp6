@@ -16,6 +16,21 @@
         <a-form-item label="名称">
           <a-input v-decorator="['name', { rules: [{ required: true, message: '请输入名称！' }] }]" />
         </a-form-item>
+        <a-form-item label="排序">
+          <a-input-number
+            v-decorator="['sort', { rules: [{ required: true, message: '请输入排序！' }] }]"
+            style="width:100%;"
+          />
+        </a-form-item>
+        <a-form-item label="是否为几车内免费">
+          <a-select
+            v-decorator="['is_free', { rules: [{ required: true, message: '请选择是否为几车内免费！' }] }]"
+            placeholder="请选择"
+          >
+            <a-select-option value="0">否</a-select-option>
+            <a-select-option value="1">是</a-select-option>
+          </a-select>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -29,7 +44,7 @@ export default {
     return {
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 5 }
+        sm: { span: 6 }
       },
       wrapperCol: {
         xs: { span: 24 },
@@ -56,7 +71,7 @@ export default {
       this.config.id = record.id
       this.visible = true
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(record, ['name']))
+        this.form.setFieldsValue(pick(record, ['name', 'sort']))
       })
     },
     handleSubmit () {
