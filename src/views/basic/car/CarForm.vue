@@ -62,7 +62,7 @@
             list-type="picture-card"
             class="avatar-uploader"
             :show-upload-list="false"
-            action="/admin/test/avatar"
+            action="/index.php/admin/test/avatar"
             :before-upload="beforeUpload"
             @change="handleChange"
           >
