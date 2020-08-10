@@ -28,6 +28,7 @@ const assetsCDN = {
 
 // vue.config.js
 const vueConfig = {
+  publicPath: '/wjdh_admin',
   configureWebpack: {
     // webpack plugins
     plugins: [
@@ -89,7 +90,7 @@ const vueConfig = {
     // If you want to turn on the proxy, please remove the mockjs /src/main.jsL11
     proxy: {
       '/admin': {
-        target: 'https://demo.wjdhbq.com',
+        target: 'https://demo.wjdhbq.com/index.php',
         ws: false,
         changeOrigin: true
       }
