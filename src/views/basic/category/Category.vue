@@ -6,6 +6,10 @@
         icon="plus"
         @click="handleAdd()"
       >新建</a-button>
+      <a-button
+        type="primary"
+        @click="$refs.table.refresh(true)"
+      >刷新</a-button>
     </div>
 
     <s-table
@@ -16,6 +20,10 @@
       :data="loadData"
       :pageSize="20"
     >
+      <template slot="is_free" slot-scope="text">
+        <template v-if="text=='0'">否</template>
+        <template v-if="text=='1'">是</template>
+      </template>
       <span
         slot="action"
         slot-scope="text, record"
@@ -59,9 +67,10 @@ export default {
           title: '排序',
           dataIndex: 'sort'
         },
-                {
+        {
           title: '是否为几车内免费',
-          dataIndex: 'is_free'
+          dataIndex: 'is_free',
+          scopedSlots: { customRender: 'is_free' }
         },
         {
           title: '操作',
@@ -84,6 +93,7 @@ export default {
       this.$refs.CategoryForm.add()
     },
     handleEdit (record) {
+      console.log(record)
       this.$refs.CategoryForm.edit(record)
     },
     handleOk () {

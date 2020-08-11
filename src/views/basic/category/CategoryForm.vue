@@ -71,7 +71,9 @@ export default {
       this.config.id = record.id
       this.visible = true
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(record, ['name', 'sort']))
+        const obj = pick(record, ['name', 'sort', 'is_free'])
+        obj.is_free = obj.is_free.toString()
+        this.form.setFieldsValue(obj)
       })
     },
     handleSubmit () {

@@ -14,7 +14,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col
+          <!-- <a-col
             :md="6"
             :sm="24"
           >
@@ -30,7 +30,7 @@
                 >{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
-          </a-col>
+          </a-col> -->
           <a-col
             :md="6"
             :sm="24"

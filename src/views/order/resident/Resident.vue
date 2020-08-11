@@ -181,7 +181,8 @@ export default {
         },
         {
           title: '订单来源',
-          dataIndex: 'source' },
+          dataIndex: 'source'
+        },
         {
           title: '下单时间',
           dataIndex: 'create_time'
