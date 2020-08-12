@@ -40,6 +40,12 @@
             >{{ item.name }}</a-select-option>
           </a-select>
         </a-form-item>
+        <a-form-item label="排序">
+          <a-input-number
+            v-decorator="['sort', { rules: [{ required: true, message: '请输入排序！' }] }]"
+            style="width:100%;"
+          />
+        </a-form-item>
         <a-form-item label="上传图片">
           <a-upload
             name="avatar"
@@ -125,7 +131,6 @@ export default {
       this.config.action = 'edit'
       this.config.title = '编辑物品'
       this.config.id = record.id
-      console.log(record)
       if (record.image_url === '' || record.image_url === null) {
         this.fileList = []
       } else {
@@ -133,7 +138,7 @@ export default {
       }
       this.visible = true
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(record, ['name', 'price', 'cid']))
+        this.form.setFieldsValue(pick(record, ['name', 'price', 'cid', 'sort']))
       })
     },
     handleCancel2 () {
@@ -150,7 +155,6 @@ export default {
       const file = info.file
       const fileList = info.fileList
       const len = fileList.length
-      console.log(info)
       if (file.status === 'done') {
         fileList[len - 1] = { uid: file.uid, name: file.name, url: file.response.url, status: 'done' }
       }
@@ -204,10 +208,6 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.avatar-uploader /deep/ .ant-upload {
-  width: 220px;
-  height: 220px;
-}
 /* you can make up upload button and sample style by using stylesheets */
 .ant-upload-select-picture-card i {
   font-size: 32px;

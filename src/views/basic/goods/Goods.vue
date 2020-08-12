@@ -14,13 +14,13 @@
               />
             </a-form-item>
           </a-col>
-          <!-- <a-col
+          <a-col
             :md="6"
             :sm="24"
           >
             <a-form-item label="分类">
               <a-select
-                v-model="queryParam.role_id"
+                v-model="queryParam.cid"
                 placeholder="请选择"
               >
                 <a-select-option
@@ -30,7 +30,7 @@
                 >{{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
-          </a-col> -->
+          </a-col>
           <a-col
             :md="6"
             :sm="24"
@@ -118,13 +118,12 @@ export default {
           dataIndex: 'price'
         },
         {
-          title: '物品图片',
-          dataIndex: 'image_url',
-          scopedSlots: { customRender: 'image' }
-        },
-        {
           title: '分类',
           dataIndex: 'category'
+        },
+        {
+          title: '排序',
+          dataIndex: 'sort'
         },
         {
           title: '操作',

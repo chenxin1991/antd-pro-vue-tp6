@@ -28,7 +28,7 @@
         slot="action"
         slot-scope="text, record"
       >
-        <template>
+        <template v-if="record.sort!='-1'">
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
           <a @click="handleDelete(record)">删除</a>
@@ -93,7 +93,6 @@ export default {
       this.$refs.CategoryForm.add()
     },
     handleEdit (record) {
-      console.log(record)
       this.$refs.CategoryForm.edit(record)
     },
     handleOk () {
