@@ -43,21 +43,30 @@
         <a-form-item label="上传图片">
           <a-upload
             name="avatar"
-            list-type="picture-card"
-            class="avatar-uploader"
-            :show-upload-list="false"
             action="/index.php/admin/test/avatar"
-            :before-upload="beforeUpload"
+            list-type="picture-card"
+            :file-list="fileList"
+            @preview="handlePreview"
             @change="handleChange"
           >
-            <img v-if="image_url" :src="image_url" alt="avatar" style="max-width:202px;max-height:202px;"/>
-            <div v-else>
-              <a-icon :type="loading ? 'loading' : 'plus'" />
+            <div v-if="fileList.length < 8">
+              <a-icon type="plus" />
               <div class="ant-upload-text">
                 Upload
               </div>
             </div>
           </a-upload>
+          <a-modal
+            :visible="previewVisible"
+            :footer="null"
+            @cancel="handleCancel2"
+          >
+            <img
+              alt="example"
+              style="width: 100%"
+              :src="previewImage"
+            />
+          </a-modal>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -67,6 +76,14 @@
 <script>
 import pick from 'lodash.pick'
 import { addGoods, editGoods } from '@/api/basic/goods'
+function getBase64 (file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = error => reject(error)
+  })
+}
 export default {
   props: {
     params: {
@@ -88,8 +105,10 @@ export default {
       confirmLoading: false,
       config: {},
       form: this.$form.createForm(this),
-      loading: false,
-      image_url: ''
+      previewVisible: false,
+      previewImage: '',
+      fileList: [],
+      imageList: []
     }
   },
   methods: {
@@ -99,34 +118,46 @@ export default {
       this.visible = true
       this.$nextTick(() => {
         this.form.resetFields()
-        this.image_url = ''
+        this.fileList = []
       })
     },
     edit (record) {
       this.config.action = 'edit'
       this.config.title = '编辑物品'
       this.config.id = record.id
-      this.image_url = record.image_url
+      console.log(record)
+      if (record.image_url === '' || record.image_url === null) {
+        this.fileList = []
+      } else {
+      this.fileList = record.image_url
+      }
       this.visible = true
       this.$nextTick(() => {
         this.form.setFieldsValue(pick(record, ['name', 'price', 'cid']))
       })
     },
-    handleChange (info) {
-      if (info.file.status === 'done' && info.file.response.status === 'done') {
-          this.image_url = info.file.response.url
-      }
+    handleCancel2 () {
+      this.previewVisible = false
     },
-    beforeUpload (file) {
-      const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
-      if (!isJpgOrPng) {
-        this.$message.error('You can only upload JPG file!')
+    async handlePreview (file) {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj)
       }
-      const isLt2M = file.size / 1024 / 1024 < 2
-      if (!isLt2M) {
-        this.$message.error('Image must smaller than 2MB!')
+      this.previewImage = file.url || file.preview
+      this.previewVisible = true
+    },
+    handleChange (info) {
+      const file = info.file
+      const fileList = info.fileList
+      const len = fileList.length
+      console.log(info)
+      if (file.status === 'done') {
+        fileList[len - 1] = { uid: file.uid, name: file.name, url: file.response.url, status: 'done' }
       }
-      return isJpgOrPng && isLt2M
+      if (file.status === 'error') {
+                fileList[len - 1] = { uid: file.uid, name: file.name, status: 'error' }
+      }
+      this.fileList = fileList
     },
     handleSubmit () {
       const {
@@ -135,7 +166,7 @@ export default {
       this.confirmLoading = true
       const { $message } = this
       validateFields((errors, values) => {
-        values.image_url = this.image_url
+        values.image_url = this.fileList
         if (!errors) {
           if (this.config.action === 'add') {
             addGoods(values)
@@ -176,5 +207,15 @@ export default {
 .avatar-uploader /deep/ .ant-upload {
   width: 220px;
   height: 220px;
+}
+/* you can make up upload button and sample style by using stylesheets */
+.ant-upload-select-picture-card i {
+  font-size: 32px;
+  color: #999;
+}
+
+.ant-upload-select-picture-card .ant-upload-text {
+  margin-top: 8px;
+  color: #666;
 }
 </style>
