@@ -28,7 +28,7 @@
         slot="action"
         slot-scope="text, record"
       >
-        <template v-if="record.sort!='-1'">
+        <template>
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
           <a @click="handleDelete(record)">删除</a>
