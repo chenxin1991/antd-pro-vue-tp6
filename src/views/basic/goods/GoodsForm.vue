@@ -131,10 +131,10 @@ export default {
       this.config.action = 'edit'
       this.config.title = '编辑物品'
       this.config.id = record.id
-      if (record.image_url === '' || record.image_url === null) {
+      if (record.images === '' || record.images === null) {
         this.fileList = []
       } else {
-      this.fileList = record.image_url
+      this.fileList = record.images
       }
       this.visible = true
       this.$nextTick(() => {
@@ -170,7 +170,7 @@ export default {
       this.confirmLoading = true
       const { $message } = this
       validateFields((errors, values) => {
-        values.image_url = this.fileList
+        values.images = this.fileList
         if (!errors) {
           if (this.config.action === 'add') {
             addGoods(values)
