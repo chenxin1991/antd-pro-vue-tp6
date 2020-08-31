@@ -31,6 +31,15 @@
             <a-select-option value="1">是</a-select-option>
           </a-select>
         </a-form-item>
+        <a-form-item label="是否可上传图片">
+          <a-select
+            v-decorator="['is_upload', { rules: [{ required: true, message: '请选择是否可上传图片！' }] }]"
+            placeholder="请选择"
+          >
+            <a-select-option value="0">否</a-select-option>
+            <a-select-option value="1">是</a-select-option>
+          </a-select>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -71,8 +80,9 @@ export default {
       this.config.id = record.id
       this.visible = true
       this.$nextTick(() => {
-        const obj = pick(record, ['name', 'sort', 'is_free'])
+        const obj = pick(record, ['name', 'sort', 'is_free', 'is_upload'])
         obj.is_free = obj.is_free.toString()
+        obj.is_upload = obj.is_upload.toString()
         this.form.setFieldsValue(obj)
       })
     },

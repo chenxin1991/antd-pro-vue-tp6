@@ -24,6 +24,10 @@
         <template v-if="text=='0'">否</template>
         <template v-if="text=='1'">是</template>
       </template>
+      <template slot="is_upload" slot-scope="text">
+        <template v-if="text=='0'">否</template>
+        <template v-if="text=='1'">是</template>
+      </template>
       <span
         slot="action"
         slot-scope="text, record"
@@ -71,6 +75,11 @@ export default {
           title: '是否为几车内免费',
           dataIndex: 'is_free',
           scopedSlots: { customRender: 'is_free' }
+        },
+        {
+          title: '是否可上传图片',
+          dataIndex: 'is_upload',
+          scopedSlots: { customRender: 'is_upload' }
         },
         {
           title: '操作',
