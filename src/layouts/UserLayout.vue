@@ -4,18 +4,18 @@
       <div class="top">
         <div class="header">
           <a href="/">
-            <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            <span class="title">Ant Design</span>
+            <img src="~@/assets/homelogo.png" class="logo" alt="logo">
+            <span class="title">万家灯火</span>
           </a>
         </div>
         <div class="desc">
-          Ant Design 是西湖区最具影响力的 Web 设计规范
+          打造搬家行业第一品牌
         </div>
       </div>
 
       <route-view></route-view>
 
-      <div class="footer">
+      <!-- <div class="footer">
         <div class="links">
           <a href="_self">帮助</a>
           <a href="_self">隐私</a>
@@ -24,7 +24,7 @@
         <div class="copyright">
           Copyright &copy; 2018 白鹭学园技术组出品
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

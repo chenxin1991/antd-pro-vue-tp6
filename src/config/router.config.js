@@ -67,8 +67,8 @@ export const asyncRouterMap = [
         children: [
           {
             path: '/wechat/user',
-            name: 'BaseForm',
-            // component: () => import('@/views/form/BasicForm'),
+            name: 'WechatUser',
+            component: () => import('@/views/wechat/User'),
             meta: { title: '微信用户', keepAlive: true }
           }
         ]
