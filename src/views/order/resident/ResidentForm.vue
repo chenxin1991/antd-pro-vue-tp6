@@ -38,28 +38,30 @@
           tab="预约与车辆"
           forceRender
         >
-          <ReserveVehicle></ReserveVehicle>
+          <test :datas="carsData" :formlist="ModifyData" :settingData="setting" ></test>
+          <!-- <ReserveVehicle :datas="carsData" :formlist="ModifyData" :settingData="setting" ></ReserveVehicle> -->
         </a-tab-pane>
         <a-tab-pane
           key="2"
           tab="起始地"
           forceRender
         >
-          <OriginalPlace></OriginalPlace>
+          <OriginalPlace :datas="PlaceData" :formlist="ModifyData"></OriginalPlace>
         </a-tab-pane>
         <a-tab-pane
           key="3"
           tab="物品"
           forceRender
         >
-          <EditorGoods></EditorGoods>
+          <EditorGoods :datas="GoodsData" :settingData="setting"></EditorGoods>
         </a-tab-pane>
       </a-tabs>
     </a-form>
   </a-modal>
 </template>
 <script>
-import ReserveVehicle from './model/ReserveVehicle.vue'
+import test from './model/test.vue'
+// import ReserveVehicle from './model/ReserveVehicle.vue'
 import OriginalPlace from './model/OriginalPlace.vue'
 import EditorGoods from './model/EditorGoods.vue'
 
@@ -72,114 +74,42 @@ import { getSetting } from '@/api/common'
 export default {
   name: 'ResidentForm',
    components: {
-     ReserveVehicle,
+    //  ReserveVehicle,
+    test,
      OriginalPlace,
      EditorGoods
    },
   data () {
     return {
+
       config: {},
-      setting: {}
+      setting: null,
+      visible: false,
+      confirmLoading: false,
+      form: this.$form.createForm(this),
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 6 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 18 }
+      },
+      ModifyData: '',
+      carsData: '',
+      PlaceData: '',
+      GoodsData: ''
     }
   },
   created () {
     getSetting({ id: 1 }).then(res => {
       this.setting = res
+
+       console.log(' this.setting', this.setting)
     })
   },
   computed: {
-    carCost: function () {
-      let cost = 0
-      this.selectCar.forEach(r => {
-        if (r.id > 0) {
-          cost = cost + r.total
-        }
-      })
-      return Math.round(cost)
-    },
-    distanceCost: function () {
-      const that = this
-      let cost = 0
-      this.selectCar.forEach(r => {
-        if (r.id > 0) {
-          if (that.distance > r.km_standard && that.distance <= 300) {
-            cost = cost + r.km_price * (that.distance - r.km_standard) * r.num
-          } else if (that.distance > 300 && that.distance <= 500) {
-            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.setting.discount1) / 10
-          } else if (that.distance > 500) {
-            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.setting.discount2) / 10
-          }
-        }
-      })
-      return Math.round(cost)
-    },
-    floorCost: function () {
-      let cost = 0
-      const floors = []
-      this.route.forEach(r => {
-        if (r.location && r.floor_num > 0 && r.stairs_or_elevators === '1') {
-          floors.push(r.floor_num)
-        }
-      })
-      if (floors.length > 0) {
-        this.selectCar.forEach(s => {
-          if (s.id > 0) {
-            for (let i = 0; i < floors.length; i++) {
-              if (s.floor_standard <= floors[i]) {
-                cost = cost + (floors[i] - s.floor_standard + 1) * s.floor_price * s.num
-              }
-            }
-          }
-        })
-      }
-      return Math.round(cost)
-    },
-    parkingCost: function () {
-      let cost = 0
-      const parking = []
-      this.route.forEach(r => {
-        if (r.location && r.parking_distance >= 0) {
-          parking.push(r.parking_distance)
-        }
-      })
-      if (parking.length > 0) {
-        this.selectCar.forEach(s => {
-          if (s.id > 0) {
-            for (let i = 0; i < parking.length; i++) {
-              switch (parking[i]) {
-                // 低于30米
-                case '0':
-                  cost = cost + s.distance1 * s.num
-                  break
-                // 30-50米
-                case '1':
-                  cost = cost + s.distance2 * s.num
-                  break
-                // 50-100米
-                case '2':
-                  cost = cost + s.distance3 * s.num
-                  break
-                // 100米以上或地下室出入
-                case '3':
-                case '4':
-                  cost = cost + s.distance4 * s.num
-                  break
-              }
-            }
-          }
-        })
-      }
-      return Math.round(cost)
-    },
-    goodsCost: function () {
-      let cost = 0
-      this.selectGoods.forEach(r => {
-        if (r.id > 0) {
-          cost = cost + r.total
-        }
-      })
-      return Math.round(cost)
-    },
+
     specialTimeCost: function () {
       let cost = 0
       if (this.time) {
@@ -247,6 +177,13 @@ export default {
       })
     },
     edit (record) {
+        // console.log('record', record)
+    this.ModifyData = JSON.parse(JSON.stringify(record))
+    this.carsData = JSON.parse(JSON.stringify(record.cars))
+    this.PlaceData = JSON.parse(JSON.stringify(record.routes))
+    this.GoodsData = JSON.parse(JSON.stringify(record.larges))
+
+    console.log('this.ModifyData', this.ModifyData)
       this.config.action = 'edit'
       this.config.title = '修改订单'
       this.config.id = record.id
@@ -259,18 +196,15 @@ export default {
         formData.appointment = moment(record.appointment)
         setFieldsValue(formData)
         this.time = record.time
-        this.selectCar = JSON.parse(JSON.stringify(record.cars))
-        this.carCount = record.cars.length
-        this.route = JSON.parse(JSON.stringify(record.routes))
-        this.routeCount = record.routes.length
-        this.distance = record.distance
-        this.selectGoods = JSON.parse(JSON.stringify(record.goods))
-        this.goodsCount = record.goods.length
-      })
-    },
 
-    filterGoods (input, option) {
-      return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        // this.selectCar = JSON.parse(JSON.stringify(record.cars))// 预约车辆
+        // this.carCount = record.cars.length
+        // this.route = JSON.parse(JSON.stringify(record.routes))// 起始地
+        // this.routeCount = record.routes.length
+        this.distance = record.distance
+        // this.selectGoods = JSON.parse(JSON.stringify(record.goods))// 物品
+        // this.goodsCount = record.goods.length
+      })
     },
     handleCancel () {
       this.visible = false

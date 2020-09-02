@@ -174,6 +174,7 @@
 
 <script>
 import jsonp from 'fetch-jsonp'
+import eventBus from '@/event/eventBus'
 function fetch (value, callback) {
   if (timeout) {
     clearTimeout(timeout)
@@ -266,6 +267,26 @@ function distance (value, callback) {
 let timeout
 export default {
 name: 'OriginalPlace',
+props: {
+    datas: {
+      type: Array,
+       default: function () {
+         return { datas: {} }
+       }
+    },
+    formlist: {
+      type: Object,
+       default: function () {
+         return { formlist: {} }
+       }
+    },
+     settingData: {
+      type: Object,
+       default: function () {
+         return { settingData: {} }
+       }
+    }
+  },
   data () {
     return {
        labelCol: {
@@ -317,42 +338,108 @@ name: 'OriginalPlace',
         }
       ],
        places: [],
-      distance: 0,
-      route: [
-        {
-          key: 0,
-          title: '',
-          address: '',
-          location: '',
-          room_number: '',
-          stairs_or_elevators: undefined,
-          floor_num: '',
-          parking_distance: undefined,
-          placeholder: '请输入起点'
-        },
-        {
-          key: 1,
-          title: '',
-          address: '',
-          location: '',
-          room_number: '',
-          stairs_or_elevators: undefined,
-          floor_num: '',
-          parking_distance: undefined,
-          placeholder: '请输入起点'
-        }
-      ],
-       routeCount: 2
+      distance: this.formlist.distance,
+      route: this.datas,
+      routeCount: this.datas.length,
+      selectCar: this.formlist.cars,
+      setting: this.settingData
     }
   },
 
   components: {},
 
-  computed: {},
+  computed: {
+        distanceCost: function () {
+          console.log(this.selectCar)
 
-  mounted: {},
+          console.log(11111)
+      const that = this
+      let cost = 0
+      this.selectCar.forEach(r => {
+        if (r.id > 0) {
+          if (that.distance > r.km_standard && that.distance <= 300) {
+            cost = cost + r.km_price * (that.distance - r.km_standard) * r.num
+          } else if (that.distance > 300 && that.distance <= 500) {
+            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.setting.discount1) / 10
+          } else if (that.distance > 500) {
+            cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.setting.discount2) / 10
+          }
+        }
+      })
+      return Math.round(cost)
+    },
+      floorCost: function () {
+      let cost = 0
+      const floors = []
+      this.route.forEach(r => {
+        if (r.location && r.floor_num > 0 && r.stairs_or_elevators === '1') {
+          floors.push(r.floor_num)
+        }
+      })
+      if (floors.length > 0) {
+        this.selectCar.forEach(s => {
+          if (s.id > 0) {
+            for (let i = 0; i < floors.length; i++) {
+              if (s.floor_standard <= floors[i]) {
+                cost = cost + (floors[i] - s.floor_standard + 1) * s.floor_price * s.num
+              }
+            }
+          }
+        })
+      }
+      return Math.round(cost)
+    },
+    parkingCost: function () {
+      let cost = 0
+      const parking = []
+      this.route.forEach(r => {
+        if (r.location && r.parking_distance >= 0) {
+          parking.push(r.parking_distance)
+        }
+      })
+      if (parking.length > 0) {
+        this.selectCar.forEach(s => {
+          if (s.id > 0) {
+            for (let i = 0; i < parking.length; i++) {
+              switch (parking[i]) {
+                // 低于30米
+                case '0':
+                  cost = cost + s.distance1 * s.num
+                  break
+                // 30-50米
+                case '1':
+                  cost = cost + s.distance2 * s.num
+                  break
+                // 50-100米
+                case '2':
+                  cost = cost + s.distance3 * s.num
+                  break
+                // 100米以上或地下室出入
+                case '3':
+                case '4':
+                  cost = cost + s.distance4 * s.num
+                  break
+              }
+            }
+          }
+        })
+      }
+      return Math.round(cost)
+    }
+  },
 
-  created () {},
+  created () {
+    console.log(this.formlist.cars)
+      console.log('this.settingData', this.settingData)
+     eventBus.$on('addCar', (message) => {
+        // 一些操作，message就是从top组件传过来的值
+        this.selectCar = message
+        console.log('message', message)
+        console.log('this.selectCar', this.selectCar)
+    })
+      //  console.log('route', this.route)
+      //  console.log(this.formlist.distance)
+  },
 
   methods: {
         onLocationSearch (value, key) {

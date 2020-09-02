@@ -152,6 +152,14 @@ function getBase64 (file) {
 
 export default {
 name: 'EditorGoods',
+props: {
+    datas: {
+      type: Array,
+       default: function () {
+         return { datas: {} }
+       }
+    }
+  },
   data () {
     return {
        labelCol: {
@@ -218,17 +226,29 @@ name: 'EditorGoods',
 
   components: {},
 
-  computed: {},
-
-  mounted: {},
+  computed: {
+      goodsCost: function () {
+      let cost = 0
+      this.selectGoods.forEach(r => {
+        if (r.id > 0) {
+          cost = cost + r.total
+        }
+      })
+      return Math.round(cost)
+    }
+  },
 
   created () {
+    // console.log(999999, this.datas)
      getGoods({ t: new Date() }).then(res => {
       this.goods = res
     })
   },
 
   methods: {
+     filterGoods (input, option) {
+  return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+},
         handleGoodsAdd () {
       const { selectGoods, goodsCount } = this
       const newData = {
