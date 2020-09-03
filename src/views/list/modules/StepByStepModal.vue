@@ -120,16 +120,16 @@ export default {
       confirmLoading: false,
       currentStep: 0,
       mdl: {},
-
       form: this.$form.createForm(this)
     }
   },
   methods: {
     edit (record) {
       this.visible = true
+       this.mdl = Object.assign({}, record)
       const { form: { setFieldsValue } } = this
       this.$nextTick(() => {
-        setFieldsValue(pick(record, []))
+        setFieldsValue(pick(this.mdl, []))
       })
     },
     handleNext (step) {

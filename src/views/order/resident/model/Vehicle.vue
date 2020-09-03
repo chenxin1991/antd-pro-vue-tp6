@@ -1,118 +1,11 @@
-<!-- 居民搬家-编辑-预约与车辆 -->
+<!-- 居民搬家-编辑-车辆 -->
 <template>
   <div>
-
     <a-form-model
-      ref="ruleForm"
       :model="form"
-      :rules="rules"
       :label-col="labelCol"
       :wrapper-col="wrapperCol"
     >
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-form-model-item
-            label="订单来源"
-            :labelCol="{
-              xs: { span: 24 },
-              sm: { span: 8 }
-            }"
-            :wrapperCol="{
-              xs: { span: 24 },
-              sm: { span: 16 }
-            }"
-          >
-            <a-select
-              v-decorator="['source', { rules: [{ required: true, message: '请选择订单来源！' }] }]"
-              placeholder="请选择"
-            >
-              <a-select-option value="0">来电</a-select-option>
-              <a-select-option value="1">上门</a-select-option>
-              <a-select-option value="2">小程序</a-select-option>
-            </a-select>
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-model-item
-            label="客户名"
-            :labelCol="{
-              xs: { span: 24 },
-              sm: { span: 8 }
-            }"
-            :wrapperCol="{
-              xs: { span: 24 },
-              sm: { span: 16 }
-            }"
-          >
-            <a-input v-decorator="['customer',{ rules: [{ required: true, message: '请输入客户名！' }] }]" />
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-model-item
-            label="联系电话"
-            :labelCol="{
-              xs: { span: 24 },
-              sm: { span: 8 }
-            }"
-            :wrapperCol="{
-              xs: { span: 24 },
-              sm: { span: 16 }
-            }"
-          >
-            <a-input v-decorator="['phone',{ rules: [{ required: true, message: '请输入联系电话！' }] }]" />
-          </a-form-model-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-form-model-item
-            label="预约日期"
-            :labelCol="{
-              xs: { span: 24 },
-              sm: { span: 8 }
-            }"
-            :wrapperCol="{
-              xs: { span: 24 },
-              sm: { span: 16 }
-            }"
-          >
-            <a-date-picker
-              v-decorator="[
-                'appointment',
-                {
-                  rules: [{ required: true, message: '请选择预约日期！' }],
-                },
-              ]"
-              style="width: 100%"
-            />
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-model-item
-            label="时间段"
-            :labelCol="{
-              xs: { span: 24 },
-              sm: { span: 8 }
-            }"
-            :wrapperCol="{
-              xs: { span: 24 },
-              sm: { span: 16 }
-            }"
-          >
-            <a-select
-              v-decorator="['time', { rules: [{ required: true, message: '请选择时间段！' }] }]"
-              placeholder="请选择时间段"
-              @change="value=>this.time=value"
-            >
-              <a-select-option
-                v-for="t in times"
-                :key="t"
-                :value="t"
-              >{{ t }}</a-select-option>
-            </a-select>
-          </a-form-model-item>
-        </a-col>
-      </a-row>
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-model-item
@@ -224,12 +117,9 @@
 
 <script>
 import { getCars } from '@/api/common'
-import pick from 'lodash.pick'
-import moment from 'moment'
 import eventBus from '@/event/eventBus'
-// import { filterGoods } from '@/event/filter'
 export default {
-name: 'ReserveVehicle',
+name: 'Vehicle',
 props: {
     datas: {
       type: Array,
@@ -321,13 +211,14 @@ props: {
       selectCar: this.datas,
       carCount: this.datas.length,
       ModifyForm: '',
-       setting: this.settingData
+      setting: this.settingData
     }
   },
 
   components: {},
 
   computed: {
+    // 特殊时间段费用
         specialTimeCost: function () {
       let cost = 0
       if (this.time) {
@@ -345,6 +236,7 @@ props: {
       }
       return Math.round(cost)
     },
+    // 车辆费用
      carCost: function () {
       let cost = 0
       this.selectCar.forEach(r => {
@@ -365,42 +257,18 @@ props: {
     })
   },
 mounted () {
-//  this.getData()
+
 },
 updated () {
 
 },
 beforeUpdate () {
-  this.getData()
+
 },
   methods: {
     filterGoods (input, option) {
   return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
 },
-
-     getData () {
-      //  console.log(1111, this.formlist)
-       const obj = {
-         source: this.formlist.source,
-         customer: this.formlist.customer,
-         phone: this.formlist.phone,
-         time: this.formlist.time
-       }
-      //  const { source, customer, phone, time } = this.formlist
-       console.log('obj', obj)
-      //  this.form = obj
-       const {
-        form: { setFieldsValue }
-      } = this
-        this.$nextTick(() => {
-  // this.form.setFieldsValue(pick(this.formlist, 'source', 'customer', 'phone', 'time'))
-       const formData = pick(obj, 'source', 'customer', 'phone', 'time')
-      console.log(333333334)
-        formData.appointment = moment(this.formlist.appointment)
-        setFieldsValue(formData)
-        // this.time = this.formlist.time
-        })
-      },
       handleCarAdd () {
       const { selectCar, carCount } = this
       const newData = {
@@ -419,7 +287,7 @@ beforeUpdate () {
         distance4: 0
       }
       this.selectCar = [...selectCar, newData]
-      console.log(this.selectCar)
+      // console.log(this.selectCar)
       eventBus.$emit('addCar', this.selectCar)
       this.carCount = carCount + 1
     },

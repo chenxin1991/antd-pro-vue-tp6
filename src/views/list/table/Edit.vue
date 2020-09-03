@@ -115,7 +115,8 @@ export default {
         }
       },
       form: this.$form.createForm(this),
-      id: 0
+      id: 0,
+      mdl: {}
     }
   },
   // beforeCreate () {
@@ -145,12 +146,13 @@ export default {
     loadEditInfo (data) {
       const { form } = this
       // ajax
-      console.log(`将加载 ${this.id} 信息到表单`)
+      // console.log(`将加载 ${this.id} 信息到表单`)
+        this.mdl = Object.assign({}, data)
       new Promise((resolve) => {
         setTimeout(resolve, 1500)
       }).then(() => {
-        const formData = pick(data, ['no', 'callNo', 'status', 'description', 'updatedAt'])
-        formData.updatedAt = moment(data.updatedAt)
+        const formData = pick(this.mdl, ['no', 'callNo', 'status', 'description', 'updatedAt'])
+        formData.updatedAt = moment(this.mdl.updatedAt)
         console.log('formData', formData)
         form.setFieldsValue(formData)
       })

@@ -62,7 +62,8 @@ export default {
       visible: false,
       confirmLoading: false,
       config: {},
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      mdl: {}
     }
   },
   methods: {
@@ -75,12 +76,13 @@ export default {
       })
     },
     edit (record) {
+       this.mdl = Object.assign({}, record)
       this.config.action = 'edit'
       this.config.title = '编辑物品分类'
       this.config.id = record.id
       this.visible = true
       this.$nextTick(() => {
-        const obj = pick(record, ['name', 'sort', 'is_free', 'is_upload'])
+        const obj = pick(this.mdl, ['name', 'sort', 'is_free', 'is_upload'])
         obj.is_free = obj.is_free.toString()
         obj.is_upload = obj.is_upload.toString()
         this.form.setFieldsValue(obj)

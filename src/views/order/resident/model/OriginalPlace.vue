@@ -173,123 +173,35 @@
 </template>
 
 <script>
-import jsonp from 'fetch-jsonp'
+
 import eventBus from '@/event/eventBus'
-function fetch (value, callback) {
-  if (timeout) {
-    clearTimeout(timeout)
-    timeout = null
-  }
+import { fetch, distance } from '@/event/originalPlace'
 
-  function fake () {
-    jsonp(
-      'https://apis.map.qq.com/ws/place/v1/suggestion/?region=深圳&region_fix=0&output=jsonp&keyword=' +
-        value +
-        '&key=OI7BZ-EGOWU-H5YVZ-4HLVW-MDUUQ-ZCFGJ'
-    )
-      .then(response => response.json())
-      .then(d => {
-        const result = d.data
-        const data = []
-        result.forEach(r => {
-          if (!r.address.includes(r.province)) {
-            if (r.address.hasOwnProperty('district')) {
-              r.address = r.province + r.city + r.district + r.address
-            } else {
-              r.address = r.province + r.city + r.address
-            }
-          }
-          data.push({
-            id: r.id,
-            title: r.title,
-            province: r.province,
-            city: r.city,
-            district: r.district,
-            location: JSON.stringify(r.location),
-            address: r.address
-          })
-        })
-        callback(data)
-      })
-  }
-
-  timeout = setTimeout(fake, 300)
-}
-
-function distance (value, callback) {
-  let from = ''
-  let to = ''
-  let waypoints = ''
-  let url = ''
-  let distance = 0
-  value.forEach(r => {
-    const location = JSON.parse(r.location)
-    if (r.key === 0) {
-      from = location.lat + ',' + location.lng
-    } else if (r.key === 1) {
-      to = location.lat + ',' + location.lng
-    } else {
-      if (waypoints) {
-        waypoints = waypoints + ';' + location.lat + ',' + location.lng
-      } else {
-        waypoints = location.lat + ',' + location.lng
-      }
-    }
-  })
-
-  if (from && to) {
-    url =
-      'https://apis.map.qq.com/ws/direction/v1/driving/?from=' +
-      from +
-      '&to=' +
-      to +
-      '&output=jsonp&key=OI7BZ-EGOWU-H5YVZ-4HLVW-MDUUQ-ZCFGJ'
-    if (waypoints) {
-      url = url + '&waypoints=' + waypoints
-    }
-    jsonp(url)
-      .then(response => response.json())
-      .then(d => {
-        if (d.status === 0) {
-          const route = d.result.routes[0]
-          distance = Math.round(route.distance / 1000)
-          callback(distance)
-        } else {
-          callback(distance)
-        }
-      })
-      .catch(err => {
-        console.log(err)
-        callback(distance)
-      })
-  }
-}
-let timeout
 export default {
-name: 'OriginalPlace',
-props: {
+  name: 'OriginalPlace',
+  props: {
     datas: {
       type: Array,
-       default: function () {
-         return { datas: {} }
-       }
+      default: function () {
+        return { datas: {} }
+      }
     },
     formlist: {
       type: Object,
-       default: function () {
-         return { formlist: {} }
-       }
+      default: function () {
+        return { formlist: {} }
+      }
     },
-     settingData: {
+   settingData: {
       type: Object,
-       default: function () {
-         return { settingData: {} }
-       }
+      default: function () {
+        return { settingData: {} }
+      }
     }
   },
   data () {
     return {
-       labelCol: {
+      labelCol: {
         xs: { span: 24 },
         sm: { span: 6 }
       },
@@ -300,7 +212,7 @@ props: {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-        columns_route: [
+      columns_route: [
         {
           title: '地址',
           dataIndex: 'title',
@@ -337,7 +249,7 @@ props: {
           scopedSlots: { customRender: 'action' }
         }
       ],
-       places: [],
+      places: [],
       distance: this.formlist.distance,
       route: this.datas,
       routeCount: this.datas.length,
@@ -349,10 +261,10 @@ props: {
   components: {},
 
   computed: {
-        distanceCost: function () {
-          console.log(this.selectCar)
-
-          console.log(11111)
+    // 距离费用
+    distanceCost: function () {
+      // console.log('this.selectCar', this.selectCar)
+      // console.log('this.setting', this.setting)
       const that = this
       let cost = 0
       this.selectCar.forEach(r => {
@@ -368,7 +280,7 @@ props: {
       })
       return Math.round(cost)
     },
-      floorCost: function () {
+    floorCost: function () {
       let cost = 0
       const floors = []
       this.route.forEach(r => {
@@ -429,21 +341,22 @@ props: {
   },
 
   created () {
-    console.log(this.formlist.cars)
-      console.log('this.settingData', this.settingData)
-     eventBus.$on('addCar', (message) => {
-        // 一些操作，message就是从top组件传过来的值
-        this.selectCar = message
-        console.log('message', message)
-        console.log('this.selectCar', this.selectCar)
+    // console.log(this.formlist.cars)
+    console.log('this.settingData', this.settingData)
+    eventBus.$on('addCar', message => {
+      // 一些操作，message就是从top组件传过来的值
+      this.selectCar = message
+      // console.log('message', message)
+      // console.log('this.selectCar', this.selectCar)
     })
-      //  console.log('route', this.route)
-      //  console.log(this.formlist.distance)
+    //  console.log('route', this.route)
+    //  console.log(this.formlist.distance)
   },
 
   methods: {
-        onLocationSearch (value, key) {
+    onLocationSearch (value, key) {
       if (value) {
+        // console.log('value', value)
         fetch(value, data => (this.places = data))
       }
     },
@@ -524,7 +437,6 @@ props: {
     }
   }
 }
-
 </script>
 <style lang='less' scoped>
 </style>

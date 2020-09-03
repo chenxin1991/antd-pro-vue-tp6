@@ -76,7 +76,6 @@ export default {
     return {
       form: this.$form.createForm(this),
       mdl: {},
-
       roles: [],
       permissions: []
     }

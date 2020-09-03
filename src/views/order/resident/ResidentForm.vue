@@ -35,11 +35,11 @@
       >
         <a-tab-pane
           key="1"
-          tab="预约与车辆"
+          tab="预约和车辆"
           forceRender
         >
-          <test :datas="carsData" :formlist="ModifyData" :settingData="setting" ></test>
-          <!-- <ReserveVehicle :datas="carsData" :formlist="ModifyData" :settingData="setting" ></ReserveVehicle> -->
+          <Reservation :formlist="ModifyData" ></Reservation>
+          <Vehicle :datas="carsData" :formlist="ModifyData" :settingData="setting" ></Vehicle>
         </a-tab-pane>
         <a-tab-pane
           key="2"
@@ -53,20 +53,17 @@
           tab="物品"
           forceRender
         >
-          <EditorGoods :datas="GoodsData" :settingData="setting"></EditorGoods>
+          <Goods :datas="GoodsData" :settingData="setting"></Goods>
         </a-tab-pane>
       </a-tabs>
     </a-form>
   </a-modal>
 </template>
 <script>
-import test from './model/test.vue'
-// import ReserveVehicle from './model/ReserveVehicle.vue'
+import Reservation from './model/Reservation.vue'
+import Vehicle from './model/Vehicle.vue'
 import OriginalPlace from './model/OriginalPlace.vue'
-import EditorGoods from './model/EditorGoods.vue'
-
-import pick from 'lodash.pick'
-import moment from 'moment'
+import Goods from './model/Goods.vue'
 
 import { addResidentOrder, editResidentOrder } from '@/api/order/resident'
 import { getSetting } from '@/api/common'
@@ -74,16 +71,15 @@ import { getSetting } from '@/api/common'
 export default {
   name: 'ResidentForm',
    components: {
-    //  ReserveVehicle,
-    test,
+    Reservation,
+     Vehicle,
      OriginalPlace,
-     EditorGoods
+     Goods
    },
   data () {
     return {
-
       config: {},
-      setting: null,
+      setting: {},
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
@@ -95,21 +91,17 @@ export default {
         xs: { span: 24 },
         sm: { span: 18 }
       },
-      ModifyData: '',
-      carsData: '',
-      PlaceData: '',
-      GoodsData: ''
+      ModifyData: '', // 编辑全部数据
+      carsData: '', // 预约和车辆
+      PlaceData: '', // 起始地
+      GoodsData: '' // 物品
+
     }
   },
   created () {
-    getSetting({ id: 1 }).then(res => {
-      this.setting = res
-
-       console.log(' this.setting', this.setting)
-    })
+   this.getSett()
   },
   computed: {
-
     specialTimeCost: function () {
       let cost = 0
       if (this.time) {
@@ -139,7 +131,14 @@ export default {
     }
   },
   methods: {
-    moment,
+  getSett () {
+    const _this = this
+     getSetting({ id: 1 }).then(res => {
+      _this.setting = res
+
+       console.log(' this.setting', _this.setting)
+    })
+  },
     add () {
       this.config.action = 'add'
       this.config.title = '新增订单'
@@ -183,28 +182,11 @@ export default {
     this.PlaceData = JSON.parse(JSON.stringify(record.routes))
     this.GoodsData = JSON.parse(JSON.stringify(record.larges))
 
-    console.log('this.ModifyData', this.ModifyData)
+    // console.log('this.ModifyData', this.ModifyData)
       this.config.action = 'edit'
       this.config.title = '修改订单'
       this.config.id = record.id
       this.visible = true
-      const {
-        form: { setFieldsValue }
-      } = this
-      this.$nextTick(() => {
-        const formData = pick(record, ['source', 'customer', 'phone', 'time'])
-        formData.appointment = moment(record.appointment)
-        setFieldsValue(formData)
-        this.time = record.time
-
-        // this.selectCar = JSON.parse(JSON.stringify(record.cars))// 预约车辆
-        // this.carCount = record.cars.length
-        // this.route = JSON.parse(JSON.stringify(record.routes))// 起始地
-        // this.routeCount = record.routes.length
-        this.distance = record.distance
-        // this.selectGoods = JSON.parse(JSON.stringify(record.goods))// 物品
-        // this.goodsCount = record.goods.length
-      })
     },
     handleCancel () {
       this.visible = false
@@ -216,8 +198,8 @@ export default {
       } = this
       // this.confirmLoading = true
       validateFields((errors, values) => {
+        console.log(values)
         if (!errors) {
-          values.appointment = values.appointment.format('YYYY-MM-DD')
           const cars = []
           let carFlag = true
           this.selectCar.forEach(r => {
@@ -268,6 +250,7 @@ export default {
             $message.error('请检查拆装信息是否填写完整!')
             return false
           }
+
           values.goods = goods
           values.distance = this.distance
           values.carCost = this.carCost

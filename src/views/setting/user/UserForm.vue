@@ -61,7 +61,8 @@ export default {
       visible: false,
       confirmLoading: false,
       config: {},
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      mdl: {}
     }
   },
   methods: {
@@ -78,8 +79,9 @@ export default {
       this.config.title = '编辑用户'
       this.config.id = record.id
       this.visible = true
+       this.mdl = Object.assign({}, record)
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(record, ['username', 'name', 'role_id']))
+        this.form.setFieldsValue(pick(this.mdl, ['username', 'name', 'role_id']))
       })
     },
     handleSubmit () {

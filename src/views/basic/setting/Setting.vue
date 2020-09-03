@@ -190,13 +190,15 @@ export default {
         xs: { span: 24 },
         sm: { span: 16 }
       },
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      mdl: {}
     }
   },
   created () {
     getSetting({ id: 1 }).then(res => {
+      this.mdl = Object.assign({}, res.result.data)
       this.form.setFieldsValue(
-        pick(res.result.data, [
+        pick(this.mdl, [
           'discount1',
           'discount2',
           'add_ratio1',
