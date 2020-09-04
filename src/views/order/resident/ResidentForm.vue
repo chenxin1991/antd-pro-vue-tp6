@@ -107,7 +107,7 @@
               >
                 <a-date-picker
                   v-decorator="[
-                    'appointment',
+                    'appointDate',
                     {
                       rules: [{ required: true, message: '请选择预约日期！' }],
                     },
@@ -129,9 +129,9 @@
                 }"
               >
                 <a-select
-                  v-decorator="['time', { rules: [{ required: true, message: '请选择时间段！' }] }]"
+                  v-decorator="['appointTime', { rules: [{ required: true, message: '请选择时间段！' }] }]"
                   placeholder="请选择时间段"
-                  @change="value=>this.time=value"
+                  @change="value=>this.appointTime=value"
                 >
                   <a-select-option
                     v-for="t in times"
@@ -742,7 +742,7 @@ export default {
         '06:00',
         '07:00'
       ],
-      time: '',
+      appointTime: '',
       car: [],
       selectCar: [],
       places: [],
@@ -958,8 +958,8 @@ export default {
         form: { setFieldsValue }
       } = this
       this.$nextTick(() => {
-        const formData = pick(record, ['source', 'customer', 'phone', 'time'])
-        formData.appointment = moment(record.appointment)
+        const formData = pick(record, ['source', 'customer', 'phone', 'appointTime'])
+        formData.appointDate = moment(record.appointDate)
         setFieldsValue(formData)
         this.time = record.time
         this.selectCar = JSON.parse(JSON.stringify(record.cars))
@@ -1153,7 +1153,7 @@ export default {
       // this.confirmLoading = true
       validateFields((errors, values) => {
         if (!errors) {
-          values.appointment = values.appointment.format('YYYY-MM-DD')
+          values.appointDate = values.appointDate.format('YYYY-MM-DD')
           const cars = []
           let carFlag = true
           this.selectCar.forEach(r => {

@@ -55,10 +55,10 @@
                 placeholder="请选择"
                 default-value="0"
               >
-                <a-select-option value="0">待受理</a-select-option>
+                <a-select-option value="0">待确认</a-select-option>
                 <a-select-option value="1">待派单</a-select-option>
                 <a-select-option value="2">待开工</a-select-option>
-                <a-select-option value="3">待完成</a-select-option>
+                <a-select-option value="3">待完工</a-select-option>
                 <a-select-option value="4">待评价</a-select-option>
                 <a-select-option value="5">已关闭</a-select-option>
                 <a-select-option value="6">已取消</a-select-option>
@@ -188,8 +188,8 @@ export default {
           dataIndex: 'create_time'
         },
         {
-          title: '预约时间',
-          dataIndex: 'appointment'
+          title: '预约日期',
+          dataIndex: 'appointDate'
         },
         {
           title: '客户名',
@@ -201,19 +201,19 @@ export default {
         },
         {
           title: '总报价',
-          dataIndex: 'total_cost'
+          dataIndex: 'totalCost'
         },
         {
           title: '订单状态',
-          dataIndex: 'order_status'
+          dataIndex: 'orderStatus'
         },
         {
           title: '支付状态',
-          dataIndex: 'pay_status'
+          dataIndex: 'payStatus'
         },
         {
           title: '接线员',
-          dataIndex: 'username'
+          dataIndex: 'adminname'
         },
         {
           title: '队长',
