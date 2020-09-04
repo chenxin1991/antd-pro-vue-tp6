@@ -39,21 +39,21 @@
           forceRender
         >
           <Reservation :formlist="ModifyData" ></Reservation>
-          <Vehicle :datas="carsData" :formlist="ModifyData" :settingData="setting" ></Vehicle>
+          <Vehicle :datas="carsData" :formlist="ModifyData" :settingData="sett" ></Vehicle>
         </a-tab-pane>
         <a-tab-pane
           key="2"
           tab="起始地"
           forceRender
         >
-          <OriginalPlace :datas="PlaceData" :formlist="ModifyData"></OriginalPlace>
+          <OriginalPlace :datas="PlaceData" :formlist="ModifyData" :settingData="sett" ></OriginalPlace>
         </a-tab-pane>
         <a-tab-pane
           key="3"
           tab="物品"
           forceRender
         >
-          <Goods :datas="GoodsData" :settingData="setting"></Goods>
+          <Goods :datas="GoodsData" ></Goods>
         </a-tab-pane>
       </a-tabs>
     </a-form>
@@ -94,8 +94,8 @@ export default {
       ModifyData: '', // 编辑全部数据
       carsData: '', // 预约和车辆
       PlaceData: '', // 起始地
-      GoodsData: '' // 物品
-
+      GoodsData: '', // 物品
+      sett: ''
     }
   },
   created () {
@@ -135,8 +135,7 @@ export default {
     const _this = this
      getSetting({ id: 1 }).then(res => {
       _this.setting = res
-
-       console.log(' this.setting', _this.setting)
+      _this.sett = _this.setting
     })
   },
     add () {

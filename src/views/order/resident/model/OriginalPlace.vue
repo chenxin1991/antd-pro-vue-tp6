@@ -342,15 +342,15 @@ export default {
 
   created () {
     // console.log(this.formlist.cars)
+
     console.log('this.settingData', this.settingData)
+
     eventBus.$on('addCar', message => {
       // 一些操作，message就是从top组件传过来的值
       this.selectCar = message
       // console.log('message', message)
       // console.log('this.selectCar', this.selectCar)
     })
-    //  console.log('route', this.route)
-    //  console.log(this.formlist.distance)
   },
 
   methods: {
