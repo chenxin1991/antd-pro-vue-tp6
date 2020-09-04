@@ -114,8 +114,7 @@ export default {
       previewVisible: false,
       previewImage: '',
       fileList: [],
-      imageList: [],
-      mdl: {}
+      imageList: []
     }
   },
   methods: {
@@ -129,7 +128,6 @@ export default {
       })
     },
     edit (record) {
-        this.mdl = Object.assign({}, record) // 浅拷贝
       this.config.action = 'edit'
       this.config.title = '编辑物品'
       this.config.id = record.id
@@ -140,7 +138,7 @@ export default {
       }
       this.visible = true
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(this.mdl, ['name', 'price', 'cid', 'sort']))
+        this.form.setFieldsValue(pick(record, ['name', 'price', 'cid', 'sort']))
       })
     },
     handleCancel2 () {

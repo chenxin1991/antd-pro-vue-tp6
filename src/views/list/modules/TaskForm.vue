@@ -55,15 +55,13 @@ export default {
         xs: { span: 24 },
         sm: { span: 13 }
       },
-      form: this.$form.createForm(this),
-      mdl: {}
+      form: this.$form.createForm(this)
     }
   },
   mounted () {
-    // console.log('this.', this.record)
+    console.log('this.', this.record)
     if (this.record) {
-       this.mdl = Object.assign({}, this.record)
-      this.form.setFieldsValue(pick(this.mdl, ['taskName']))
+      this.form.setFieldsValue(pick(this.record, ['taskName']))
     }
   },
   methods: {

@@ -41,8 +41,7 @@ export default {
       visible: false,
       confirmLoading: false,
       config: {},
-      form: this.$form.createForm(this),
-      mdl: {}
+      form: this.$form.createForm(this)
     }
   },
   methods: {
@@ -55,13 +54,12 @@ export default {
       })
     },
     edit (record) {
-      this.mdl = Object.assign({}, record)
       this.config.action = 'edit'
       this.config.title = '编辑队长'
       this.config.id = record.id
       this.visible = true
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(this.mdl, ['name', 'phone']))
+        this.form.setFieldsValue(pick(record, ['name', 'phone']))
       })
     },
     handleSubmit () {

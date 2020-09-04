@@ -228,8 +228,7 @@ export default {
       config: {},
       form: this.$form.createForm(this),
       loading: false,
-      image_url: '',
-      mdl: {}
+      image_url: ''
     }
   },
   methods: {
@@ -243,7 +242,6 @@ export default {
       })
     },
     edit (record) {
-       this.mdl = Object.assign({}, record)
       this.config.action = 'edit'
       this.config.title = '编辑车型'
       this.config.id = record.id
@@ -251,7 +249,7 @@ export default {
       this.image_url = record.image_url
       this.$nextTick(() => {
         this.form.setFieldsValue(
-          pick(this.mdl, [
+          pick(record, [
             'name',
             'price',
             'km_standard',

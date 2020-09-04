@@ -44,8 +44,8 @@ export default {
       },
       visible: false,
       confirmLoading: false,
-      form: this.$form.createForm(this),
-      mdl: {}
+
+      form: this.$form.createForm(this)
     }
   },
   methods: {
@@ -54,10 +54,9 @@ export default {
     },
     edit (record) {
       this.visible = true
-      this.mdl = Object.assign({}, record)
       const { form: { setFieldsValue } } = this
       this.$nextTick(() => {
-        setFieldsValue(pick(this.mdl, []))
+        setFieldsValue(pick(record, []))
       })
     },
     handleSubmit () {

@@ -46,8 +46,7 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-      leaders: [],
-      mdl: {}
+      leaders: []
     }
   },
   created () {
@@ -64,12 +63,11 @@ export default {
         record.leader = ''
       }
       this.visible = true
-      this.mdl = Object.assign({}, record)
       const {
         form: { setFieldsValue }
       } = this
       this.$nextTick(() => {
-        setFieldsValue(pick(this.mdl, ['leader']))
+        setFieldsValue(pick(record, ['leader']))
       })
     },
     filter (input, option) {
