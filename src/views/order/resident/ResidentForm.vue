@@ -786,7 +786,7 @@ export default {
     getGoods({ t: new Date() }).then(res => {
       this.goods = res
     })
-    getSetting({ id: 1 }).then(res => {
+    getSetting({ t: new Date() }).then(res => {
       this.setting = res
     })
   },

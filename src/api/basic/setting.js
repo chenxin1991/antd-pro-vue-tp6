@@ -8,7 +8,7 @@ export default api
 
 export function editSetting (parameter) {
   return axios({
-    url: api.Setting + '/' + parameter.id,
+    url: api.Setting,
     method: 'put',
     data: parameter
   })
@@ -16,7 +16,7 @@ export function editSetting (parameter) {
 
 export function getSetting (parameter) {
   return axios({
-    url: api.Setting + '/' + parameter.id,
+    url: api.Setting,
     method: 'get',
     params: parameter
   })

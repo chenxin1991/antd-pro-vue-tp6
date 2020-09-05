@@ -37,7 +37,7 @@ export function getGoods (parameter) {
 
 export function getSetting (parameter) {
   return axios({
-    url: api.setting + '/' + parameter.id,
+    url: api.setting,
     method: 'get',
     params: parameter
   })
