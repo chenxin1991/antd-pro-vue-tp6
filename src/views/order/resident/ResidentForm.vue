@@ -476,6 +476,33 @@
                       @change="value => handleGoodsNumChange(value, record.key)"
                     />
                   </template>
+                  <template
+                    slot="image"
+                    slot-scope="text,record"
+                  >
+                    <a-upload
+                      name="avatar"
+                      list-type="picture-card"
+                      class="avatar-uploader"
+                      :show-upload-list="false"
+                      action="/index.php/admin/test/avatar"
+                      :before-upload="beforeUpload"
+                      @change="info => handleImageChange(info,record.key)"
+                    >
+                      <img
+                        v-if="text"
+                        :src="text"
+                        alt="avatar"
+                        style="max-width:80px;max-height:80px;"
+                      />
+                      <div v-else>
+                        <a-icon :type="loading ? 'loading' : 'plus'" />
+                        <div class="ant-upload-text">
+                          Upload
+                        </div>
+                      </div>
+                    </a-upload>
+                  </template>
                   <span
                     slot="action"
                     slot-scope="text, record"
@@ -532,11 +559,11 @@ function fetch (value, callback) {
         value +
         '&key=OI7BZ-EGOWU-H5YVZ-4HLVW-MDUUQ-ZCFGJ'
     )
-      .then(response => response.json())
-      .then(d => {
+      .then((response) => response.json())
+      .then((d) => {
         const result = d.data
         const data = []
-        result.forEach(r => {
+        result.forEach((r) => {
           if (!r.address.includes(r.province)) {
             if (r.address.hasOwnProperty('district')) {
               r.address = r.province + r.city + r.district + r.address
@@ -567,7 +594,7 @@ function distance (value, callback) {
   let waypoints = ''
   let url = ''
   let distance = 0
-  value.forEach(r => {
+  value.forEach((r) => {
     const location = JSON.parse(r.location)
     if (r.key === 0) {
       from = location.lat + ',' + location.lng
@@ -593,8 +620,8 @@ function distance (value, callback) {
       url = url + '&waypoints=' + waypoints
     }
     jsonp(url)
-      .then(response => response.json())
-      .then(d => {
+      .then((response) => response.json())
+      .then((d) => {
         if (d.status === 0) {
           const route = d.result.routes[0]
           distance = Math.round(route.distance / 1000)
@@ -603,7 +630,7 @@ function distance (value, callback) {
           callback(distance)
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err)
         callback(distance)
       })
@@ -699,6 +726,11 @@ export default {
           dataIndex: 'total'
         },
         {
+          title: '图片',
+          dataIndex: 'image_url',
+          scopedSlots: { customRender: 'image' }
+        },
+        {
           title: '操作',
           dataIndex: 'action',
           scopedSlots: { customRender: 'action' }
@@ -776,24 +808,25 @@ export default {
       carCount: 0,
       routeCount: 2,
       goodsCount: 0,
-      setting: {}
+      setting: {},
+      loading: false
     }
   },
   created () {
-    getCars({ t: new Date() }).then(res => {
+    getCars({ t: new Date() }).then((res) => {
       this.car = res
     })
-    getGoods({ t: new Date() }).then(res => {
+    getGoods({ t: new Date() }).then((res) => {
       this.goods = res
     })
-    getSetting({ t: new Date() }).then(res => {
+    getSetting({ t: new Date() }).then((res) => {
       this.setting = res
     })
   },
   computed: {
     carCost: function () {
       let cost = 0
-      this.selectCar.forEach(r => {
+      this.selectCar.forEach((r) => {
         if (r.id > 0) {
           cost = cost + r.total
         }
@@ -803,7 +836,7 @@ export default {
     distanceCost: function () {
       const that = this
       let cost = 0
-      this.selectCar.forEach(r => {
+      this.selectCar.forEach((r) => {
         if (r.id > 0) {
           if (that.distance > r.km_standard && that.distance <= 300) {
             cost = cost + r.km_price * (that.distance - r.km_standard) * r.num
@@ -819,13 +852,13 @@ export default {
     floorCost: function () {
       let cost = 0
       const floors = []
-      this.route.forEach(r => {
+      this.route.forEach((r) => {
         if (r.location && r.floor_num > 0 && r.stairs_or_elevators === '1') {
           floors.push(r.floor_num)
         }
       })
       if (floors.length > 0) {
-        this.selectCar.forEach(s => {
+        this.selectCar.forEach((s) => {
           if (s.id > 0) {
             for (let i = 0; i < floors.length; i++) {
               if (s.floor_standard <= floors[i]) {
@@ -840,13 +873,13 @@ export default {
     parkingCost: function () {
       let cost = 0
       const parking = []
-      this.route.forEach(r => {
+      this.route.forEach((r) => {
         if (r.location && r.parking_distance >= 0) {
           parking.push(r.parking_distance)
         }
       })
       if (parking.length > 0) {
-        this.selectCar.forEach(s => {
+        this.selectCar.forEach((s) => {
           if (s.id > 0) {
             for (let i = 0; i < parking.length; i++) {
               switch (parking[i]) {
@@ -876,7 +909,7 @@ export default {
     },
     goodsCost: function () {
       let cost = 0
-      this.selectGoods.forEach(r => {
+      this.selectGoods.forEach((r) => {
         if (r.id > 0) {
           cost = cost + r.total
         }
@@ -887,27 +920,20 @@ export default {
       let cost = 0
       if (this.time) {
         if (this.time >= '19:00' && this.time <= '23:00') {
-          cost = (
+          cost =
             (this.setting.add_ratio1 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.goodsCost)
-          )
         } else if (this.time > '23:00' || this.time <= '07:00') {
-          cost = (
+          cost =
             (this.setting.add_ratio2 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.goodsCost)
-          )
         }
       }
       return Math.round(cost)
     },
     totalCost: function () {
       return (
-        this.carCost +
-        this.distanceCost +
-        this.floorCost +
-        this.parkingCost +
-        this.goodsCost +
-        this.specialTimeCost
+        this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.goodsCost + this.specialTimeCost
       )
     }
   },
@@ -993,7 +1019,7 @@ export default {
     },
     handleCarIDChange (value, key, option) {
       const newData = [...this.selectCar]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter((item) => key === item.key)[0]
       const item = option.data.attrs.option.item
       if (target) {
         target['id'] = value
@@ -1013,7 +1039,7 @@ export default {
     },
     handleCarNumChange (value, key) {
       const newData = [...this.selectCar]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter((item) => key === item.key)[0]
       if (target) {
         target['num'] = value
         target['total'] = target['num'] * target['price']
@@ -1021,18 +1047,18 @@ export default {
       }
     },
     handleCarDelete (key) {
-      this.selectCar = this.selectCar.filter(item => item.key !== key)
+      this.selectCar = this.selectCar.filter((item) => item.key !== key)
     },
     onLocationSearch (value, key) {
       if (value) {
-        fetch(value, data => (this.places = data))
+        fetch(value, (data) => (this.places = data))
       }
     },
     onLocationSelect (value, option, key) {
       let flag = true
       const data = option.data.attrs.option
       const newData = [...this.route]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter((item) => key === item.key)[0]
       if (target) {
         target['title'] = data.title
         target['location'] = data.location
@@ -1040,18 +1066,18 @@ export default {
         target['select_title'] = data.title
         this.route = newData
       }
-      this.route.forEach(r => {
+      this.route.forEach((r) => {
         if (!r.location) {
           flag = false
         }
       })
       if (flag) {
-        distance(this.route, data => (this.distance = data))
+        distance(this.route, (data) => (this.distance = data))
       }
     },
     onLocationChange (value, key) {
       const newData = [...this.route]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter((item) => key === item.key)[0]
       if (target) {
         target['title'] = value
         this.route = newData
@@ -1059,7 +1085,7 @@ export default {
     },
     onLacationBlur (key) {
       const newData = [...this.route]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter((item) => key === item.key)[0]
       if (target) {
         if (target['select_title'] !== target['title']) {
           target['title'] = target['select_title']
@@ -1069,7 +1095,7 @@ export default {
     },
     handleRouteChange (value, key, column) {
       const newData = [...this.route]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter((item) => key === item.key)[0]
       if (target) {
         target[column] = value
         this.route = newData
@@ -1093,14 +1119,14 @@ export default {
     },
     handleRouteDelete (key) {
       let flag = true
-      this.route = this.route.filter(item => item.key !== key)
-      this.route.forEach(r => {
+      this.route = this.route.filter((item) => item.key !== key)
+      this.route.forEach((r) => {
         if (!r.location) {
           flag = false
         }
       })
       if (flag) {
-        distance(this.route, data => (this.distance = data))
+        distance(this.route, (data) => (this.distance = data))
       }
     },
     handleGoodsAdd () {
@@ -1118,7 +1144,7 @@ export default {
     },
     handleGoodsIDChange (value, key, option) {
       const newData = [...this.selectGoods]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter((item) => key === item.key)[0]
       if (target) {
         target['id'] = value
         target['name'] = option.data.attrs.option.name
@@ -1129,15 +1155,36 @@ export default {
     },
     handleGoodsNumChange (value, key) {
       const newData = [...this.selectGoods]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter((item) => key === item.key)[0]
       if (target) {
         target['num'] = value
         target['total'] = target['num'] * target['price']
         this.selectGoods = newData
       }
     },
+    handleImageChange (info, key) {
+      if (info.file.status === 'done' && info.file.response.status === 'done') {
+        const newData = [...this.selectGoods]
+        const target = newData.filter((item) => key === item.key)[0]
+        if (target) {
+          target['image_url'] = info.file.response.url
+          this.selectGoods = newData
+        }
+      }
+    },
+    beforeUpload (file) {
+      const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+      if (!isJpgOrPng) {
+        this.$message.error('You can only upload JPG file!')
+      }
+      const isLt2M = file.size / 1024 / 1024 < 2
+      if (!isLt2M) {
+        this.$message.error('Image must smaller than 2MB!')
+      }
+      return isJpgOrPng && isLt2M
+    },
     handleGoodsDelete (key) {
-      this.selectGoods = this.selectGoods.filter(item => item.key !== key)
+      this.selectGoods = this.selectGoods.filter((item) => item.key !== key)
     },
     filterGoods (input, option) {
       return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -1156,7 +1203,7 @@ export default {
           values.appointDate = values.appointDate.format('YYYY-MM-DD')
           const cars = []
           let carFlag = true
-          this.selectCar.forEach(r => {
+          this.selectCar.forEach((r) => {
             if (r.key >= 0 && r.id > 0 && r.num > 0) {
               cars.push(r)
             } else {
@@ -1170,7 +1217,7 @@ export default {
           values.cars = cars
           const routes = []
           let routeFlag = true
-          this.route.forEach(r => {
+          this.route.forEach((r) => {
             if (
               r.key >= 0 &&
               r.location &&
@@ -1193,7 +1240,7 @@ export default {
           values.routes = routes
           const goods = []
           let goodsFlag = true
-          this.selectGoods.forEach(r => {
+          this.selectGoods.forEach((r) => {
             if (r.key >= 0 && r.id && r.name && r.num > 0) {
               goods.push(r)
             } else {
@@ -1215,25 +1262,25 @@ export default {
           values.totalCost = this.totalCost
           if (this.config.action === 'add') {
             addResidentOrder(values)
-              .then(res => {
+              .then((res) => {
                 $message.success('添加成功')
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)
               })
-              .catch(err => {
+              .catch((err) => {
                 $message.error(`load user err: ${err.message}`)
               })
           } else if (this.config.action === 'edit') {
             values.id = this.config.id
             editResidentOrder(values)
-              .then(res => {
+              .then((res) => {
                 $message.success('修改成功')
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)
               })
-              .catch(err => {
+              .catch((err) => {
                 $message.error(`load user err: ${err.message}`)
               })
           }
@@ -1252,5 +1299,18 @@ export default {
 }
 .ant-form-item {
   margin-bottom: 12px;
+}
+.ant-upload.ant-upload-select-picture-card {
+  width: 80px;
+  height: 80px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+}
+.ant-upload-picture-card-wrapper {
+  zoom: 1;
+  width: 100%;
+}
+.ant-upload.ant-upload-select-picture-card > .ant-upload {
+  padding: 0px;
 }
 </style>
