@@ -49,10 +49,11 @@ import {
   notification,
   Tree,
   AutoComplete,
-  Timeline
+  Timeline,
+  descriptions
 } from 'ant-design-vue'
 // import VueCropper from 'vue-cropper'
-
+Vue.use(descriptions)
 Vue.use(ConfigProvider)
 Vue.use(Layout)
 Vue.use(Input)

@@ -124,10 +124,12 @@
         <template>
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
+          <a @click="handleDetails(record)">详情</a>
+          <a-divider type="vertical" />
           <a-dropdown>
             <a class="ant-dropdown-link">
               更多
-              <a-icon type="down" />
+              <!-- <a-icon type="down" /> -->
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
@@ -156,6 +158,7 @@
       ref="grapForm"
       @ok="handleOk"
     />
+    <ResidentDetails ref="ResidentDetails" @ok="handleOk"></ResidentDetails>
   </a-card>
 </template>
 
@@ -164,6 +167,7 @@ import { STable } from '@/components'
 import ResidentForm from './ResidentForm'
 import DispatchForm from './DispatchForm'
 import GrapForm from './GrapForm'
+import ResidentDetails from './ResidentDetails'
 import { getResidentOrders, delResidentOrder } from '@/api/order/resident'
 
 export default {
@@ -172,10 +176,12 @@ export default {
     STable,
     ResidentForm,
     GrapForm,
-    DispatchForm
+    DispatchForm,
+    ResidentDetails
   },
   data () {
     return {
+      isResidentDetails: false,
       // 查询参数
       queryParam: {},
       // 表头
@@ -250,6 +256,9 @@ export default {
     },
     handleDispatch (record) {
       this.$refs.dispatchForm.edit(record)
+    },
+     handleDetails (record) {
+      this.$refs.ResidentDetails.edit(record)
     },
     handleGrap (record) {
       this.$message.warning('功能暂未开放！')

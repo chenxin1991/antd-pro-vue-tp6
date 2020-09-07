@@ -536,6 +536,7 @@
         </a-tab-pane>
       </a-tabs>
     </a-form>
+
   </a-modal>
 </template>
 <script>
@@ -1300,7 +1301,7 @@ export default {
 .ant-form-item {
   margin-bottom: 12px;
 }
-.ant-upload.ant-upload-select-picture-card {
+/deep/  .ant-upload.ant-upload-select-picture-card {
   width: 80px;
   height: 80px;
   margin-right: 0px;
@@ -1311,7 +1312,8 @@ export default {
   width: 100%;
   display: block;
 }
-.ant-upload.ant-upload-select-picture-card > .ant-upload {
+/deep/ .ant-upload.ant-upload-select-picture-card > .ant-upload {
   padding: 0px;
 }
+
 </style>
