@@ -129,7 +129,7 @@
           <a-dropdown>
             <a class="ant-dropdown-link">
               更多
-              <!-- <a-icon type="down" /> -->
+              <a-icon type="down" />
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
@@ -235,7 +235,7 @@ export default {
         {
           title: '操作',
           dataIndex: 'action',
-          width: '150px',
+          width: '160px',
           scopedSlots: { customRender: 'action' }
         }
       ],
