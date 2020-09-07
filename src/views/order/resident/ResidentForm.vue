@@ -55,9 +55,9 @@
                   v-decorator="['source', { rules: [{ required: true, message: '请选择订单来源！' }] }]"
                   placeholder="请选择"
                 >
-                  <a-select-option value="0">来电</a-select-option>
-                  <a-select-option value="1">上门</a-select-option>
-                  <a-select-option value="2">小程序</a-select-option>
+                  <a-select-option value="1">来电</a-select-option>
+                  <a-select-option value="2">上门</a-select-option>
+                  <a-select-option value="3">小程序</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -595,16 +595,15 @@ function distance (value, callback) {
   let url = ''
   let distance = 0
   value.forEach((r) => {
-    const location = JSON.parse(r.location)
     if (r.key === 0) {
-      from = location.lat + ',' + location.lng
+      from = r.location.lat + ',' + r.location.lng
     } else if (r.key === 1) {
-      to = location.lat + ',' + location.lng
+      to = r.location.lat + ',' + r.location.lng
     } else {
       if (waypoints) {
-        waypoints = waypoints + ';' + location.lat + ',' + location.lng
+        waypoints = waypoints + ';' + r.location.lat + ',' + r.location.lng
       } else {
-        waypoints = location.lat + ',' + location.lng
+        waypoints = r.location.lat + ',' + r.location.lng
       }
     }
   })
@@ -838,7 +837,7 @@ export default {
       let cost = 0
       this.selectCar.forEach((r) => {
         if (r.id > 0) {
-          if (that.distance > r.km_standard && that.distance <= 300) {
+          if (that.distance > parseFloat(r.km_standard) && that.distance <= 300) {
             cost = cost + r.km_price * (that.distance - r.km_standard) * r.num
           } else if (that.distance > 300 && that.distance <= 500) {
             cost = cost + (r.km_price * (that.distance - r.km_standard) * r.num * that.setting.discount1) / 10
@@ -985,6 +984,7 @@ export default {
       } = this
       this.$nextTick(() => {
         const formData = pick(record, ['source', 'customer', 'phone', 'appointTime'])
+        formData.source = formData.source.toString()
         formData.appointDate = moment(record.appointDate)
         setFieldsValue(formData)
         this.time = record.time
@@ -1061,7 +1061,7 @@ export default {
       const target = newData.filter((item) => key === item.key)[0]
       if (target) {
         target['title'] = data.title
-        target['location'] = data.location
+        target['location'] = JSON.parse(data.location)
         target['address'] = data.address
         target['select_title'] = data.title
         this.route = newData
@@ -1293,7 +1293,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 .editable-add-btn {
   margin-bottom: 8px;
 }
@@ -1309,6 +1309,7 @@ export default {
 .ant-upload-picture-card-wrapper {
   zoom: 1;
   width: 100%;
+  display: block;
 }
 .ant-upload.ant-upload-select-picture-card > .ant-upload {
   padding: 0px;

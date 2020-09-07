@@ -112,6 +112,11 @@
       :columns="columns"
       :data="loadData"
     >
+      <template slot="source" slot-scope="text">
+        <template v-if="text=='1'">来电</template>
+        <template v-if="text=='2'">上门</template>
+        <template v-if="text=='3'">小程序</template>
+      </template>
       <span
         slot="action"
         slot-scope="text, record"
@@ -181,7 +186,9 @@ export default {
         },
         {
           title: '订单来源',
-          dataIndex: 'source'
+          dataIndex: 'source',
+          scopedSlots: { customRender: 'source' }
+
         },
         {
           title: '下单时间',
