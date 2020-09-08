@@ -16,7 +16,7 @@
       </p>
       <a-row>
         <a-col :span="24">
-          <a-descriptions >
+          <a-descriptions>
             <a-descriptions-item label="订单来源">
               {{ source }}
             </a-descriptions-item>
@@ -40,8 +40,16 @@
       </p>
       <a-row>
         <a-col :span="24">
-          <a-table :columns="cars_columns" :pagination="false" :bordered="true" :data-source="cars_data" >
-            <a slot="name" slot-scope="text">{{ text }}</a>
+          <a-table
+            :columns="cars_columns"
+            :pagination="false"
+            :bordered="true"
+            :data-source="cars_data"
+          >
+            <a
+              slot="name"
+              slot-scope="text"
+            >{{ text }}</a>
           </a-table>
         </a-col>
       </a-row>
@@ -50,8 +58,16 @@
       </p>
       <a-row>
         <a-col :span="24">
-          <a-table :columns="routes_columns" :pagination="false" :bordered="true" :data-source="routes_data" >
-            <a slot="name" slot-scope="text">{{ text }}</a>
+          <a-table
+            :columns="routes_columns"
+            :pagination="false"
+            :bordered="true"
+            :data-source="routes_data"
+          >
+            <a
+              slot="name"
+              slot-scope="text"
+            >{{ text }}</a>
           </a-table>
         </a-col>
       </a-row>
@@ -62,39 +78,27 @@
       </p>
       <a-row>
         <a-col :span="24">
-          <a-table :columns="goods_columns" :pagination="false" :bordered="true" :data-source="goods_data" >
-            <a slot="name" slot-scope="text">{{ text }}</a>
-          </a-table>
-          <a-descriptions
-            v-for="(item,index) in goods"
-            :key="index"
-            title="物品"
+          <a-table
+            :columns="goods_columns"
+            :pagination="false"
+            :bordered="true"
+            :data-source="goods_data"
           >
-            <a-descriptions-item label="名称">
-              {{ item.name }}
-            </a-descriptions-item>
-            <a-descriptions-item label="单价">
-              {{ item.price }}
-            </a-descriptions-item>
-            <a-descriptions-item label="数量">
-              {{ item.num }}
-            </a-descriptions-item>
-            <a-descriptions-item label="总计">
-              {{ item.total }}
-            </a-descriptions-item>
-            <a-descriptions-item label="图片">
-              {{ item.image_url }}
-            </a-descriptions-item>
-          </a-descriptions>
+            <template
+              slot="image_url"
+              slot-scope="text"
+            ><img class="goods-img" :src="text"/>
+            </template>
+          </a-table>
         </a-col>
       </a-row>
-      <a-divider />
-      <!-- <p :style="pStyle">
+      <!-- <a-divider /> -->
+      <p :style="pStyle">
         价格明细
-      </p> -->
+      </p>
       <a-row>
         <a-col :span="24">
-          <a-descriptions title="价格明细">
+          <a-descriptions>
             <a-descriptions-item label="车辆费用">
               {{ carCost }}
             </a-descriptions-item>
@@ -108,7 +112,7 @@
               {{ distanceCost }}
             </a-descriptions-item>
             <a-descriptions-item label="楼层费用">
-              {{ floorCost }}元
+              {{ floorCost }}
             </a-descriptions-item>
             <a-descriptions-item label="停车距离费用">
               {{ parkingCost }}
@@ -138,7 +142,8 @@ export default {
         color: 'rgba(0,0,0,0.85)',
         lineHeight: '24px',
         display: 'block',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        marginTop: '16px'
       },
       pStyle2: {
         marginBottom: '24px'
@@ -164,92 +169,104 @@ export default {
       goodsCost: '',
       totalCost: '',
       cars_columns: [
-  {
-    title: '车型',
-    dataIndex: 'name',
-    key: 'name'
-  },
-  {
-    title: '单价',
-    dataIndex: 'price',
-    key: 'age'
-  },
-  {
-    title: '数量',
-    dataIndex: 'num',
-    key: 'num',
-    ellipsis: true
-  },
-  {
-    title: '总计',
-    dataIndex: 'total',
-    key: 'total',
-    ellipsis: true
-  }
-],
-cars_data: [],
-  routes_columns: [
-  {
-    title: '地址',
-    dataIndex: 'title',
-    key: 'title'
-  },
-  {
-    title: '门牌号',
-    dataIndex: 'room_number',
-    key: 'room_number'
-  },
-  {
-    title: '电梯或楼梯',
-    dataIndex: 'parking_distance',
-    key: 'parking_distance',
-    ellipsis: true
-  },
-  {
-    title: '楼层数',
-    dataIndex: 'floor_num',
-    key: 'floor_num',
-    ellipsis: true
-  },
-  {
-    title: '停车位距离',
-    dataIndex: 'distance',
-    key: 'distance',
-    ellipsis: true
-  }
-],
-routes_data: [],
- goods_columns: [
-  {
-    title: '名称',
-    dataIndex: 'name',
-    key: 'name'
-  },
-  {
-    title: '单价',
-    dataIndex: 'price',
-    key: 'price'
-  },
-  {
-    title: '数量',
-    dataIndex: 'num',
-    key: 'num',
-    ellipsis: true
-  },
-  {
-    title: '总计',
-    dataIndex: 'total',
-    key: 'total',
-    ellipsis: true
-  },
-  {
-    title: '图片',
-    dataIndex: 'image_url',
-    key: 'image_url',
-    ellipsis: true
-  }
-],
-goods_data: []
+        {
+          title: '车型',
+          dataIndex: 'name',
+          key: 'name'
+        },
+        {
+          title: '单价',
+          dataIndex: 'price',
+          key: 'age',
+          width: 120
+        },
+        {
+          title: '数量',
+          dataIndex: 'num',
+          key: 'num',
+          width: 120,
+          ellipsis: true
+        },
+        {
+          title: '总计',
+          dataIndex: 'total',
+          key: 'total',
+          width: 120,
+          ellipsis: true
+        }
+      ],
+      cars_data: [],
+      routes_columns: [
+        {
+          title: '地址',
+          dataIndex: 'title',
+          key: 'title'
+        },
+        {
+          title: '门牌号',
+          dataIndex: 'room_number',
+          key: 'room_number',
+           width: 100
+        },
+        {
+          title: '电梯或楼梯',
+          dataIndex: 'stairs_or_elevators',
+          key: 'stairs_or_elevators',
+           width: 120,
+          ellipsis: true
+        },
+        {
+          title: '楼层数',
+          dataIndex: 'floor_num',
+          key: 'floor_num',
+           width: 100,
+          ellipsis: true
+        },
+        {
+          title: '停车位距离',
+          dataIndex: 'parking_distance',
+          key: 'parking_distance',
+           width: 120,
+          ellipsis: true
+        }
+      ],
+      routes_data: [],
+      goods_columns: [
+        {
+          title: '名称',
+          dataIndex: 'name',
+          key: 'name'
+        },
+        {
+          title: '单价',
+          dataIndex: 'price',
+          key: 'price',
+            width: 100
+        },
+        {
+          title: '数量',
+          dataIndex: 'num',
+          key: 'num',
+            width: 100,
+          ellipsis: true
+        },
+        {
+          title: '总计',
+          dataIndex: 'total',
+          key: 'total',
+          width: 100,
+          ellipsis: true
+        },
+        {
+          title: '图片',
+          dataIndex: 'image_url',
+          key: 'image_url',
+           width: 120,
+           scopedSlots: { customRender: 'image_url' },
+          ellipsis: true
+        }
+      ],
+      goods_data: []
     }
   },
 
@@ -261,7 +278,7 @@ goods_data: []
 
   methods: {
     edit (record) {
-      console.log(record)
+      // console.log(record)
       this.visible = true
 
       this.source = record.source
@@ -269,14 +286,7 @@ goods_data: []
       this.phone = record.phone
       this.appointDate = record.appointDate
       this.appointTime = record.appointTime
-
-      // this.cars = record.cars
-
-      // this.routes = record.routes
       this.distance = record.distance
-
-      // this.goods = record.goods
-
       this.carCost = record.carCost
       this.specialTimeCost = record.specialTimeCost
       this.distanceCost = record.distanceCost
@@ -287,9 +297,7 @@ goods_data: []
 
       this.cars_data = record.cars
       this.routes_data = record.routes
-        this.routes_data.distance = record.distance
-
-        this.goods_data = record.goods
+      this.goods_data = record.goods
     },
     onClose () {
       this.visible = false
@@ -298,4 +306,8 @@ goods_data: []
 }
 </script>
 <style lang='less' scoped>
+.goods-img{
+      width: 70px;
+    height: 70px;
+}
 </style>

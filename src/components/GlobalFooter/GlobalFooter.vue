@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    <div class="links">
+    <!-- <div class="links">
       <a
         href="https://pro.loacg.com/"
         target="_blank"
@@ -13,10 +13,13 @@
       </a>
       <a href="https://ant.design/">Ant Design</a>
       <a href="https://vue.ant.design/">Vue Antd</a>
-    </div>
+    </div> -->
     <div class="copyright">
-      Copyright
-      <a-icon type="copyright" /> 2018 <span>白鹭学园技术组出品</span>
+      <!-- Copyright -->
+      <!-- <a-icon type="copyright" /> -->
+      <img class="company-logo" src="@/assets/icons/company.png"/>
+      <!-- 2018  -->
+      <span>深圳市万家灯火搬迁有限公司</span>
     </div>
   </div>
 </template>
@@ -54,6 +57,13 @@ export default {
   .copyright {
     color: rgba(0, 0, 0, 0.45);
     font-size: 14px;
+  }
+  .copyright img{
+      width: 24px;
+    height: 24px;
+  }
+  .copyright span{
+   margin-left: 10px;
   }
 }
 </style>
