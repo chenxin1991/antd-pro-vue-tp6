@@ -449,20 +449,25 @@
                     slot="id"
                     slot-scope="text,record"
                   >
-                    <a-select
-                      show-search
-                      :value="text"
-                      placeholder="选择物品"
-                      :filter-option="filterGoods"
-                      @change="(value,option) => handleGoodsIDChange(value,record.key,option)"
-                    >
-                      <a-select-option
-                        :key="index"
-                        v-for="(item, index) in goods"
-                        :value="item.id"
-                        :option="{'price':item.price,'name':item.name}"
-                      >{{ item.name }}</a-select-option>
-                    </a-select>
+                    <template v-if="text && text.toString().indexOf('other_') != -1">
+                      <a-input :value="record.name" />
+                    </template>
+                    <template v-else>
+                      <a-select
+                        show-search
+                        :value="text"
+                        placeholder="选择物品"
+                        :filter-option="filterGoods"
+                        @change="(value,option) => handleGoodsIDChange(value,record.key,option)"
+                      >
+                        <a-select-option
+                          :key="index"
+                          v-for="(item, index) in goods"
+                          :value="item.id"
+                          :option="{'price':item.price,'name':item.name}"
+                        >{{ item.name }}</a-select-option>
+                      </a-select>
+                    </template>
                   </template>
                   <template
                     slot="num"
@@ -474,6 +479,16 @@
                       :max="10"
                       style="width:100%"
                       @change="value => handleGoodsNumChange(value, record.key)"
+                    />
+                  </template>
+                  <template
+                    slot="price"
+                    slot-scope="text,record"
+                  >
+                    <a-input-number
+                      :value="text"
+                      style="width:100%"
+                      @change="value => handlePriceChange(value, record.key)"
                     />
                   </template>
                   <template
@@ -713,7 +728,8 @@ export default {
         {
           title: '单价',
           dataIndex: 'price',
-          width: '15%'
+          width: '15%',
+          scopedSlots: { customRender: 'price' }
         },
         {
           title: '数量',
@@ -910,7 +926,7 @@ export default {
     goodsCost: function () {
       let cost = 0
       this.selectGoods.forEach((r) => {
-        if (r.id > 0) {
+        if (r.id) {
           cost = cost + r.total
         }
       })
@@ -1163,6 +1179,16 @@ export default {
         this.selectGoods = newData
       }
     },
+    handlePriceChange (value, key) {
+      const newData = [...this.selectGoods]
+      const target = newData.filter((item) => key === item.key)[0]
+      console.log(target)
+      if (target) {
+        target['price'] = value
+        target['total'] = target['num'] * target['price']
+        this.selectGoods = newData
+      }
+    },
     handleImageChange (info, key) {
       if (info.file.status === 'done' && info.file.response.status === 'done') {
         const newData = [...this.selectGoods]
@@ -1301,7 +1327,7 @@ export default {
 .ant-form-item {
   margin-bottom: 12px;
 }
-/deep/  .ant-upload.ant-upload-select-picture-card {
+/deep/ .ant-upload.ant-upload-select-picture-card {
   width: 80px;
   height: 80px;
   margin-right: 0px;
@@ -1315,5 +1341,4 @@ export default {
 /deep/ .ant-upload.ant-upload-select-picture-card > .ant-upload {
   padding: 0px;
 }
-
 </style>
