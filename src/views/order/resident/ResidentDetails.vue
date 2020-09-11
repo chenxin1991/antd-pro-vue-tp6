@@ -64,10 +64,24 @@
             :bordered="true"
             :data-source="routes_data"
           >
-            <a
-              slot="name"
+            <template
+              slot="stairs_or_elevators"
               slot-scope="text"
-            >{{ text }}</a>
+            >
+              <span v-if="text=== '0'">电梯</span>
+              <span v-else>楼梯</span>
+            </template>
+
+            <template
+              slot="parking_distance"
+              slot-scope="text"
+            >
+              <span v-if="text=== '0'">低于30米</span>
+              <span v-if="text=== '1'">30-50米</span>
+              <span v-if="text=== '2'">50-100米</span>
+              <span v-if="text=== '3'">100米以上</span>
+              <span v-if="text=== '4'">地下室出入</span>
+            </template>
           </a-table>
         </a-col>
       </a-row>
@@ -87,7 +101,10 @@
             <template
               slot="image_url"
               slot-scope="text"
-            ><img class="goods-img" :src="text"/>
+            ><img
+              class="goods-img"
+              :src="text"
+            />
             </template>
           </a-table>
         </a-col>
@@ -206,27 +223,29 @@ export default {
           title: '门牌号',
           dataIndex: 'room_number',
           key: 'room_number',
-           width: 100
+          width: 100
         },
         {
           title: '电梯或楼梯',
           dataIndex: 'stairs_or_elevators',
           key: 'stairs_or_elevators',
-           width: 120,
-          ellipsis: true
+          width: 120,
+          ellipsis: true,
+          scopedSlots: { customRender: 'stairs_or_elevators' }
         },
         {
           title: '楼层数',
           dataIndex: 'floor_num',
           key: 'floor_num',
-           width: 100,
+          width: 100,
           ellipsis: true
         },
         {
           title: '停车位距离',
           dataIndex: 'parking_distance',
           key: 'parking_distance',
-           width: 120,
+          width: 120,
+           scopedSlots: { customRender: 'parking_distance' },
           ellipsis: true
         }
       ],
@@ -241,13 +260,13 @@ export default {
           title: '单价',
           dataIndex: 'price',
           key: 'price',
-            width: 100
+          width: 100
         },
         {
           title: '数量',
           dataIndex: 'num',
           key: 'num',
-            width: 100,
+          width: 100,
           ellipsis: true
         },
         {
@@ -261,8 +280,8 @@ export default {
           title: '图片',
           dataIndex: 'image_url',
           key: 'image_url',
-           width: 120,
-           scopedSlots: { customRender: 'image_url' },
+          width: 120,
+          scopedSlots: { customRender: 'image_url' },
           ellipsis: true
         }
       ],
@@ -306,8 +325,8 @@ export default {
 }
 </script>
 <style lang='less' scoped>
-.goods-img{
-      width: 70px;
-    height: 70px;
+.goods-img {
+  width: 70px;
+  height: 70px;
 }
 </style>
