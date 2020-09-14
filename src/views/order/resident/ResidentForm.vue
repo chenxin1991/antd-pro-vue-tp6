@@ -1182,7 +1182,7 @@ export default {
     handlePriceChange (value, key) {
       const newData = [...this.selectGoods]
       const target = newData.filter((item) => key === item.key)[0]
-      console.log(target)
+      // console.log(target)
       if (target) {
         target['price'] = value
         target['total'] = target['num'] * target['price']

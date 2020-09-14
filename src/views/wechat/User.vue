@@ -24,7 +24,13 @@
           width="60"
         />
       </template>
-
+      <template
+        slot="gender"
+        slot-scope="text"
+      >
+        <span v-if="text==0">女</span>
+        <span v-if="text==1">男</span>
+      </template>
     </s-table>
 
   </a-card>
@@ -61,7 +67,8 @@ export default {
         },
         {
           title: '性别',
-          dataIndex: 'gender'
+          dataIndex: 'gender',
+          scopedSlots: { customRender: 'gender' }
         },
         {
           title: '国家',
