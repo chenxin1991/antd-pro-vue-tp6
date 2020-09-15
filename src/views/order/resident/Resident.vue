@@ -133,14 +133,20 @@
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
+                <a @click="handleConfirm(record)">确定</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="handleCancel(record)">取消</a>
+              </a-menu-item>
+              <a-menu-item>
                 <a @click="handleDispatch(record)">派单</a>
               </a-menu-item>
-              <a-menu-item>
+              <!-- <a-menu-item>
                 <a @click="handleGrap(record)">抢单</a>
-              </a-menu-item>
-              <a-menu-item>
+              </a-menu-item> -->
+              <!-- <a-menu-item>
                 <a @click="handleDelete(record)">删除</a>
-              </a-menu-item>
+              </a-menu-item> -->
             </a-menu>
           </a-dropdown>
         </template>
@@ -159,6 +165,9 @@
       @ok="handleOk"
     />
     <ResidentDetails ref="ResidentDetails" @ok="handleOk"></ResidentDetails>
+    <!-- 更多-取消订单弹框 -->
+    <CancelForm ref="CancelForm"></CancelForm>
+
   </a-card>
 </template>
 
@@ -168,6 +177,7 @@ import ResidentForm from './ResidentForm'
 import DispatchForm from './DispatchForm'
 import GrapForm from './GrapForm'
 import ResidentDetails from './ResidentDetails'
+import CancelForm from './CancelForm'
 import { getResidentOrders, delResidentOrder } from '@/api/order/resident'
 
 export default {
@@ -177,10 +187,12 @@ export default {
     ResidentForm,
     GrapForm,
     DispatchForm,
-    ResidentDetails
+    ResidentDetails,
+    CancelForm
   },
   data () {
     return {
+
       isResidentDetails: false,
       // 查询参数
       queryParam: {},
@@ -245,7 +257,11 @@ export default {
           return res.result
         })
       }
+
     }
+  },
+  created () {
+
   },
   methods: {
     handleAdd () {
@@ -286,6 +302,24 @@ export default {
     },
     handleOk () {
       this.$refs.table.refresh()
+    },
+    // 更多-确定
+    handleConfirm () {
+      this.$confirm({
+        title: '请确定订单是否正确?',
+        content: h => <div style="color:red;">正确订单才可进行派单~</div>,
+        onOk () {
+          console.log('OK')
+        },
+        onCancel () {
+          console.log('Cancel')
+        },
+        class: 'test'
+      })
+    },
+ // 更多-取消订单
+    handleCancel () {
+    this.$refs.CancelForm.showModal()
     }
   }
 }

@@ -50,9 +50,11 @@ import {
   Tree,
   AutoComplete,
   Timeline,
-  descriptions
+  descriptions,
+  FormModel 
 } from 'ant-design-vue'
 // import VueCropper from 'vue-cropper'
+Vue.use(FormModel);
 Vue.use(descriptions)
 Vue.use(ConfigProvider)
 Vue.use(Layout)
