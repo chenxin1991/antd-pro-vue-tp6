@@ -934,12 +934,12 @@ export default {
     },
     specialTimeCost: function () {
       let cost = 0
-      if (this.time) {
-        if (this.time >= '19:00' && this.time <= '23:00') {
+      if (this.appointTime) {
+        if (this.appointTime >= '19:00' && this.appointTime <= '23:00') {
           cost =
             (this.setting.add_ratio1 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.goodsCost)
-        } else if (this.time > '23:00' || this.time <= '07:00') {
+        } else if (this.appointTime > '23:00' || this.appointTime <= '07:00') {
           cost =
             (this.setting.add_ratio2 / 100) *
             (this.carCost + this.distanceCost + this.floorCost + this.parkingCost + this.goodsCost)
@@ -1004,7 +1004,6 @@ export default {
         formData.source = formData.source.toString()
         formData.appointDate = moment(record.appointDate)
         setFieldsValue(formData)
-        this.time = record.time
         this.selectCar = JSON.parse(JSON.stringify(record.cars))
         this.carCount = record.cars.length
         this.route = JSON.parse(JSON.stringify(record.routes))
@@ -1182,7 +1181,6 @@ export default {
     handlePriceChange (value, key) {
       const newData = [...this.selectGoods]
       const target = newData.filter((item) => key === item.key)[0]
-      // console.log(target)
       if (target) {
         target['price'] = value
         target['total'] = target['num'] * target['price']
