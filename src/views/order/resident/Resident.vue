@@ -140,13 +140,13 @@
               <a-icon type="down" />
             </a>
             <a-menu slot="overlay">
-              <a-menu-item>
+              <a-menu-item v-if="record.orderStatus==='待确认'">
                 <a @click="handleConfirm(record)">确认</a>
               </a-menu-item>
               <a-menu-item>
                 <a @click="handleCancel(record)">取消</a>
               </a-menu-item>
-              <a-menu-item>
+              <a-menu-item v-if="record.orderStatus==='待派单'">
                 <a @click="handleDispatch(record)">派单</a>
               </a-menu-item>
               <!-- <a-menu-item>
@@ -320,13 +320,13 @@ export default {
     },
     // 更多-确定
     handleConfirm (record) {
+      // console.log(record)
       if (record.isOrigin === 1) {
       this.$message.error('请确定物品价格是否正确')
           return false
       }
       this.$confirm({
-        title: '是否确认订单?',
-        class: 'test'
+        title: '是否确认订单？'
       })
     },
  // 更多-取消订单
