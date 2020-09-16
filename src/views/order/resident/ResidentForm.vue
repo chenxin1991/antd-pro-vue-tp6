@@ -933,6 +933,7 @@ export default {
       return Math.round(cost)
     },
     specialTimeCost: function () {
+      console.log(this.appointTime)
       let cost = 0
       if (this.appointTime) {
         if (this.appointTime >= '19:00' && this.appointTime <= '23:00') {
@@ -1004,6 +1005,7 @@ export default {
         formData.source = formData.source.toString()
         formData.appointDate = moment(record.appointDate)
         setFieldsValue(formData)
+        this.appointTime = record.appointTime
         this.selectCar = JSON.parse(JSON.stringify(record.cars))
         this.carCount = record.cars.length
         this.route = JSON.parse(JSON.stringify(record.routes))
