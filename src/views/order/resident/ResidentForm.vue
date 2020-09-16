@@ -656,7 +656,6 @@ function distance (value, callback) {
 export default {
   data () {
     return {
-
       columns_car: [
         {
           title: '车型',
@@ -1273,14 +1272,13 @@ export default {
           let flag = false
           this.selectGoods.forEach((r) => {
             if (r.key >= 0 && r.id && r.name && r.num > 0) {
-               const reg2 = /^\d+(\.\d+)?$/ // 非负浮点数（正浮点数 + 0）
+              const reg2 = /^\d+(\.\d+)?$/ // 非负浮点数（正浮点数 + 0）
 
-            const price = r.price
-            if (!reg2.test(price)) {
-              // console.log(reg2.test(price))
-                   flag = true
-                   return false
-            }
+              const price = r.price
+              if (!reg2.test(price)) {
+                flag = true
+                return false
+              }
 
               goods.push(r)
             } else {

@@ -61,7 +61,7 @@
                 <a-select-option value="3">待完工</a-select-option>
                 <a-select-option value="4">待评价</a-select-option>
                 <a-select-option value="5">已关闭</a-select-option>
-                <a-select-option value="6">已取消</a-select-option>
+                <a-select-option value="-1">已取消</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -112,16 +112,28 @@
       :columns="columns"
       :data="loadData"
     >
-      <template slot="source" slot-scope="text">
+      <template
+        slot="source"
+        slot-scope="text"
+      >
         <template v-if="text=='1'">来电</template>
         <template v-if="text=='2'">上门</template>
         <template v-if="text=='3'">小程序</template>
       </template>
-      <template slot="totalCost" slot-scope="text,record">
+      <template
+        slot="totalCost"
+        slot-scope="text,record"
+      >
         <span>{{ text }}</span>
-        <span v-if="record.isOrigin" style="color:#ff5155;margin-left:5px;font-size:12px;">起</span>
+        <span
+          v-if="record.isOrigin"
+          style="color:#ff5155;margin-left:5px;font-size:12px;"
+        >起</span>
       </template>
-      <template slot="isOtherLarge" slot-scope="text">
+      <template
+        slot="isOtherLarge"
+        slot-scope="text"
+      >
         <template v-if="text=='0'">否</template>
         <template v-if="text=='1'">是</template>
       </template>
@@ -174,7 +186,10 @@
       @ok="handleOk"
     />
     <!-- 订单详情 -->
-    <ResidentDetails ref="ResidentDetails" @ok="handleOk"></ResidentDetails>
+    <ResidentDetails
+      ref="ResidentDetails"
+      @ok="handleOk"
+    ></ResidentDetails>
     <!-- 更多-取消订单弹框 -->
     <CancelForm ref="CancelForm"></CancelForm>
 
@@ -188,7 +203,7 @@ import DispatchForm from './DispatchForm'
 import GrapForm from './GrapForm'
 import ResidentDetails from './ResidentDetails'
 import CancelForm from './CancelForm'
-import { getResidentOrders, delResidentOrder } from '@/api/order/resident'
+import { getResidentOrders, delResidentOrder, confirmResidentOrders } from '@/api/order/resident'
 
 export default {
   name: 'OrderResident',
@@ -202,7 +217,6 @@ export default {
   },
   data () {
     return {
-
       isResidentDetails: false,
       // 查询参数
       queryParam: {},
@@ -267,17 +281,14 @@ export default {
         }
       ],
       // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
-        return getResidentOrders(Object.assign(parameter, this.queryParam)).then(res => {
+      loadData: (parameter) => {
+        return getResidentOrders(Object.assign(parameter, this.queryParam)).then((res) => {
           return res.result
         })
       }
-
     }
   },
-  created () {
-
-  },
+  created () {},
   methods: {
     handleAdd () {
       this.$refs.residentForm.add()
@@ -288,7 +299,7 @@ export default {
     handleDispatch (record) {
       this.$refs.dispatchForm.edit(record)
     },
-     handleDetails (record) {
+    handleDetails (record) {
       this.$refs.ResidentDetails.edit(record)
     },
     handleGrap (record) {
@@ -305,11 +316,11 @@ export default {
         cancelText: '取消',
         onOk () {
           delResidentOrder(record)
-            .then(res => {
+            .then((res) => {
               that.$message.success('删除成功')
               that.$refs.table.refresh()
             })
-            .catch(err => {
+            .catch((err) => {
               that.$message.error(`load user err: ${err.message}`)
             })
         }
@@ -320,18 +331,31 @@ export default {
     },
     // 更多-确定
     handleConfirm (record) {
-      // console.log(record)
+      const that = this
       if (record.isOrigin === 1) {
-      this.$message.error('请确定物品价格是否正确')
-          return false
+        this.$message.error('请确定物品价格是否正确')
+        return false
       }
       this.$confirm({
-        title: '是否确认订单？'
+        title: '警告',
+        content: `是否确认订单 ${record.number}?`,
+        okText: '确认',
+        okType: 'danger',
+        onOk () {
+          confirmResidentOrders(record)
+            .then((res) => {
+              that.$message.success('确认成功')
+              that.$refs.table.refresh()
+            })
+            .catch((err) => {
+              that.$message.error(`load user err: ${err.message}`)
+            })
+        }
       })
     },
- // 更多-取消订单
+    // 更多-取消订单
     handleCancel () {
-    this.$refs.CancelForm.showModal()
+      this.$refs.CancelForm.showModal()
     }
   }
 }

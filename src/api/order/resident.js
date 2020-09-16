@@ -37,3 +37,18 @@ export function getResidentOrders (parameter) {
     params: parameter
   })
 }
+
+export function confirmResidentOrders (parameter) {
+  return axios({
+    url: api.ResidentOrder + '/confirm/' + parameter.id,
+    method: 'post'
+  })
+}
+
+export function dispatchResidentOrders (parameter) {
+  return axios({
+    url: api.ResidentOrder + '/dispatch/' + parameter.id,
+    method: 'post',
+    data: parameter
+  })
+}

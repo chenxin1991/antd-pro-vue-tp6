@@ -25,6 +25,9 @@
           >{{ item.name }}</a-select-option>
         </a-select>
       </a-form-item>
+      <a-form-item style="display:none;">
+        <a-input v-decorator="['id']" type="hidden"/>
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
@@ -32,6 +35,7 @@
 <script>
 import pick from 'lodash.pick'
 import { getLeaders } from '@/api/common'
+import { dispatchResidentOrders } from '@/api/order/resident'
 export default {
   data () {
     return {
@@ -59,6 +63,7 @@ export default {
       this.visible = true
     },
     edit (record) {
+      console.log('record', record)
       if (record.leader === 0) {
         record.leader = ''
       }
@@ -67,7 +72,7 @@ export default {
         form: { setFieldsValue }
       } = this
       this.$nextTick(() => {
-        setFieldsValue(pick(record, ['leader']))
+        setFieldsValue(pick(record, ['leader', 'id']))
       })
     },
     filter (input, option) {
@@ -75,17 +80,22 @@ export default {
     },
     handleSubmit () {
       const {
-        form: { validateFields }
+        form: { validateFields }, $message
       } = this
       this.confirmLoading = true
       validateFields((errors, values) => {
+        console.log('values', values)
         if (!errors) {
-          console.log('values', values)
-          setTimeout(() => {
-            this.visible = false
-            this.confirmLoading = false
-            this.$emit('ok', values)
-          }, 1500)
+            dispatchResidentOrders(values)
+              .then(res => {
+                $message.success('添加成功')
+                this.visible = false
+                this.confirmLoading = false
+                this.$emit('ok', values)
+              })
+              .catch(err => {
+                $message.error(`load user err: ${err.message}`)
+              })
         } else {
           this.confirmLoading = false
         }
