@@ -117,6 +117,10 @@
         <template v-if="text=='2'">上门</template>
         <template v-if="text=='3'">小程序</template>
       </template>
+      <template slot="totalCost" slot-scope="text,record">
+        <span>{{ text }}</span>
+        <span v-if="record.isOrigin" style="color:#ff5155;margin-left:5px;font-size:12px;">起</span>
+      </template>
       <template slot="isOtherLarge" slot-scope="text">
         <template v-if="text=='0'">否</template>
         <template v-if="text=='1'">是</template>
@@ -156,6 +160,7 @@
         </template>
       </span>
     </s-table>
+    <!-- 编辑订单 -->
     <resident-form
       ref="residentForm"
       @ok="handleOk"
@@ -168,6 +173,7 @@
       ref="grapForm"
       @ok="handleOk"
     />
+    <!-- 订单详情 -->
     <ResidentDetails ref="ResidentDetails" @ok="handleOk"></ResidentDetails>
     <!-- 更多-取消订单弹框 -->
     <CancelForm ref="CancelForm"></CancelForm>
@@ -229,7 +235,8 @@ export default {
         },
         {
           title: '总报价',
-          dataIndex: 'totalCost'
+          dataIndex: 'totalCost',
+          scopedSlots: { customRender: 'totalCost' }
         },
         {
           title: '订单状态',
@@ -312,16 +319,13 @@ export default {
       this.$refs.table.refresh()
     },
     // 更多-确定
-    handleConfirm () {
+    handleConfirm (record) {
+      if (record.isOrigin === 1) {
+      this.$message.error('请确定物品价格是否正确')
+          return false
+      }
       this.$confirm({
-        title: '请确定订单是否正确?',
-        content: h => <div style="color:red;">正确订单才可进行派单~</div>,
-        onOk () {
-          console.log('OK')
-        },
-        onCancel () {
-          console.log('Cancel')
-        },
+        title: '是否确认订单?',
         class: 'test'
       })
     },

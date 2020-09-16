@@ -1,3 +1,4 @@
+<!---编辑订单 --->
 <template>
   <a-modal
     :title="config.title"
@@ -655,6 +656,7 @@ function distance (value, callback) {
 export default {
   data () {
     return {
+
       columns_car: [
         {
           title: '车型',
@@ -933,7 +935,7 @@ export default {
       return Math.round(cost)
     },
     specialTimeCost: function () {
-      console.log(this.appointTime)
+      // console.log(this.appointTime)
       let cost = 0
       if (this.appointTime) {
         if (this.appointTime >= '19:00' && this.appointTime <= '23:00') {
@@ -1219,6 +1221,7 @@ export default {
     handleCancel () {
       this.visible = false
     },
+    // 确定订单
     handleSubmit () {
       const {
         form: { validateFields },
@@ -1267,15 +1270,29 @@ export default {
           values.routes = routes
           const goods = []
           let goodsFlag = true
+          let flag = false
           this.selectGoods.forEach((r) => {
             if (r.key >= 0 && r.id && r.name && r.num > 0) {
+               const reg2 = /^\d+(\.\d+)?$/ // 非负浮点数（正浮点数 + 0）
+
+            const price = r.price
+            if (!reg2.test(price)) {
+              // console.log(reg2.test(price))
+                   flag = true
+                   return false
+            }
+
               goods.push(r)
             } else {
               goodsFlag = false
             }
           })
           if (!goodsFlag) {
-            $message.error('请检查拆装信息是否填写完整!')
+            $message.error('请检查物品信息是否填写完整!')
+            return false
+          }
+          if (flag) {
+            $message.error('请检查物品价格是否填写正确!')
             return false
           }
           values.goods = goods
@@ -1299,6 +1316,7 @@ export default {
                 $message.error(`load user err: ${err.message}`)
               })
           } else if (this.config.action === 'edit') {
+            values.isOrigin = 0
             values.id = this.config.id
             editResidentOrder(values)
               .then((res) => {
