@@ -117,6 +117,10 @@
         <template v-if="text=='2'">上门</template>
         <template v-if="text=='3'">小程序</template>
       </template>
+      <template slot="isOtherLarge" slot-scope="text">
+        <template v-if="text=='0'">否</template>
+        <template v-if="text=='1'">是</template>
+      </template>
       <span
         slot="action"
         slot-scope="text, record"
@@ -133,7 +137,7 @@
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a @click="handleConfirm(record)">确定</a>
+                <a @click="handleConfirm(record)">确认</a>
               </a-menu-item>
               <a-menu-item>
                 <a @click="handleCancel(record)">取消</a>
@@ -144,9 +148,9 @@
               <!-- <a-menu-item>
                 <a @click="handleGrap(record)">抢单</a>
               </a-menu-item> -->
-              <!-- <a-menu-item>
+              <a-menu-item>
                 <a @click="handleDelete(record)">删除</a>
-              </a-menu-item> -->
+              </a-menu-item>
             </a-menu>
           </a-dropdown>
         </template>
@@ -206,7 +210,6 @@ export default {
           title: '订单来源',
           dataIndex: 'source',
           scopedSlots: { customRender: 'source' }
-
         },
         {
           title: '下单时间',
@@ -243,6 +246,11 @@ export default {
         {
           title: '队长',
           dataIndex: 'leadername'
+        },
+        {
+          title: '是否有其他大件',
+          dataIndex: 'isOtherLarge',
+          scopedSlots: { customRender: 'isOtherLarge' }
         },
         {
           title: '操作',
@@ -284,7 +292,7 @@ export default {
       const that = this
       this.$confirm({
         title: '警告',
-        content: `真的要删除 ${record.number} 吗?`,
+        content: `真的要删除订单 ${record.number} 吗?`,
         okText: '删除',
         okType: 'danger',
         cancelText: '取消',
