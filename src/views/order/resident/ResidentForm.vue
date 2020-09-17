@@ -143,6 +143,24 @@
               </a-form-item>
             </a-col>
           </a-row>
+          <a-row :gutter="24">
+            <a-col :span="24">
+              <a-form-item
+                label="备注"
+                :labelCol="{
+                  xs: { span: 24 },
+                  sm: { span: 2 }
+                }"
+                :wrapperCol="{
+                  xs: { span: 24 },
+                  sm: { span: 22 }
+                }"
+              >
+
+                <a-textarea v-decorator="['remark', { rules: [{ required: true, message: '请输入备注内容!' }] }]" placeholder="请输入备注内容" auto-size />
+              </a-form-item>
+            </a-col>
+          </a-row>
           <a-row :gutter="16">
             <a-col :span="24">
               <a-form-item
@@ -994,6 +1012,7 @@ export default {
       })
     },
     edit (record) {
+      console.log(record)
       this.config.action = 'edit'
       this.config.title = '修改订单'
       this.config.id = record.id
@@ -1002,7 +1021,7 @@ export default {
         form: { setFieldsValue }
       } = this
       this.$nextTick(() => {
-        const formData = pick(record, ['source', 'customer', 'phone', 'appointTime'])
+        const formData = pick(record, ['source', 'customer', 'phone', 'appointTime', 'remark'])
         formData.source = formData.source.toString()
         formData.appointDate = moment(record.appointDate)
         setFieldsValue(formData)

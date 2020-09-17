@@ -5,6 +5,7 @@
       v-model="visibleCancel"
       title="订单取消原因"
       @ok="handleOkCancel"
+      @cancel="handleCancel"
     >
       <a-radio-group
         v-model="value"
@@ -12,13 +13,13 @@
       >
         <a-radio
           :style="radioStyle"
-          :value="value1"
+          :value="`价格太贵`"
         >
           价格太贵
         </a-radio>
         <a-radio
           :style="radioStyle"
-          :value="value2"
+          :value="`客户预定时间排不下`"
         >
           客户预定时间排不下
         </a-radio>
@@ -47,8 +48,6 @@ export default {
     return {
       visibleCancel: false, // 取消订单
       value: '',
-      value1: '价格太贵',
-      value2: '客户预定时间排不下',
       moreValue: '',
       radioStyle: {
         display: 'block',
@@ -67,24 +66,32 @@ export default {
   created () {},
 
   methods: {
-    // 更多-取消订单
     showModal () {
       this.visibleCancel = true
     },
-    // 更多-取消订单原因
+    // 取消订单原因
     onChange (e) {
-      console.log('radio checked', e.target.value)
+      this.value = e.target.value
     },
     // 点击确定
     handleOkCancel () {
-        //  console.log('moreValue', this.moreValue)
-      if (this.value === 3 && this.moreValue === '') {
-            this.$message.error('请输入/选择取消订单原因')
-      } else {
-           this.visibleCancel = false
+      if (this.value === '') {
+        this.$message.error('请选择取消订单原因')
+        return false
       }
+      if (this.value === 3 && this.moreValue === '') {
+        this.$message.error('请输入/选择取消订单原因')
+      } else {
+        this.visibleCancel = false
+      }
+      this.value = ''
+    },
+    // 点击取消
+    handleCancel () {
+      // console.log(this.value)
+      this.value = ''
+      this.visibleCancel = false
     }
-
   }
 }
 </script>
