@@ -63,7 +63,6 @@ export default {
       this.visible = true
     },
     edit (record) {
-      console.log('record', record)
       if (record.leader === 0) {
         record.leader = ''
       }
@@ -84,7 +83,6 @@ export default {
       } = this
       this.confirmLoading = true
       validateFields((errors, values) => {
-        console.log('values', values)
         if (!errors) {
             dispatchResidentOrders(values)
               .then(res => {

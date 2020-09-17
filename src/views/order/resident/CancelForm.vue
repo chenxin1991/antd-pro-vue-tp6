@@ -4,6 +4,7 @@
     <a-modal
       v-model="visibleCancel"
       title="订单取消原因"
+      :confirmLoading="confirmLoading"
       @ok="handleOkCancel"
       @cancel="handleCancel"
     >
@@ -42,6 +43,7 @@
 </template>
 
 <script>
+import { cancelResidentOrders } from '@/api/order/resident'
 export default {
   name: 'CancelForm',
   data () {
@@ -53,7 +55,9 @@ export default {
         display: 'block',
         height: '30px',
         lineHeight: '30px'
-      }
+      },
+      confirmLoading: false,
+      id: 0
     }
   },
 
@@ -66,8 +70,9 @@ export default {
   created () {},
 
   methods: {
-    showModal () {
+    showModal (record) {
       this.visibleCancel = true
+      this.id = record.id
     },
     // 取消订单原因
     onChange (e) {
@@ -75,20 +80,30 @@ export default {
     },
     // 点击确定
     handleOkCancel () {
+      const that = this
       if (this.value === '') {
         this.$message.error('请选择取消订单原因')
         return false
       }
       if (this.value === 3 && this.moreValue === '') {
-        this.$message.error('请输入/选择取消订单原因')
-      } else {
-        this.visibleCancel = false
+        this.$message.error('请输入取消订单原因')
+        return false
       }
-      this.value = ''
+      const cancelReason = this.value === 3 ? this.moreValue : this.value
+      this.confirmLoading = true
+      cancelResidentOrders({ id: this.id, cancelReason: cancelReason })
+        .then((res) => {
+          that.$message.success('取消成功')
+          this.visibleCancel = false
+          this.confirmLoading = false
+          this.$emit('ok', { id: this.id, cancelReason: cancelReason })
+        })
+        .catch((err) => {
+          that.$message.error(`load user err: ${err.message}`)
+        })
     },
     // 点击取消
     handleCancel () {
-      // console.log(this.value)
       this.value = ''
       this.visibleCancel = false
     }

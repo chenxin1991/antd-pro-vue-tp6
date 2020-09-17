@@ -155,7 +155,7 @@
               <a-menu-item v-if="record.orderStatus==='待确认'">
                 <a @click="handleConfirm(record)">确认</a>
               </a-menu-item>
-              <a-menu-item>
+              <a-menu-item v-if="record.orderStatus==='待确认' || record.orderStatus==='待派单' || record.orderStatus==='待开工'">
                 <a @click="handleCancel(record)">取消</a>
               </a-menu-item>
               <a-menu-item v-if="record.orderStatus==='待派单'">
@@ -354,8 +354,8 @@ export default {
       })
     },
     // 更多-取消订单
-    handleCancel () {
-      this.$refs.CancelForm.showModal()
+    handleCancel (record) {
+      this.$refs.CancelForm.showModal(record)
     }
   }
 }

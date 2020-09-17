@@ -952,7 +952,6 @@ export default {
       return Math.round(cost)
     },
     specialTimeCost: function () {
-      // console.log(this.appointTime)
       let cost = 0
       if (this.appointTime) {
         if (this.appointTime >= '19:00' && this.appointTime <= '23:00') {
@@ -1012,7 +1011,6 @@ export default {
       })
     },
     edit (record) {
-      console.log(record)
       this.config.action = 'edit'
       this.config.title = '修改订单'
       this.config.id = record.id
@@ -1245,7 +1243,7 @@ export default {
         form: { validateFields },
         $message
       } = this
-      // this.confirmLoading = true
+      this.confirmLoading = true
       validateFields((errors, values) => {
         if (!errors) {
           values.appointDate = values.appointDate.format('YYYY-MM-DD')
@@ -1347,7 +1345,7 @@ export default {
               })
           }
         } else {
-          // this.confirmLoading = false
+          this.confirmLoading = false
         }
       })
     }

@@ -52,3 +52,11 @@ export function dispatchResidentOrders (parameter) {
     data: parameter
   })
 }
+
+export function cancelResidentOrders (parameter) {
+  return axios({
+    url: api.ResidentOrder + '/cancel/' + parameter.id,
+    method: 'post',
+    data: parameter
+  })
+}
