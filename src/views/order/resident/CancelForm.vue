@@ -99,7 +99,7 @@ export default {
           this.$emit('ok', { id: this.id, cancelReason: cancelReason })
         })
         .catch((err) => {
-          that.$message.error(`load user err: ${err.message}`)
+          that.$message.error(`${err.message}`)
         })
     },
     // 点击取消
