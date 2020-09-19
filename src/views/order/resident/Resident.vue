@@ -19,7 +19,7 @@
             :sm="24"
           >
             <a-form-item label="下单日期">
-              <a-range-picker />
+              <a-range-picker @change="onChange1" />
             </a-form-item>
           </a-col>
           <a-col
@@ -27,7 +27,7 @@
             :sm="24"
           >
             <a-form-item label="预约日期">
-              <a-range-picker />
+              <a-range-picker @change="onChange2" />
             </a-form-item>
           </a-col>
           <a-col
@@ -36,12 +36,13 @@
           >
             <a-form-item label="订单来源">
               <a-select
-                v-model="queryParam.status"
+                allowClear
+                v-model="queryParam.source"
                 placeholder="请选择"
               >
-                <a-select-option value="0">来电</a-select-option>
-                <a-select-option value="1">上门</a-select-option>
-                <a-select-option value="2">小程序</a-select-option>
+                <a-select-option value="1">来电</a-select-option>
+                <a-select-option value="2">上门</a-select-option>
+                <a-select-option value="3">小程序</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -51,9 +52,9 @@
           >
             <a-form-item label="订单状态">
               <a-select
-                v-model="queryParam.status"
+                allowClear
+                v-model="queryParam.orderStatus"
                 placeholder="请选择"
-                default-value="0"
               >
                 <a-select-option value="0">待确认</a-select-option>
                 <a-select-option value="1">待派单</a-select-option>
@@ -71,7 +72,8 @@
           >
             <a-form-item label="支付状态">
               <a-select
-                v-model="queryParam.status"
+                allowClear
+                v-model="queryParam.payStatus"
                 placeholder="请选择"
               >
                 <a-select-option value="0">未支付</a-select-option>
@@ -116,9 +118,9 @@
         slot="source"
         slot-scope="text"
       >
-        <template v-if="text=='1'">来电</template>
-        <template v-if="text=='2'">上门</template>
-        <template v-if="text=='3'">小程序</template>
+        <template v-if="text==1">来电</template>
+        <template v-if="text==2">上门</template>
+        <template v-if="text==3">小程序</template>
       </template>
       <template
         slot="totalCost"
@@ -134,8 +136,8 @@
         slot="isOtherLarge"
         slot-scope="text"
       >
-        <template v-if="text=='0'">否</template>
-        <template v-if="text=='1'">是</template>
+        <template v-if="text==0">否</template>
+        <template v-if="text==1">是</template>
       </template>
       <span
         slot="action"
@@ -356,6 +358,12 @@ export default {
     // 更多-取消订单
     handleCancel (record) {
       this.$refs.CancelForm.showModal(record)
+    },
+    onChange1 (date, dateString) {
+      this.queryParam.orderDate = dateString
+    },
+    onChange2 (date, dateString) {
+      this.queryParam.appointDate = dateString
     }
   }
 }
