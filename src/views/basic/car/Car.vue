@@ -88,6 +88,22 @@ export default {
           dataIndex: 'name'
         },
         {
+          title: '载重',
+          dataIndex: 'loadSize'
+        },
+        {
+          title: '长宽高',
+          dataIndex: 'lwh'
+        },
+        {
+          title: '载货体积',
+          dataIndex: 'volume'
+        },
+        {
+          title: '配备工人',
+          dataIndex: 'manning'
+        },
+        {
           title: '单价（元）',
           dataIndex: 'price'
         },

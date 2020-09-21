@@ -14,67 +14,193 @@
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
       >
-        <a-form-item
-          :labelCol="{
-            xs: { span: 24 },
-            sm: { span: 5 }
-          }"
-          :wrapperCol="{
-            xs: { span: 24 },
-            sm: { span: 16 }
-          }"
-          label="名称">
-          <a-input v-decorator="['name', { rules: [{ required: true, message: '请输入名称！' }] }]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="{
-            xs: { span: 24 },
-            sm: { span: 5 }
-          }"
-          :wrapperCol="{
-            xs: { span: 24 },
-            sm: { span: 16 }
-          }"
-          label="单价（元）">
-          <a-input-number
-            :min="0"
-            v-decorator="[
-              'price',
-              {
-                rules: [{ required: true, message: '请输入单价！' }],
-              },
-            ]"
-            style="width: 100%"
-          />
-        </a-form-item>
-        <a-form-item
-          :labelCol="{
-            xs: { span: 24 },
-            sm: { span: 5 }
-          }"
-          :wrapperCol="{
-            xs: { span: 24 },
-            sm: { span: 16 }
-          }"
-          label="上传图片">
-          <a-upload
-            name="avatar"
-            list-type="picture-card"
-            class="avatar-uploader"
-            :show-upload-list="false"
-            action="/index.php/admin/test/avatar"
-            :before-upload="beforeUpload"
-            @change="handleChange"
-          >
-            <img v-if="image_url" :src="image_url" alt="avatar" style="max-width:202px;max-height:202px;"/>
-            <div v-else>
-              <a-icon :type="loading ? 'loading' : 'plus'" />
-              <div class="ant-upload-text">
-                Upload
-              </div>
-            </div>
-          </a-upload>
-        </a-form-item>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 16 }
+              }"
+              label="名称"
+            >
+              <a-input
+                v-decorator="[
+                  'name',
+                  {
+                    rules: [{ required: true, message: '请输入名称！' }],
+                  },
+                ]"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 16 }
+              }"
+              label="单价（元）"
+            >
+              <a-input-number
+                :min="0"
+                v-decorator="[
+                  'price',
+                  {
+                    rules: [{ required: true, message: '请输入单价（元）！' }],
+                  },
+                ]"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 16 }
+              }"
+              label="载重"
+            >
+              <a-input
+                :min="0"
+                v-decorator="[
+                  'loadSize',
+                  {
+                    rules: [{ required: true, message: '请输入载重！' }],
+                  },
+                ]"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 16 }
+              }"
+              label="长宽高"
+            >
+              <a-input
+                :min="0"
+                v-decorator="[
+                  'lwh',
+                  {
+                    rules: [{ required: true, message: '请输入长宽高！' }],
+                  },
+                ]"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 16 }
+              }"
+              label="体积"
+            >
+              <a-input
+                :min="0"
+                v-decorator="[
+                  'volume',
+                  {
+                    rules: [{ required: true, message: '请输入载重！' }],
+                  },
+                ]"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 16 }
+              }"
+              label="配备工人"
+            >
+              <a-input
+                :min="0"
+                v-decorator="[
+                  'manning',
+                  {
+                    rules: [{ required: true, message: '请输入配备工人！' }],
+                  },
+                ]"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item
+              :labelCol="{
+                xs: { span: 24 },
+                sm: { span: 6 }
+              }"
+              :wrapperCol="{
+                xs: { span: 24 },
+                sm: { span: 16 }
+              }"
+              label="上传图片"
+            >
+              <a-upload
+                name="avatar"
+                list-type="picture-card"
+                class="avatar-uploader"
+                :show-upload-list="false"
+                action="/index.php/admin/test/avatar"
+                :before-upload="beforeUpload"
+                @change="handleChange"
+              >
+                <img
+                  v-if="image_url"
+                  :src="image_url"
+                  alt="avatar"
+                  style="max-width:142px;max-height:142px;"
+                />
+                <div v-else>
+                  <a-icon :type="loading ? 'loading' : 'plus'" />
+                  <div class="ant-upload-text">
+                    Upload
+                  </div>
+                </div>
+              </a-upload>
+            </a-form-item>
+          </a-col>
+        </a-row>
         <a-divider orientation="left">
           超出公里数收费标准
         </a-divider>
@@ -252,6 +378,10 @@ export default {
           pick(record, [
             'name',
             'price',
+            'loadSize',
+            'lwh',
+            'volume',
+            'manning',
             'km_standard',
             'km_price',
             'floor_standard',
@@ -266,7 +396,7 @@ export default {
     },
     handleChange (info) {
       if (info.file.status === 'done' && info.file.response.status === 'done') {
-          this.image_url = info.file.response.url
+        this.image_url = info.file.response.url
       }
     },
     beforeUpload (file) {
@@ -291,25 +421,25 @@ export default {
         if (!errors) {
           if (this.config.action === 'add') {
             addCar(values)
-              .then(res => {
+              .then((res) => {
                 $message.success('添加成功')
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)
               })
-              .catch(err => {
+              .catch((err) => {
                 $message.error(`load user err: ${err.message}`)
               })
           } else if (this.config.action === 'edit') {
             values.id = this.config.id
             editCar(values)
-              .then(res => {
+              .then((res) => {
                 $message.success('修改成功')
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)
               })
-              .catch(err => {
+              .catch((err) => {
                 $message.error(`load user err: ${err.message}`)
               })
           }
@@ -327,8 +457,8 @@ export default {
 
 <style lang="less" scoped>
 .avatar-uploader /deep/ .ant-upload {
-  width: 220px;
-  height: 220px;
+  width: 160px;
+  height: 160px;
 }
 .ant-form-item {
   margin-bottom: 12px;
