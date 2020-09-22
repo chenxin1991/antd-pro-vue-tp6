@@ -1,4 +1,4 @@
-<!-- 居民搬家-详情 -->
+<!-- 居民搬家-订单详情 -->
 <template>
   <div>
     <a-drawer
@@ -18,7 +18,9 @@
         <a-col :span="24">
           <a-descriptions>
             <a-descriptions-item label="订单来源">
-              {{ source }}
+              <span v-if="source===1">来电</span>
+              <span v-if="source===2">上门</span>
+              <span v-if="source===3">小程序</span>
             </a-descriptions-item>
             <a-descriptions-item label="客户名">
               {{ customer }}
@@ -137,9 +139,43 @@
             <a-descriptions-item label="物品费用">
               {{ goodsCost }}
             </a-descriptions-item>
+          </a-descriptions>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="24">
+          <a-descriptions>
+            <a-descriptions-item v-if="changeCost>0" label="额外增加">
+              {{ changeCost }}
+            </a-descriptions-item>
+            <a-descriptions-item v-if="changeCost<0" label="额外减少">
+              {{ changeCost }}
+            </a-descriptions-item>
+            <a-descriptions-item v-if="costChangeRemark!==''" label="原因">
+              {{ costChangeRemark }}
+            </a-descriptions-item>
+          </a-descriptions>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="24">
+          <a-descriptions>
             <a-descriptions-item label="总价">
               {{ totalCost }}
             </a-descriptions-item>
+          </a-descriptions>
+        </a-col>
+      </a-row>
+      <p :style="pStyle">
+        订单评价
+      </p>
+      <a-row>
+        <a-col :span="24">
+          <a-descriptions>
+            <a-descriptions-item label="评价">
+              评价内容
+            </a-descriptions-item>
+
           </a-descriptions>
         </a-col>
       </a-row>
@@ -285,7 +321,10 @@ export default {
           ellipsis: true
         }
       ],
-      goods_data: []
+      goods_data: [],
+      changeCost: '', // 额外增加/减少金额
+      costChangeRemark: ''// 修改金额备注
+
     }
   },
 
@@ -297,7 +336,7 @@ export default {
 
   methods: {
     edit (record) {
-      // console.log(record)
+      console.log(record)
       this.visible = true
 
       this.source = record.source
@@ -313,6 +352,8 @@ export default {
       this.parkingCost = record.parkingCost
       this.goodsCost = record.goodsCost
       this.totalCost = record.totalCost
+      this.changeCost = record.changeCost
+      this.costChangeRemark = record.costChangeRemark
 
       this.cars_data = record.cars
       this.routes_data = record.routes

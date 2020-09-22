@@ -144,7 +144,7 @@
         slot-scope="text, record"
       >
         <template>
-          <a @click="handleEdit(record)">编辑</a>
+          <a @click="handleEdit(record)" :disabled="record.orderStatus==='已完工'">编辑</a>
           <a-divider type="vertical" />
           <a @click="handleDetails(record)">详情</a>
           <a-divider type="vertical" />
