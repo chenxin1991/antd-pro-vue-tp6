@@ -157,7 +157,7 @@
                 }"
               >
 
-                <a-textarea v-decorator="['remark', { rules: [{ required: true, message: '请输入备注内容!' }] }]" placeholder="请输入备注内容" auto-size />
+                <a-textarea v-decorator="['remark', { rules: [{message: '请输入备注内容!' }] }]" placeholder="请输入备注内容" auto-size />
               </a-form-item>
             </a-col>
           </a-row>
