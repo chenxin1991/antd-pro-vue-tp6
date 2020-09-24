@@ -60,6 +60,26 @@ export const asyncRouterMap = [
         ]
       },
       {
+        path: '/statistics',
+        redirect: '/statistics/Telephone',
+        component: PageView,
+        meta: { title: '报表统计', icon: 'line-chart' },
+        children: [
+          {
+            path: '/statistics/Telephone',
+            name: 'StatisticsTelephone',
+            component: () => import('@/views/statistics/Telephone'),
+            meta: { title: '接线员报表统计', keepAlive: true }
+          },
+          {
+            path: '/statistics/Partner',
+            name: 'StatisticsPartner',
+            component: () => import('@/views/statistics/Partner'),
+            meta: { title: '合伙人报表统计', keepAlive: true }
+          }
+        ]
+      },
+      {
         path: '/wechat',
         redirect: '/wechat/user',
         component: PageView,

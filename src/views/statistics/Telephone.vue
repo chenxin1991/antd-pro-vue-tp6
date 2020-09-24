@@ -1,11 +1,11 @@
-<!-- 企业搬迁 -->
+<!-- 接线员报表统计 -->
 <template>
-  <div></div>
+  <div>接线员报表统计</div>
 </template>
 
 <script>
 export default {
-name: 'Company',
+name: 'Telephone',
   data () {
     return {
     }

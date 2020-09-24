@@ -1,11 +1,11 @@
-<!-- 企业搬迁 -->
+<!-- 合伙人报表统计 -->
 <template>
-  <div></div>
+  <div>合伙人报表统计</div>
 </template>
 
 <script>
 export default {
-name: 'Company',
+name: 'Partner',
   data () {
     return {
     }
