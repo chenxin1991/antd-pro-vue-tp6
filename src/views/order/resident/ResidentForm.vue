@@ -58,7 +58,6 @@
                 >
                   <a-select-option value="1">来电</a-select-option>
                   <a-select-option value="2">上门</a-select-option>
-                  <a-select-option value="3">小程序</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>

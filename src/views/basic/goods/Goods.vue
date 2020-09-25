@@ -20,6 +20,7 @@
           >
             <a-form-item label="分类">
               <a-select
+                allowClear
                 v-model="queryParam.cid"
                 placeholder="请选择"
               >

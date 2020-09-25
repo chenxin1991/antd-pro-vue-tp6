@@ -93,25 +93,41 @@ export default {
         if (!errors) {
           if (this.config.action === 'add') {
             addUser(values)
-              .then(res => {
-                $message.success('添加成功')
-                this.visible = false
-                this.confirmLoading = false
-                this.$emit('ok', values)
+              .then((res) => {
+                if (res.code === 200) {
+                  $message.success(res.message)
+                  this.visible = false
+                  this.confirmLoading = false
+                  this.$emit('ok', values)
+                } else if (res.code === -2) {
+                  $message.error(res.message)
+                  this.confirmLoading = false
+                } else if (res.code === -1) {
+                  $message.error(res.message)
+                  this.confirmLoading = false
+                }
               })
-              .catch(err => {
+              .catch((err) => {
                 $message.error(`load user err: ${err.message}`)
               })
           } else if (this.config.action === 'edit') {
             values.id = this.config.id
             editUser(values)
-              .then(res => {
-                $message.success('修改成功')
-                this.visible = false
-                this.confirmLoading = false
-                this.$emit('ok', values)
+              .then((res) => {
+                if (res.code === 200) {
+                  $message.success(res.message)
+                  this.visible = false
+                  this.confirmLoading = false
+                  this.$emit('ok', values)
+                } else if (res.code === -2) {
+                  $message.error(res.message)
+                  this.confirmLoading = false
+                } else if (res.code === -1) {
+                  $message.error(res.message)
+                  this.confirmLoading = false
+                }
               })
-              .catch(err => {
+              .catch((err) => {
                 $message.error(`load user err: ${err.message}`)
               })
           }

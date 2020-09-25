@@ -20,6 +20,7 @@
           >
             <a-form-item label="角色">
               <a-select
+                allowClear
                 v-model="queryParam.role_id"
                 placeholder="请选择"
               >
@@ -37,11 +38,12 @@
           >
             <a-form-item label="状态">
               <a-select
+                allowClear
                 v-model="queryParam.status"
                 placeholder="请选择"
               >
-                <a-select-option value="0">启用</a-select-option>
-                <a-select-option value="1">禁用</a-select-option>
+                <a-select-option value="1">启用</a-select-option>
+                <a-select-option value="0">禁用</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -78,9 +80,20 @@
       :columns="columns"
       :data="loadData"
     >
-      <span slot="status" slot-scope="text">
-        <a-badge v-if="text==='正常'" status="success" :text="text" />
-        <a-badge v-if="text==='禁用'" status="error" :text="text" />
+      <span
+        slot="status"
+        slot-scope="text"
+      >
+        <a-badge
+          v-if="text==='正常'"
+          status="success"
+          :text="text"
+        />
+        <a-badge
+          v-if="text==='禁用'"
+          status="error"
+          :text="text"
+        />
       </span>
       <span
         slot="action"
@@ -89,7 +102,14 @@
         <template>
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
-          <a @click="handleDisable(record)">禁用</a>
+          <a
+            v-if="record.status==='正常'"
+            @click="handleDisable(record)"
+          >禁用</a>
+          <a
+            v-if="record.status==='禁用'"
+            @click="handleEnable(record)"
+          >启用</a>
         </template>
       </span>
     </s-table>
@@ -104,7 +124,7 @@
 <script>
 import { STable } from '@/components'
 import UserForm from './UserForm'
-import { getUsers } from '@/api/setting/user'
+import { getUsers, disableUser, enableUser } from '@/api/setting/user'
 import { getRoles } from '@/api/common'
 
 export default {
@@ -150,15 +170,15 @@ export default {
       roles: [],
 
       // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
-        return getUsers(Object.assign(parameter, this.queryParam)).then(res => {
+      loadData: (parameter) => {
+        return getUsers(Object.assign(parameter, this.queryParam)).then((res) => {
           return res.result
         })
       }
     }
   },
   created () {
-    getRoles({ t: new Date() }).then(res => {
+    getRoles({ t: new Date() }).then((res) => {
       this.roles = res
     })
   },
@@ -167,12 +187,56 @@ export default {
       this.$refs.userForm.add()
     },
     handleEdit (record) {
+      console.log(record)
       this.$refs.userForm.edit(record)
     },
     handleOk () {
       this.$refs.table.refresh()
     },
-    handleDisable (record) {}
+    handleDisable (record) {
+      const that = this
+      this.$confirm({
+        title: '警告',
+        content: `真的要禁用 ${record.name} 吗?`,
+        okText: '禁用',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk () {
+          disableUser(record)
+            .then((res) => {
+                if (res.code === 200) {
+                  that.$message.success(res.message)
+                } else if (res.code === -1) {
+                  that.$message.error(res.message)
+                }
+              that.$refs.table.refresh()
+            })
+            .catch((err) => {
+              that.$message.error(`load user err: ${err.message}`)
+            })
+        }
+      })
+    },
+    handleEnable (record) {
+      const that = this
+      this.$confirm({
+        title: '警告',
+        content: `真的要启用 ${record.name} 吗?`,
+        okText: '启用',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk () {
+          enableUser(record)
+            .then((res) => {
+              that.$message.success('启用成功')
+              that.$refs.table.refresh()
+            })
+            .catch((err) => {
+              that.$message.error(`load user err: ${err.message}`)
+            })
+        }
+      })
+    }
   }
 }
 </script>

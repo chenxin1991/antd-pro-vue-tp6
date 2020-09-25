@@ -29,3 +29,19 @@ export function getUsers (parameter) {
     params: parameter
   })
 }
+
+export function disableUser (parameter) {
+  return axios({
+    url: api.user + '/disable/' + parameter.id,
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function enableUser (parameter) {
+  return axios({
+    url: api.user + '/enable/' + parameter.id,
+    method: 'post',
+    data: parameter
+  })
+}
