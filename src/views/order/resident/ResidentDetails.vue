@@ -145,13 +145,22 @@
       <a-row>
         <a-col :span="24">
           <a-descriptions>
-            <a-descriptions-item v-if="changeCost>0" label="额外增加">
+            <a-descriptions-item
+              v-if="changeCost>0"
+              label="额外增加"
+            >
               {{ changeCost }}
             </a-descriptions-item>
-            <a-descriptions-item v-if="changeCost<0" label="额外减少">
+            <a-descriptions-item
+              v-if="changeCost<0"
+              label="额外减少"
+            >
               {{ changeCost }}
             </a-descriptions-item>
-            <a-descriptions-item v-if="costChangeRemark!==''" label="原因">
+            <a-descriptions-item
+              v-if="costChangeRemark!==''"
+              label="原因"
+            >
               {{ costChangeRemark }}
             </a-descriptions-item>
           </a-descriptions>
@@ -171,22 +180,52 @@
       </p>
       <a-row>
         <a-col :span="24">
-          <a-descriptions>
-            <a-descriptions-item label="评价">
-              评价内容
+          暂无评价
+          <a-descriptions bordered >
+            <a-descriptions-item label="评分">
+              {{ evaluateScore }}
             </a-descriptions-item>
-
+            <a-descriptions-item
+              label="内容"
+              :span="2"
+            >
+              <span v-if="evaluateContent.attitude" style="margin:5px;">服务态度好</span>
+              <span v-if="evaluateContent.professional" style="margin:5px;">货品完好</span>
+              <span v-if="evaluateContent.environment" style="margin:5px;">效率高</span>
+              <span v-if="evaluateContent.efficiency" style="margin:5px;">风雨无阻</span>
+              <span v-if="evaluateContent.time" style="margin:5px;">快速准时</span>
+            </a-descriptions-item>
+            <a-descriptions-item
+              label="图片"
+              :span="3"
+            >
+              <viewer :images="evaluateUrls">
+                <img
+                  v-for="(src,index) in evaluateUrls"
+                  :src="src"
+                  :key="index"
+                  class="evaluateStyle"
+                >
+              </viewer>
+            </a-descriptions-item>
+            <a-descriptions-item label="更多评价">
+              {{ evaluateRemark }}
+            </a-descriptions-item>
           </a-descriptions>
         </a-col>
       </a-row>
     </a-drawer>
+
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'ResidentDetails',
-  components: {},
+  components: {
+
+  },
   data () {
     return {
       visible: false,
@@ -281,7 +320,7 @@ export default {
           dataIndex: 'parking_distance',
           key: 'parking_distance',
           width: 120,
-           scopedSlots: { customRender: 'parking_distance' },
+          scopedSlots: { customRender: 'parking_distance' },
           ellipsis: true
         }
       ],
@@ -323,8 +362,11 @@ export default {
       ],
       goods_data: [],
       changeCost: '', // 额外增加/减少金额
-      costChangeRemark: ''// 修改金额备注
-
+      costChangeRemark: '', // 修改金额备注
+      evaluateScore: '',
+      evaluateContent: '',
+      evaluateUrls: [],
+      evaluateRemark: ''
     }
   },
 
@@ -336,7 +378,7 @@ export default {
 
   methods: {
     edit (record) {
-      console.log(record)
+      // console.log(record)
       this.visible = true
 
       this.source = record.source
@@ -358,6 +400,14 @@ export default {
       this.cars_data = record.cars
       this.routes_data = record.routes
       this.goods_data = record.goods
+
+      const evaluate = JSON.parse(record.comment)
+
+      // console.log(evaluate)
+      this.evaluateScore = evaluate.score
+      this.evaluateContent = evaluate.content
+      this.evaluateUrls = evaluate.imageUrls
+      this.evaluateRemark = evaluate.remark
     },
     onClose () {
       this.visible = false
@@ -365,9 +415,15 @@ export default {
   }
 }
 </script>
+
 <style lang='less' scoped>
 .goods-img {
   width: 70px;
   height: 70px;
+}
+.evaluateStyle{
+  width: 100px;
+  height: 100px;
+  margin: 10px;
 }
 </style>

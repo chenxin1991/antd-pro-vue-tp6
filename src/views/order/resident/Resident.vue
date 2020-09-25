@@ -144,7 +144,10 @@
         slot-scope="text, record"
       >
         <template>
-          <a @click="handleEdit(record)" :disabled="record.orderStatus==='已完工'">编辑</a>
+          <a
+            @click="handleEdit(record)"
+            :disabled="record.orderStatus==='待评价' || record.orderStatus==='已关闭' || record.orderStatus==='已取消' "
+          >编辑</a>
           <a-divider type="vertical" />
           <a @click="handleDetails(record)">详情</a>
           <a-divider type="vertical" />
@@ -283,8 +286,8 @@ export default {
         }
       ],
       // 加载数据方法 必须为 Promise 对象
-      loadData: (parameter) => {
-        return getResidentOrders(Object.assign(parameter, this.queryParam)).then((res) => {
+      loadData: parameter => {
+        return getResidentOrders(Object.assign(parameter, this.queryParam)).then(res => {
           return res.result
         })
       }
@@ -318,11 +321,11 @@ export default {
         cancelText: '取消',
         onOk () {
           delResidentOrder(record)
-            .then((res) => {
+            .then(res => {
               that.$message.success('删除成功')
               that.$refs.table.refresh()
             })
-            .catch((err) => {
+            .catch(err => {
               that.$message.error(`load user err: ${err.message}`)
             })
         }
@@ -345,11 +348,11 @@ export default {
         okType: 'danger',
         onOk () {
           confirmResidentOrders(record)
-            .then((res) => {
+            .then(res => {
               that.$message.success('确认成功')
               that.$refs.table.refresh()
             })
-            .catch((err) => {
+            .catch(err => {
               that.$message.error(`load user err: ${err.message}`)
             })
         }

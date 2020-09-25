@@ -12,6 +12,7 @@
         :form="form"
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
+
       >
         <a-form-item label="用户名">
           <a-input v-decorator="['username', { rules: [{ required: true, message: '请输入用户名！' }] }]" />
