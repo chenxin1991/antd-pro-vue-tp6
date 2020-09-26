@@ -19,7 +19,7 @@
             :md="6"
             :sm="24"
           >
-            <a-form-item label="日期范围">
+            <a-form-item label="下单日期">
               <a-range-picker @change="onChange1" />
             </a-form-item>
           </a-col>
@@ -41,34 +41,13 @@
         </a-row>
       </a-form>
     </div>
-
-    <div class="table-operator">
-      <a-button
-        type="primary"
-        @click="$refs.table.refresh(true)"
-      >刷新</a-button>
-    </div>
-
     <s-table
       ref="table"
       size="default"
-      rowKey="user_id"
+      rowKey="key"
       :columns="columns"
       :data="loadData"
     >
-      <template
-        slot="text"
-        slot-scope="text"
-      >
-        {{ text }}
-      </template>
-      <template
-        slot="gender"
-        slot-scope="text"
-      >
-        <span v-if="text==0">女</span>
-        <span v-if="text==1">男</span>
-      </template>
     </s-table>
 
   </a-card>
@@ -77,9 +56,10 @@
 <script>
 import moment from 'moment'
 import { STable } from '@/components'
+import { Telephone } from '@/api/statistics'
 
 export default {
-  name: 'WechatUser',
+  name: 'StatisticsTelephone',
   components: {
     STable
   },
@@ -92,32 +72,47 @@ export default {
       columns: [
         {
           title: '接线员',
-          dataIndex: 'user_id'
+          dataIndex: 'name'
         },
         {
           title: '总接单量',
-          dataIndex: 'avatarUrl',
-          scopedSlots: { customRender: 'avatarUrl' }
+          dataIndex: 'totalCount'
         },
         {
-          title: '成交单量',
-          dataIndex: 'nickName'
+          title: '已成交单量',
+          dataIndex: 'completedCount'
+        },
+        {
+          title: '进行中单量',
+          dataIndex: 'ongoingCount'
         },
         {
           title: '未成交单量',
-          dataIndex: 'gender',
-          scopedSlots: { customRender: 'gender' }
+          dataIndex: 'cancelCount'
         },
         {
-          title: '成交总金额',
-          dataIndex: 'country'
+          title: '接单总金额',
+          dataIndex: 'totalCost'
+        },
+        {
+          title: '已成交总金额',
+          dataIndex: 'completedCost'
+        },
+        {
+          title: '进行中总金额',
+          dataIndex: 'ongoingCost'
         },
         {
           title: '未成交总金额',
-          dataIndex: 'province'
+          dataIndex: 'cancelCost'
         }
       ],
-      loadData: ''
+      // 加载数据方法 必须为 Promise 对象
+      loadData: (parameter) => {
+        return Telephone(Object.assign(parameter, this.queryParam)).then(res => {
+          return res.result
+        })
+      }
     }
   },
   methods: {

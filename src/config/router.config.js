@@ -69,13 +69,13 @@ export const asyncRouterMap = [
             path: '/statistics/Telephone',
             name: 'StatisticsTelephone',
             component: () => import('@/views/statistics/Telephone'),
-            meta: { title: '接线员报表统计', keepAlive: true }
+            meta: { title: '接线员', keepAlive: true }
           },
           {
             path: '/statistics/Partner',
             name: 'StatisticsPartner',
             component: () => import('@/views/statistics/Partner'),
-            meta: { title: '合伙人报表统计', keepAlive: true }
+            meta: { title: '合伙人', keepAlive: true }
           }
         ]
       },

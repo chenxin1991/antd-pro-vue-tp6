@@ -19,7 +19,7 @@
             :md="6"
             :sm="24"
           >
-            <a-form-item label="日期范围">
+            <a-form-item label="完成日期">
               <a-range-picker @change="onChange1" />
             </a-form-item>
           </a-col>
@@ -41,14 +41,6 @@
         </a-row>
       </a-form>
     </div>
-
-    <div class="table-operator">
-      <a-button
-        type="primary"
-        @click="$refs.table.refresh(true)"
-      >刷新</a-button>
-    </div>
-
     <s-table
       ref="table"
       size="default"
@@ -79,7 +71,7 @@ import moment from 'moment'
 import { STable } from '@/components'
 
 export default {
-  name: 'WechatUser',
+  name: 'StatisticsPartner',
   components: {
     STable
   },
