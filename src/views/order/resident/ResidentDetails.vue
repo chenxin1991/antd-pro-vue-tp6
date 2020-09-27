@@ -180,7 +180,7 @@
       </p>
       <a-row>
         <a-col :span="24">
-          暂无评价
+
           <a-descriptions bordered >
             <a-descriptions-item label="评分">
               {{ evaluateScore }}
@@ -364,9 +364,9 @@ export default {
       changeCost: '', // 额外增加/减少金额
       costChangeRemark: '', // 修改金额备注
       evaluateScore: '',
-      evaluateContent: '',
-      evaluateUrls: [],
-      evaluateRemark: ''
+      evaluateContent: '', // 评价内容
+      evaluateUrls: [], // 评价图片路径
+      evaluateRemark: ''// 评价备注
     }
   },
 
@@ -401,13 +401,18 @@ export default {
       this.routes_data = record.routes
       this.goods_data = record.goods
 
+   if (record.comment) {
       const evaluate = JSON.parse(record.comment)
-
-      // console.log(evaluate)
       this.evaluateScore = evaluate.score
       this.evaluateContent = evaluate.content
       this.evaluateUrls = evaluate.imageUrls
       this.evaluateRemark = evaluate.remark
+   } else {
+      this.evaluateScore = ''
+      this.evaluateContent = ''
+      this.evaluateUrls = []
+      this.evaluateRemark = ''
+   }
     },
     onClose () {
       this.visible = false
