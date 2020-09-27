@@ -187,7 +187,7 @@ export default {
       this.$refs.userForm.add()
     },
     handleEdit (record) {
-      console.log(record)
+      // console.log(record)
       this.$refs.userForm.edit(record)
     },
     handleOk () {
