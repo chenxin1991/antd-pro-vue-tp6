@@ -49,7 +49,6 @@
       :data="loadData"
     >
     </s-table>
-
   </a-card>
 </template>
 

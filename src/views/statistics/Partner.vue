@@ -19,7 +19,7 @@
             :md="6"
             :sm="24"
           >
-            <a-form-item label="完成日期">
+            <a-form-item label="下单日期">
               <a-range-picker @change="onChange1" />
             </a-form-item>
           </a-col>
@@ -44,31 +44,18 @@
     <s-table
       ref="table"
       size="default"
-      rowKey="user_id"
+      rowKey="key"
       :columns="columns"
       :data="loadData"
     >
-      <template
-        slot="text"
-        slot-scope="text"
-      >
-        {{ text }}
-      </template>
-      <template
-        slot="gender"
-        slot-scope="text"
-      >
-        <span v-if="text==0">女</span>
-        <span v-if="text==1">男</span>
-      </template>
     </s-table>
-
   </a-card>
 </template>
 
 <script>
 import moment from 'moment'
 import { STable } from '@/components'
+import { Partner } from '@/api/statistics'
 
 export default {
   name: 'StatisticsPartner',
@@ -83,44 +70,48 @@ export default {
       // 表头
       columns: [
         {
-          title: '队长',
-          dataIndex: 'user_id'
+          title: '接线员',
+          dataIndex: 'name'
         },
         {
-          title: '接单总数',
-          dataIndex: 'avatarUrl',
-          scopedSlots: { customRender: 'avatarUrl' }
+          title: '总接单量',
+          dataIndex: 'totalCount'
         },
         {
-          title: '已完成订单数',
-          dataIndex: 'nickName'
+          title: '已成交单量',
+          dataIndex: 'completedCount'
         },
         {
-          title: '已完成总金额',
-          dataIndex: 'gender',
-          scopedSlots: { customRender: 'gender' }
+          title: '进行中单量',
+          dataIndex: 'ongoingCount'
         },
         {
-          title: '待完成订单数',
-          dataIndex: 'country'
+          title: '未成交单量',
+          dataIndex: 'cancelCount'
         },
         {
-          title: '待完成总金额',
-          dataIndex: 'province'
+          title: '接单总金额',
+          dataIndex: 'totalCost'
         },
         {
-          title: '好评数',
-          dataIndex: 'country'
+          title: '已成交总金额',
+          dataIndex: 'completedCost'
         },
         {
-          title: '中评数',
-          dataIndex: 'province'
-        }, {
-          title: '差评数',
-          dataIndex: 'country'
+          title: '进行中总金额',
+          dataIndex: 'ongoingCost'
+        },
+        {
+          title: '未成交总金额',
+          dataIndex: 'cancelCost'
         }
       ],
-      loadData: ''
+      // 加载数据方法 必须为 Promise 对象
+      loadData: (parameter) => {
+        return Partner(Object.assign(parameter, this.queryParam)).then(res => {
+          return res.result
+        })
+      }
     }
   },
   methods: {
