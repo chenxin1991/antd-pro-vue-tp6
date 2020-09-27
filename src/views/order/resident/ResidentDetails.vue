@@ -18,21 +18,21 @@
         <a-col :span="24">
           <a-descriptions>
             <a-descriptions-item label="订单来源">
-              <span v-if="source===1">来电</span>
-              <span v-if="source===2">上门</span>
-              <span v-if="source===3">小程序</span>
+              <span v-if="record.source===1">来电</span>
+              <span v-if="record.source===2">上门</span>
+              <span v-if="record.source===3">小程序</span>
             </a-descriptions-item>
             <a-descriptions-item label="客户名">
-              {{ customer }}
+              {{ record.customer }}
             </a-descriptions-item>
             <a-descriptions-item label="联系电话">
-              {{ phone }}
+              {{ record.phone }}
             </a-descriptions-item>
             <a-descriptions-item label="预约日期">
-              {{ appointDate }}
+              {{ record.appointDate }}
             </a-descriptions-item>
             <a-descriptions-item label="时间段">
-              {{ appointTime }}
+              {{ record.appointTime }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -119,25 +119,25 @@
         <a-col :span="24">
           <a-descriptions>
             <a-descriptions-item label="车辆费用">
-              {{ carCost }}
+              {{ record.carCost }}元
             </a-descriptions-item>
             <a-descriptions-item label="特殊时间段费用">
-              {{ specialTimeCost }}
+              {{ record.specialTimeCost }}元
             </a-descriptions-item>
             <a-descriptions-item label="实际距离">
-              {{ distance }}公里
+              {{ record.distance }}公里
             </a-descriptions-item>
             <a-descriptions-item label="距离费用">
-              {{ distanceCost }}
+              {{ record.distanceCost }}元
             </a-descriptions-item>
             <a-descriptions-item label="楼层费用">
-              {{ floorCost }}
+              {{ record.floorCost }}元
             </a-descriptions-item>
             <a-descriptions-item label="停车距离费用">
-              {{ parkingCost }}
+              {{ record.parkingCost }}元
             </a-descriptions-item>
             <a-descriptions-item label="物品费用">
-              {{ goodsCost }}
+              {{ record.goodsCost }}元
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -146,22 +146,22 @@
         <a-col :span="24">
           <a-descriptions>
             <a-descriptions-item
-              v-if="changeCost>0"
+              v-if="record.changeCost>0"
               label="额外增加"
             >
-              {{ changeCost }}
+              {{ record.changeCost }}元
             </a-descriptions-item>
             <a-descriptions-item
-              v-if="changeCost<0"
+              v-if="record.changeCost<0"
               label="额外减少"
             >
-              {{ changeCost }}
+              {{ record.changeCost }}元
             </a-descriptions-item>
             <a-descriptions-item
-              v-if="costChangeRemark!==''"
+              v-if="record.costChangeRemark!==''"
               label="原因"
             >
-              {{ costChangeRemark }}
+              {{ record.costChangeRemark }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -170,7 +170,7 @@
         <a-col :span="24">
           <a-descriptions>
             <a-descriptions-item label="总价">
-              {{ totalCost }}
+              {{ record.totalCost }}元
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -181,27 +181,42 @@
       <a-row>
         <a-col :span="24">
 
-          <a-descriptions bordered >
+          <a-descriptions bordered>
             <a-descriptions-item label="评分">
-              {{ evaluateScore }}
+              {{ evaluate.score }}<span v-if="evaluate.score">（分）</span>
             </a-descriptions-item>
             <a-descriptions-item
               label="内容"
               :span="2"
             >
-              <span v-if="evaluateContent.attitude" style="margin:5px;">服务态度好</span>
-              <span v-if="evaluateContent.professional" style="margin:5px;">货品完好</span>
-              <span v-if="evaluateContent.environment" style="margin:5px;">效率高</span>
-              <span v-if="evaluateContent.efficiency" style="margin:5px;">风雨无阻</span>
-              <span v-if="evaluateContent.time" style="margin:5px;">快速准时</span>
+              <span
+                v-if="evaluateContent.attitude"
+                style="margin:5px;"
+              >服务态度好</span>
+              <span
+                v-if="evaluateContent.professional"
+                style="margin:5px;"
+              >货品完好</span>
+              <span
+                v-if="evaluateContent.environment"
+                style="margin:5px;"
+              >效率高</span>
+              <span
+                v-if="evaluateContent.efficiency"
+                style="margin:5px;"
+              >风雨无阻</span>
+              <span
+                v-if="evaluateContent.time"
+                style="margin:5px;"
+              >快速准时</span>
             </a-descriptions-item>
             <a-descriptions-item
               label="图片"
               :span="3"
             >
-              <viewer :images="evaluateUrls">
+              <viewer :images="evaluate.imageUrls">
                 <img
-                  v-for="(src,index) in evaluateUrls"
+                  v-for="(src,index) in evaluate.imageUrls"
                   :src="src"
                   :key="index"
                   class="evaluateStyle"
@@ -209,7 +224,7 @@
               </viewer>
             </a-descriptions-item>
             <a-descriptions-item label="更多评价">
-              {{ evaluateRemark }}
+              {{ evaluate.remark }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -220,15 +235,13 @@
 </template>
 
 <script>
-
 export default {
   name: 'ResidentDetails',
-  components: {
-
-  },
+  components: {},
   data () {
     return {
       visible: false,
+      record: {},
       pStyle: {
         fontSize: '16px',
         color: 'rgba(0,0,0,0.85)',
@@ -240,26 +253,6 @@ export default {
       pStyle2: {
         marginBottom: '24px'
       },
-      // 预约
-      source: '',
-      customer: '',
-      phone: '',
-      appointDate: '',
-      appointTime: '',
-      // 车辆
-      cars: [],
-      // 起始地
-      routes: [],
-      distance: '',
-      // 物品
-      goods: [],
-      carCost: '',
-      specialTimeCost: '',
-      distanceCost: '',
-      floorCost: '',
-      parkingCost: '',
-      goodsCost: '',
-      totalCost: '',
       cars_columns: [
         {
           title: '车型',
@@ -361,12 +354,8 @@ export default {
         }
       ],
       goods_data: [],
-      changeCost: '', // 额外增加/减少金额
-      costChangeRemark: '', // 修改金额备注
-      evaluateScore: '',
-      evaluateContent: '', // 评价内容
-      evaluateUrls: [], // 评价图片路径
-      evaluateRemark: ''// 评价备注
+      evaluate: {}, // 订单评价
+      evaluateContent: {} // 评价内容
     }
   },
 
@@ -380,39 +369,20 @@ export default {
     edit (record) {
       // console.log(record)
       this.visible = true
-
-      this.source = record.source
-      this.customer = record.customer
-      this.phone = record.phone
-      this.appointDate = record.appointDate
-      this.appointTime = record.appointTime
-      this.distance = record.distance
-      this.carCost = record.carCost
-      this.specialTimeCost = record.specialTimeCost
-      this.distanceCost = record.distanceCost
-      this.floorCost = record.floorCost
-      this.parkingCost = record.parkingCost
-      this.goodsCost = record.goodsCost
-      this.totalCost = record.totalCost
-      this.changeCost = record.changeCost
-      this.costChangeRemark = record.costChangeRemark
+      this.record = record
 
       this.cars_data = record.cars
       this.routes_data = record.routes
       this.goods_data = record.goods
 
-   if (record.comment) {
-      const evaluate = JSON.parse(record.comment)
-      this.evaluateScore = evaluate.score
-      this.evaluateContent = evaluate.content
-      this.evaluateUrls = evaluate.imageUrls
-      this.evaluateRemark = evaluate.remark
-   } else {
-      this.evaluateScore = ''
-      this.evaluateContent = ''
-      this.evaluateUrls = []
-      this.evaluateRemark = ''
-   }
+      if (record.comment) {
+        const evaluate = JSON.parse(record.comment)
+        this.evaluate = evaluate
+        this.evaluateContent = evaluate.content
+      } else {
+        this.evaluate = {}
+        this.evaluateContent = {}
+      }
     },
     onClose () {
       this.visible = false
@@ -426,7 +396,7 @@ export default {
   width: 70px;
   height: 70px;
 }
-.evaluateStyle{
+.evaluateStyle {
   width: 100px;
   height: 100px;
   margin: 10px;
