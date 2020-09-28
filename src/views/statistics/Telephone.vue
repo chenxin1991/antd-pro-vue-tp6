@@ -53,7 +53,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import { STable } from '@/components'
 import { Telephone } from '@/api/statistics'
 
@@ -115,7 +114,6 @@ export default {
     }
   },
   methods: {
-      moment,
     handleOk () {
       this.$refs.table.refresh()
     },
