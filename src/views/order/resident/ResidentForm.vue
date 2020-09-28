@@ -19,7 +19,6 @@
       <a-button
         key="submit"
         type="primary"
-        :loading="confirmLoading"
         @click="handleSubmit"
       >
         确定
