@@ -110,12 +110,18 @@ export default {
       confirmLoading: false,
       config: {},
       form: {
-        name: '',
-        phone: ''
+        source: '',
+        company: '',
+        linkman: '',
+        phone: '',
+        describe: ''
       },
       rules: {
-        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-        phone: [{ required: true, validator: validatorPhone, trigger: 'blur' }]
+        source: [{ required: true, message: '请选择订单来源', trigger: 'blur' }],
+        company: [{ required: true, message: '请输入单位名称', trigger: 'blur' }],
+        linkman: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
+        phone: [{ required: true, validator: validatorPhone, trigger: 'blur' }],
+        describe: [{ required: true, message: '请输入描述', trigger: 'blur' }]
       }
     }
   },
@@ -123,7 +129,7 @@ export default {
   methods: {
     add () {
       this.config.action = 'add'
-      this.config.title = '新增队长'
+      this.config.title = '新增订单'
       this.visible = true
       this.$nextTick(() => {
         this.form.resetFields()
@@ -131,7 +137,7 @@ export default {
     },
     edit (record) {
       this.config.action = 'edit'
-      this.config.title = '编辑队长'
+      this.config.title = '编辑订单'
       this.config.id = record.id
       this.visible = true
       this.form = JSON.parse(JSON.stringify(record))
