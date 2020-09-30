@@ -17,10 +17,9 @@
       >
         <a-form-model-item
           ref="source"
-          label="来源"
+          label="订单来源"
           prop="source"
         >
-          <!-- <a-input placeholder="请选择订单来源" v-model="form.name" /> -->
           <a-select
             allowClear
             v-model="form.source"
@@ -39,28 +38,42 @@
           label="单位名称"
           prop="company"
         >
-          <a-input placeholder="请输入单位名称" v-model="form.company" />
+          <a-input
+            placeholder="请输入单位名称"
+            v-model="form.company"
+          />
         </a-form-model-item>
+
         <a-form-model-item
           ref="linkman"
           label="联系人"
           prop="linkman"
         >
-          <a-input placeholder="请输入联系人" v-model="form.linkman" />
+          <a-input
+            placeholder="请输入联系人"
+            v-model="form.linkman"
+          />
         </a-form-model-item>
         <a-form-model-item
           ref="phone"
           label="联系电话"
           prop="phone"
         >
-          <a-input placeholder="请输入联系电话" v-model="form.phone" />
+          <a-input
+            placeholder="请输入联系电话"
+            v-model="form.phone"
+          />
         </a-form-model-item>
         <a-form-model-item
           ref="describe"
           label="描述"
           prop="describe"
         >
-          <a-textarea placeholder="请输入描述" auto-size v-model="form.describe"/>
+          <a-textarea
+            placeholder="请输入描述"
+            :auto-size="{ minRows: 3, maxRows: 6 }"
+            v-model="form.describe"
+          />
         </a-form-model-item>
 
       </a-form-model>
@@ -167,7 +180,4 @@ export default {
 }
 </script>
 <style lang='less' scoped>
-/deep/.ant-calendar-picker{
-  width: 100%;
-}
 </style>

@@ -8,6 +8,29 @@
             :md="6"
             :sm="24"
           >
+            <a-form-item label="订单号/客户名/手机号">
+              <a-input
+                v-model="queryParam.keyword"
+                @keyup.enter.native="$refs.table.refresh(true)"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col
+            :md="6"
+            :sm="24"
+          >
+            <a-form-item label="单位名称">
+              <a-input
+                v-model="queryParam.company"
+                placeholder="请输入单位名称"
+                @keyup.enter.native="$refs.table.refresh(true)"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col
+            :md="6"
+            :sm="24"
+          >
             <a-form-item label="订单来源">
               <a-select
                 allowClear
@@ -21,29 +44,6 @@
                 <a-select-option value="5">合作伙伴介绍项目</a-select-option>
                 <a-select-option value="6">其他来源</a-select-option>
               </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col
-            :md="6"
-            :sm="24"
-          >
-            <a-form-item label="企业名称">
-              <a-input
-                v-model="queryParam.company"
-                placeholder="请输入企业名称"
-                @keyup.enter.native="$refs.table.refresh(true)"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col
-            :md="6"
-            :sm="24"
-          >
-            <a-form-item label="订单号/客户名/手机号">
-              <a-input
-                v-model="queryParam.keyword"
-                @keyup.enter.native="$refs.table.refresh(true)"
-              />
             </a-form-item>
           </a-col>
 
@@ -115,23 +115,24 @@ export default {
       queryParam: {},
       // 表头
       columns: [
+         {
+          title: '订单号',
+          dataIndex: 'orderNumber'
+        },
+
         {
-          title: '来源',
+          title: '订单来源',
           dataIndex: 'source'
         },
-          {
+         {
           title: '单位名称',
           dataIndex: 'company'
         },
         {
-          title: '订单号',
-          dataIndex: 'orderNumber'
-        },
-         {
           title: '联系人',
           dataIndex: 'linkman'
         },
-          {
+        {
           title: '联系电话',
           dataIndex: 'phone'
         },
@@ -139,7 +140,8 @@ export default {
         {
           title: '描述',
           dataIndex: 'describe'
-        }, {
+        },
+        {
           title: '下单手机号',
           dataIndex: 'orderMobile'
         },
