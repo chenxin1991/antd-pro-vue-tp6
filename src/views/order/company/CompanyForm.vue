@@ -34,24 +34,24 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item
-          ref="company"
+          ref="name"
           label="单位名称"
-          prop="company"
+          prop="name"
         >
           <a-input
             placeholder="请输入单位名称"
-            v-model="form.company"
+            v-model="form.name"
           />
         </a-form-model-item>
 
         <a-form-model-item
-          ref="linkman"
+          ref="customer"
           label="联系人"
-          prop="linkman"
+          prop="customer"
         >
           <a-input
             placeholder="请输入联系人"
-            v-model="form.linkman"
+            v-model="form.customer"
           />
         </a-form-model-item>
         <a-form-model-item
@@ -65,14 +65,14 @@
           />
         </a-form-model-item>
         <a-form-model-item
-          ref="describe"
+          ref="description"
           label="描述"
-          prop="describe"
+          prop="description"
         >
           <a-textarea
             placeholder="请输入描述"
             :auto-size="{ minRows: 3, maxRows: 6 }"
-            v-model="form.describe"
+            v-model="form.description"
           />
         </a-form-model-item>
 
@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { addLeader, editLeader } from '@/api/basic/leader'
+import { addCompanyOrder, editCompanyOrder } from '@/api/order/company'
 export default {
   data () {
     // 手机格式验证
@@ -111,17 +111,17 @@ export default {
       config: {},
       form: {
         source: '',
-        company: '',
-        linkman: '',
+        name: '',
+        customer: '',
         phone: '',
-        describe: ''
+        description: ''
       },
       rules: {
         source: [{ required: true, message: '请选择订单来源', trigger: 'blur' }],
-        company: [{ required: true, message: '请输入单位名称', trigger: 'blur' }],
-        linkman: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
+        name: [{ required: true, message: '请输入单位名称', trigger: 'blur' }],
+        customer: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
         phone: [{ required: true, validator: validatorPhone, trigger: 'blur' }],
-        describe: [{ required: true, message: '请输入描述', trigger: 'blur' }]
+        description: [{ required: true, message: '请输入描述', trigger: 'blur' }]
       }
     }
   },
@@ -144,13 +144,16 @@ export default {
     },
     handleSubmit () {
       const values = {
+        source: this.form.source,
         name: this.form.name,
-        phone: this.form.phone
+        customer: this.form.customer,
+        phone: this.form.phone,
+        description: this.form.description
       }
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
           if (this.config.action === 'add') {
-            addLeader(values)
+            addCompanyOrder(values)
               .then(res => {
                 this.$message.success('添加成功')
                 this.visible = false
@@ -162,7 +165,7 @@ export default {
               })
           } else if (this.config.action === 'edit') {
             values.id = this.config.id
-            editLeader(values)
+            editCompanyOrder(values)
               .then(res => {
                 this.$message.success('修改成功')
                 this.visible = false

@@ -8,21 +8,9 @@
             :md="6"
             :sm="24"
           >
-            <a-form-item label="订单号/客户名/手机号">
+            <a-form-item label="订单号/单位名称/联系电话">
               <a-input
                 v-model="queryParam.keyword"
-                @keyup.enter.native="$refs.table.refresh(true)"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col
-            :md="6"
-            :sm="24"
-          >
-            <a-form-item label="单位名称">
-              <a-input
-                v-model="queryParam.company"
-                placeholder="请输入单位名称"
                 @keyup.enter.native="$refs.table.refresh(true)"
               />
             </a-form-item>
@@ -80,6 +68,17 @@
       :columns="columns"
       :data="loadData"
     >
+      <template
+        slot="source"
+        slot-scope="text"
+      >
+        <template v-if="text==1">员工或朋友推荐</template>
+        <template v-if="text==2">客户打电话到前台</template>
+        <template v-if="text==3">小程序下单</template>
+        <template v-if="text==4">提前介入项目</template>
+        <template v-if="text==5">合作伙伴介绍项目</template>
+        <template v-if="text==6">其他来源</template>
+      </template>
       <span
         slot="action"
         slot-scope="text, record"
@@ -101,7 +100,7 @@
 <script>
 import { STable } from '@/components'
 import CompanyForm from './CompanyForm'
-import { getLeaders, delLeader } from '@/api/basic/leader'
+import { getCompanyOrders, delCompanyOrder } from '@/api/order/company'
 
 export default {
   name: 'Company',
@@ -115,39 +114,38 @@ export default {
       queryParam: {},
       // 表头
       columns: [
-         {
+        {
           title: '订单号',
-          dataIndex: 'orderNumber'
+          dataIndex: 'number'
         },
-
         {
           title: '订单来源',
-          dataIndex: 'source'
+          dataIndex: 'source',
+          scopedSlots: { customRender: 'source' }
         },
-         {
+        {
           title: '单位名称',
-          dataIndex: 'company'
+          dataIndex: 'name'
         },
         {
           title: '联系人',
-          dataIndex: 'linkman'
+          dataIndex: 'customer'
         },
         {
           title: '联系电话',
           dataIndex: 'phone'
         },
-
         {
           title: '描述',
-          dataIndex: 'describe'
+          dataIndex: 'description'
         },
         {
           title: '下单手机号',
-          dataIndex: 'orderMobile'
+          dataIndex: 'userMobile'
         },
         {
           title: '下单时间',
-          dataIndex: 'orderTime'
+          dataIndex: 'create_time'
         },
         {
           title: '操作',
@@ -158,8 +156,8 @@ export default {
       ],
       roles: [],
       // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
-        return getLeaders(Object.assign(parameter, this.queryParam)).then(res => {
+      loadData: (parameter) => {
+        return getCompanyOrders(Object.assign(parameter, this.queryParam)).then((res) => {
           return res.result
         })
       }
@@ -179,17 +177,17 @@ export default {
       const that = this
       this.$confirm({
         title: '警告',
-        content: `真的要删除 ${record.name} 吗?`,
+        content: `真的要删除 ${record.number} 吗?`,
         okText: '删除',
         okType: 'danger',
         cancelText: '取消',
         onOk () {
-          delLeader(record)
-            .then(res => {
+          delCompanyOrder(record)
+            .then((res) => {
               that.$message.success('删除成功')
               that.$refs.table.refresh()
             })
-            .catch(err => {
+            .catch((err) => {
               that.$message.error(`load user err: ${err.message}`)
             })
         }
