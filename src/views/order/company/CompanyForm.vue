@@ -132,7 +132,8 @@ export default {
       this.config.title = '新增订单'
       this.visible = true
       this.$nextTick(() => {
-        this.form.resetFields()
+      this.form = {}
+      this.$refs.ruleForm.resetFields()
       })
     },
     edit (record) {
@@ -141,6 +142,12 @@ export default {
       this.config.id = record.id
       this.visible = true
       this.form = JSON.parse(JSON.stringify(record))
+      if (this.form.source === 1) this.form.source = '员工或朋友推荐'
+      if (this.form.source === 2) this.form.source = '客户打电话到前台'
+      if (this.form.source === 3) this.form.source = '小程序下单'
+      if (this.form.source === 4) this.form.source = '提前介入项目'
+      if (this.form.source === 5) this.form.source = '合作伙伴介绍项目'
+      if (this.form.source === 6) this.form.source = '其他来源'
     },
     handleSubmit () {
       const values = {
@@ -159,6 +166,7 @@ export default {
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)
+                this.form = {}
               })
               .catch(err => {
                 this.$message.error(`${err.message}`)
@@ -184,6 +192,7 @@ export default {
     },
     handleCancel () {
       this.visible = false
+      this.$refs.ruleForm.resetFields()
     }
   }
 }
