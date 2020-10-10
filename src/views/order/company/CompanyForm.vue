@@ -23,6 +23,7 @@
           <a-select
             allowClear
             v-model="form.source"
+            :label="form.source"
             placeholder="请选择订单来源"
           >
             <a-select-option value="1">员工或朋友推荐</a-select-option>
@@ -132,8 +133,8 @@ export default {
       this.config.title = '新增订单'
       this.visible = true
       this.$nextTick(() => {
-      this.form = {}
-      this.$refs.ruleForm.resetFields()
+        this.form = {}
+        this.$refs.ruleForm.resetFields()
       })
     },
     edit (record) {
@@ -142,12 +143,7 @@ export default {
       this.config.id = record.id
       this.visible = true
       this.form = JSON.parse(JSON.stringify(record))
-      if (this.form.source === 1) this.form.source = '员工或朋友推荐'
-      if (this.form.source === 2) this.form.source = '客户打电话到前台'
-      if (this.form.source === 3) this.form.source = '小程序下单'
-      if (this.form.source === 4) this.form.source = '提前介入项目'
-      if (this.form.source === 5) this.form.source = '合作伙伴介绍项目'
-      if (this.form.source === 6) this.form.source = '其他来源'
+      this.form.source = this.form.source + ''
     },
     handleSubmit () {
       const values = {
@@ -157,6 +153,7 @@ export default {
         phone: this.form.phone,
         description: this.form.description
       }
+
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
           if (this.config.action === 'add') {
