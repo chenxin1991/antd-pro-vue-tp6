@@ -155,14 +155,12 @@ export default {
       })
     },
     edit (record) {
-      console.log(record)
       this.config.action = 'edit'
       this.config.title = '编辑订单'
       this.config.id = record.id
       this.visible = true
       this.form = JSON.parse(JSON.stringify(record))
       this.form.type = this.form.type.toString()
-      console.log(this.form.type)
       this.form.source = this.form.source.toString()
     },
     handleSubmit () {
@@ -174,7 +172,6 @@ export default {
         phone: this.form.phone,
         description: this.form.description
       }
-           console.log('values', values)
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
           if (this.config.action === 'add') {
