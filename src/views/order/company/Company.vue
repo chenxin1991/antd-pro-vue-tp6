@@ -137,7 +137,8 @@ export default {
         },
         {
           title: '描述',
-          dataIndex: 'description'
+          dataIndex: 'description',
+          ellipsis: true
         },
         {
           title: '下单手机号',
