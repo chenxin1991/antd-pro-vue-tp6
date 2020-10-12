@@ -25,12 +25,11 @@
                 v-model="queryParam.source"
                 placeholder="请选择"
               >
-                <a-select-option value="1">员工或朋友推荐</a-select-option>
-                <a-select-option value="2">客户打电话到前台</a-select-option>
-                <a-select-option value="3">小程序下单</a-select-option>
-                <a-select-option value="4">提前介入项目</a-select-option>
-                <a-select-option value="5">合作伙伴介绍项目</a-select-option>
-                <a-select-option value="6">其他来源</a-select-option>
+                <a-select-option value="1">项目公告</a-select-option>
+                <a-select-option value="2">前台电话</a-select-option>
+                <a-select-option value="3">平台系统</a-select-option>
+                <a-select-option value="4">第三方推荐</a-select-option>
+                <a-select-option value="5">其他来源</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -72,12 +71,11 @@
         slot="source"
         slot-scope="text"
       >
-        <template v-if="text==1">员工或朋友推荐</template>
-        <template v-if="text==2">客户打电话到前台</template>
-        <template v-if="text==3">小程序下单</template>
-        <template v-if="text==4">提前介入项目</template>
-        <template v-if="text==5">合作伙伴介绍项目</template>
-        <template v-if="text==6">其他来源</template>
+        <template v-if="text==1">项目公告</template>
+        <template v-if="text==2">前台电话</template>
+        <template v-if="text==3">平台系统</template>
+        <template v-if="text==4">第三方推荐</template>
+        <template v-if="text==5">其他来源</template>
       </template>
       <span
         slot="action"
