@@ -16,6 +16,22 @@
         :wrapper-col="wrapperCol"
       >
         <a-form-model-item
+          ref="type"
+          label="订单类型"
+          prop="type"
+        >
+          <a-select
+            allowClear
+            v-model="form.type"
+            :label="form.type"
+            placeholder="请选择订单类型"
+          >
+            <a-select-option value="1">投标项目</a-select-option>
+            <a-select-option value="2">竞价项目</a-select-option>
+            <a-select-option value="3">常规项目</a-select-option>
+          </a-select>
+        </a-form-model-item>
+        <a-form-model-item
           ref="source"
           label="订单来源"
           prop="source"
@@ -110,6 +126,7 @@ export default {
       confirmLoading: false,
       config: {},
       form: {
+        type: '',
         source: '',
         name: '',
         customer: '',
@@ -117,7 +134,8 @@ export default {
         description: ''
       },
       rules: {
-        source: [{ required: true, message: '请选择订单来源', trigger: 'blur' }],
+         type: [{ required: true, message: '请选择订单类型', trigger: ['change', 'blur'] }],
+        source: [{ required: true, message: '请选择订单来源', trigger: ['change', 'blur'] }],
         name: [{ required: true, message: '请输入单位名称', trigger: 'blur' }],
         customer: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
         phone: [{ required: true, validator: validatorPhone, trigger: 'blur' }],
@@ -137,22 +155,26 @@ export default {
       })
     },
     edit (record) {
+      console.log(record)
       this.config.action = 'edit'
       this.config.title = '编辑订单'
       this.config.id = record.id
       this.visible = true
       this.form = JSON.parse(JSON.stringify(record))
-      this.form.source = this.form.source + ''
+      this.form.type = this.form.type.toString()
+      console.log(this.form.type)
+      this.form.source = this.form.source.toString()
     },
     handleSubmit () {
       const values = {
+          type: this.form.type,
         source: this.form.source,
         name: this.form.name,
         customer: this.form.customer,
         phone: this.form.phone,
         description: this.form.description
       }
-
+           console.log('values', values)
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
           if (this.config.action === 'add') {

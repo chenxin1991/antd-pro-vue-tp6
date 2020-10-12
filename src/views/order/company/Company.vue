@@ -19,6 +19,22 @@
             :md="6"
             :sm="24"
           >
+            <a-form-item label="订单类型">
+              <a-select
+                allowClear
+                v-model="queryParam.type"
+                placeholder="请选择"
+              >
+                <a-select-option value="1">投标项目</a-select-option>
+                <a-select-option value="2">竞价项目</a-select-option>
+                <a-select-option value="3">常规项目</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col
+            :md="6"
+            :sm="24"
+          >
             <a-form-item label="订单来源">
               <a-select
                 allowClear
@@ -68,6 +84,14 @@
       :data="loadData"
     >
       <template
+        slot="type"
+        slot-scope="text"
+      >
+        <template v-if="text==1">投标项目</template>
+        <template v-if="text==2">竞价项目</template>
+        <template v-if="text==3">常规项目</template>
+      </template>
+      <template
         slot="source"
         slot-scope="text"
       >
@@ -84,7 +108,31 @@
         <template>
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
-          <a @click="handleDelete(record)">删除</a>
+          <a @click="handleDetails(record)">详情</a>
+          <a-divider type="vertical" />
+          <a-dropdown>
+            <a class="ant-dropdown-link">
+              更多
+              <a-icon type="down" />
+            </a>
+            <a-menu slot="overlay">
+              <a-menu-item >
+                <a @click="handleConfirm(record)">确认</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="handleCancel(record)">取消</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="handleDispatch(record)">派单</a>
+              </a-menu-item>
+              <!-- <a-menu-item>
+                <a @click="handleGrap(record)">抢单</a>
+              </a-menu-item> -->
+              <a-menu-item>
+                <a @click="handleDelete(record)">删除</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
         </template>
       </span>
     </s-table>
@@ -115,6 +163,11 @@ export default {
         {
           title: '订单号',
           dataIndex: 'number'
+        },
+         {
+          title: '订单类型',
+          dataIndex: 'type',
+          scopedSlots: { customRender: 'type' }
         },
         {
           title: '订单来源',
@@ -149,7 +202,7 @@ export default {
         {
           title: '操作',
           dataIndex: 'action',
-          width: '150px',
+          width: '180px',
           scopedSlots: { customRender: 'action' }
         }
       ],
@@ -157,6 +210,7 @@ export default {
       // 加载数据方法 必须为 Promise 对象
       loadData: (parameter) => {
         return getCompanyOrders(Object.assign(parameter, this.queryParam)).then((res) => {
+          console.log(res.result)
           return res.result
         })
       }
