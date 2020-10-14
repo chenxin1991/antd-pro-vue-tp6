@@ -59,7 +59,6 @@
             v-model="form.name"
           />
         </a-form-model-item>
-
         <a-form-model-item
           ref="customer"
           label="联系人"

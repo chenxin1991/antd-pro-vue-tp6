@@ -140,19 +140,22 @@
       ref="CompanyForm"
       @ok="handleOk"
     />
+    <CompanyDetails ref="CompanyDetails" @ok="handleOk"></CompanyDetails>
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
 import CompanyForm from './CompanyForm'
+import CompanyDetails from './CompanyDetails'
 import { getCompanyOrders, delCompanyOrder } from '@/api/order/company'
 
 export default {
   name: 'Company',
   components: {
     STable,
-    CompanyForm
+    CompanyForm,
+    CompanyDetails
   },
   data () {
     return {
@@ -210,7 +213,6 @@ export default {
       // 加载数据方法 必须为 Promise 对象
       loadData: (parameter) => {
         return getCompanyOrders(Object.assign(parameter, this.queryParam)).then((res) => {
-          console.log(res.result)
           return res.result
         })
       }
@@ -245,6 +247,9 @@ export default {
             })
         }
       })
+    },
+    handleDetails (record) {
+      this.$refs.CompanyDetails.edit(record)
     }
   }
 }
