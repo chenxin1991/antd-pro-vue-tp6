@@ -133,7 +133,7 @@ export default {
         description: ''
       },
       rules: {
-         type: [{ required: true, message: '请选择订单类型', trigger: ['change', 'blur'] }],
+        type: [{ required: true, message: '请选择订单类型', trigger: ['change', 'blur'] }],
         source: [{ required: true, message: '请选择订单来源', trigger: ['change', 'blur'] }],
         name: [{ required: true, message: '请输入单位名称', trigger: 'blur' }],
         customer: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
@@ -164,37 +164,37 @@ export default {
     },
     handleSubmit () {
       const values = {
-          type: this.form.type,
+        type: this.form.type,
         source: this.form.source,
         name: this.form.name,
         customer: this.form.customer,
         phone: this.form.phone,
         description: this.form.description
       }
-      this.$refs.ruleForm.validate(valid => {
+      this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           if (this.config.action === 'add') {
             addCompanyOrder(values)
-              .then(res => {
+              .then((res) => {
                 this.$message.success('添加成功')
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)
                 this.form = {}
               })
-              .catch(err => {
+              .catch((err) => {
                 this.$message.error(`${err.message}`)
               })
           } else if (this.config.action === 'edit') {
             values.id = this.config.id
             editCompanyOrder(values)
-              .then(res => {
+              .then((res) => {
                 this.$message.success('修改成功')
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)
               })
-              .catch(err => {
+              .catch((err) => {
                 this.$message.error(`${err.message}`)
               })
           }

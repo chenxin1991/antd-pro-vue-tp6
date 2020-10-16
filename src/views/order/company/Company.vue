@@ -101,6 +101,18 @@
         <template v-if="text==4">第三方推荐</template>
         <template v-if="text==5">其他来源</template>
       </template>
+      <template
+        slot="status"
+        slot-scope="text"
+      >
+        <template v-if="text==0">待派单</template>
+        <template v-if="text==1">正沟通</template>
+        <template v-if="text==2">已踏勘</template>
+        <template v-if="text==3">已报价</template>
+        <template v-if="text==4">已签合同</template>
+        <template v-if="text==5">施工中</template>
+        <template v-if="text==6">已完工</template>
+      </template>
       <span
         slot="action"
         slot-scope="text, record"
@@ -116,18 +128,9 @@
               <a-icon type="down" />
             </a>
             <a-menu slot="overlay">
-              <a-menu-item >
-                <a @click="handleConfirm(record)">确认</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="handleCancel(record)">取消</a>
-              </a-menu-item>
               <a-menu-item>
                 <a @click="handleDispatch(record)">派单</a>
               </a-menu-item>
-              <!-- <a-menu-item>
-                <a @click="handleGrap(record)">抢单</a>
-              </a-menu-item> -->
               <a-menu-item>
                 <a @click="handleDelete(record)">删除</a>
               </a-menu-item>
@@ -141,20 +144,23 @@
       @ok="handleOk"
     />
     <CompanyDetails ref="CompanyDetails" @ok="handleOk"></CompanyDetails>
+    <DispatchForm ref="DispatchForm" @ok="handleOk"></DispatchForm>
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
 import CompanyForm from './CompanyForm'
+import DispatchForm from './DispatchForm'
 import CompanyDetails from './CompanyDetails'
 import { getCompanyOrders, delCompanyOrder } from '@/api/order/company'
 
 export default {
-  name: 'Company',
+  name: 'OrderCompany',
   components: {
     STable,
     CompanyForm,
+    DispatchForm,
     CompanyDetails
   },
   data () {
@@ -203,6 +209,19 @@ export default {
           dataIndex: 'create_time'
         },
         {
+          title: '项目经理',
+          dataIndex: 'managerName'
+        },
+        {
+          title: '负责人',
+          dataIndex: 'leaderName'
+        },
+        {
+          title: '状态',
+          dataIndex: 'status',
+          scopedSlots: { customRender: 'status' }
+        },
+        {
           title: '操作',
           dataIndex: 'action',
           width: '180px',
@@ -224,6 +243,9 @@ export default {
     },
     handleEdit (record) {
       this.$refs.CompanyForm.edit(record)
+    },
+    handleDispatch (record) {
+      this.$refs.DispatchForm.edit(record)
     },
     handleOk () {
       this.$refs.table.refresh()
