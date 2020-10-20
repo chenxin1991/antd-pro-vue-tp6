@@ -52,8 +52,8 @@
       >
         <template>
           <a @click="handleEdit(record)">编辑</a>
-          <a-divider type="vertical" />
-          <a @click="handleDelete(record)">删除</a>
+          <!-- <a-divider type="vertical" />
+          <a @click="handleDelete(record)">删除</a> -->
         </template>
       </span>
     </s-table>

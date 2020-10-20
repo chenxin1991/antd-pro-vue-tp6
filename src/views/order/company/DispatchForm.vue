@@ -13,29 +13,28 @@
         :wrapperCol="wrapperCol"
         label="负责人"
       >
-        <a-select
-          show-search
-          :filter-option="filter"
-          v-decorator="['leader',{ rules: [{ required: true, message: '请选择队长!' }] }]"
-        >
-          <a-select-option
-            :key="index"
-            v-for="(item, index) in leaders"
-            :value="item.id"
-          >{{ item.name }}</a-select-option>
-        </a-select>
+        <a-cascader
+          :options="options"
+          :show-search="{ filter }"
+          placeholder="请选择负责人"
+          v-decorator="['leader_id',{ rules: [{ required: true, message: '请选择负责人!' }] }]"
+          @change="onChange"
+        />
       </a-form-item>
       <a-form-item style="display:none;">
-        <a-input v-decorator="['id']" type="hidden"/>
+        <a-input
+          v-decorator="['id']"
+          type="hidden"
+        />
       </a-form-item>
     </a-form>
   </a-modal>
 </template>
 
 <script>
-// import pick from 'lodash.pick'
-import { getLeaders } from '@/api/common'
-import { dispatchResidentOrders } from '@/api/order/resident'
+import pick from 'lodash.pick'
+import { getProjectLeader } from '@/api/common'
+import { dispatchCompanyOrder } from '@/api/order/company'
 export default {
   data () {
     return {
@@ -50,12 +49,12 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-      leaders: []
+      options: []
     }
   },
   created () {
-    getLeaders({ t: new Date() }).then(res => {
-      this.leaders = res
+    getProjectLeader({ t: new Date() }).then((res) => {
+      this.options = res
     })
   },
   methods: {
@@ -63,39 +62,35 @@ export default {
       this.visible = true
     },
     edit (record) {
-      console.log(record)
+      if (record.leader_id === 0) {
+        record.leader_id = [0, 0]
+      }
       this.visible = true
-      // if (record.leader === 0) {
-      //   record.leader = ''
-      // }
-      // this.visible = true
-      // const {
-      //   form: { setFieldsValue }
-      // } = this
-      // this.$nextTick(() => {
-      //   setFieldsValue(pick(record, ['leader', 'id']))
-      // })
-    },
-    filter (input, option) {
-      return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      const {
+        form: { setFieldsValue }
+      } = this
+      this.$nextTick(() => {
+        setFieldsValue(pick(record, ['leader_id', 'id']))
+      })
     },
     handleSubmit () {
       const {
-        form: { validateFields }, $message
+        form: { validateFields },
+        $message
       } = this
       this.confirmLoading = true
       validateFields((errors, values) => {
         if (!errors) {
-            dispatchResidentOrders(values)
-              .then(res => {
-                $message.success('添加成功')
-                this.visible = false
-                this.confirmLoading = false
-                this.$emit('ok', values)
-              })
-              .catch(err => {
-                $message.error(`load user err: ${err.message}`)
-              })
+          dispatchCompanyOrder(values)
+            .then((res) => {
+              $message.success('派单成功')
+              this.visible = false
+              this.confirmLoading = false
+              this.$emit('ok', values)
+            })
+            .catch((err) => {
+              $message.error(`load user err: ${err.message}`)
+            })
         } else {
           this.confirmLoading = false
         }
@@ -103,6 +98,12 @@ export default {
     },
     handleCancel () {
       this.visible = false
+    },
+    onChange (value) {
+      console.log(value)
+    },
+    filter (inputValue, path) {
+      return path.some(option => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1)
     }
   }
 }

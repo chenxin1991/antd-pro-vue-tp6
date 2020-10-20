@@ -6,7 +6,8 @@ const api = {
   goods: '/common/getGoods',
   setting: '/common/getSetting',
   leader: '/common/getLeaders',
-  category: '/common/getCategory'
+  category: '/common/getCategory',
+  projectLeader: '/common/getProjectLeader'
 }
 
 export default api
@@ -54,6 +55,14 @@ export function getLeaders (parameter) {
 export function getCategory (parameter) {
   return axios({
     url: api.category,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getProjectLeader (parameter) {
+  return axios({
+    url: api.projectLeader,
     method: 'get',
     params: parameter
   })

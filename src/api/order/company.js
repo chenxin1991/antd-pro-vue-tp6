@@ -37,3 +37,11 @@ export function getCompanyOrders (parameter) {
     params: parameter
   })
 }
+
+export function dispatchCompanyOrder (parameter) {
+  return axios({
+    url: api.CompanyOrder + '/dispatch/' + parameter.id,
+    method: 'post',
+    data: parameter
+  })
+}

@@ -86,7 +86,7 @@ export default {
         if (!errors) {
             dispatchResidentOrders(values)
               .then(res => {
-                $message.success('添加成功')
+                $message.success('派单成功')
                 this.visible = false
                 this.confirmLoading = false
                 this.$emit('ok', values)

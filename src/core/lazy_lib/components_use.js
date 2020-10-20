@@ -51,7 +51,8 @@ import {
   AutoComplete,
   Timeline,
   descriptions,
-  FormModel 
+  FormModel,
+  cascader
 } from 'ant-design-vue'
 // import VueCropper from 'vue-cropper'
 Vue.use(FormModel);
@@ -98,6 +99,7 @@ Vue.use(notification)
 Vue.use(Tree)
 Vue.use(AutoComplete)
 Vue.use(Timeline)
+Vue.use(cascader)
 
 Vue.prototype.$confirm = Modal.confirm
 Vue.prototype.$message = message
