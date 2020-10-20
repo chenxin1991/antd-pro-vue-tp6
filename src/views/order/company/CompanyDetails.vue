@@ -56,7 +56,19 @@
             >
               <span>{{ record.create_time }}</span>
             </a-descriptions-item>
-            <a-descriptions-item label="描述">
+            <a-descriptions-item label="项目经理">
+              <span>{{ record.leader }}</span>
+            </a-descriptions-item>
+            <a-descriptions-item
+              label="负责人"
+              :span="2"
+            >
+              <span>{{ record.manager }}</span>
+            </a-descriptions-item>
+            <a-descriptions-item label="订单状态" :span="3">
+              {{ record.status }}
+            </a-descriptions-item>
+            <a-descriptions-item label="描述" :span="3">
               {{ record.description }}
             </a-descriptions-item>
           </a-descriptions>
@@ -97,7 +109,7 @@ export default {
 
   methods: {
     edit (record) {
-      // console.log(record)
+      console.log(record)
       this.visible = true
       this.record = record
     },
